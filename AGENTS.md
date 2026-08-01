@@ -99,6 +99,12 @@ Reanimated · RevenueCat · TypeScript strict.
   Reanimated's `Animated.View`). It mutates that component globally. Register
   a private copy instead — see `ui/motion.tsx`.
 
+## External docs
+
+When Context7 MCP is available, use it for library/framework/SDK docs
+(Expo, NativeWind, RevenueCat, etc.) before relying on training memory.
+If Context7 isn’t available in the session, proceed normally.
+
 ## Seams — use these, don't go around them
 
 | Need | Use | Not |
