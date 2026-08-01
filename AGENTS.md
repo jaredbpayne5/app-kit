@@ -18,6 +18,70 @@ Google Play, and a marketing lander. Cloned per app.
 RevenueCat. If a feature needs accounts or server-side sync, stop and discuss
 it rather than adding a backend.
 
+## Product & design reference
+
+Build order for a product clone: fill `docs/PRD.md`, then
+`docs/design-brief.md`, generate the design system and flows in Moonchild,
+update `docs/screens-status.md`, then implement in this repo. Track session
+progress in `docs/build-status.md`.
+
+- `docs/PRD.md` — authoritative for *what* to build. If a request goes beyond
+  it, flag rather than expanding scope.
+- `docs/design-brief.md` — starting direction for Moonchild’s design-system
+  prompt. Not final tokens.
+- `docs/screens-status.md` — Moonchild inventory for this product. Treat
+  **Designed in Moonchild** as fact. Do not infer design readiness from
+  memory or a vague MCP reply alone.
+- `docs/build-status.md` — phase checklist and session handoff. Read it at
+  the start of every session before doing anything else. Update Current
+  status and Where we left off before ending a session, or whenever a phase
+  (or meaningful chunk) is completed.
+
+If any of these files still contains `<!-- TEMPLATE_PLACEHOLDER -->`, stop
+and tell the user. Do not invent an MVP, design system, or screen list.
+
+## Design system & Moonchild
+
+Moonchild (via MCP) is the source of truth for the **structured** design
+system (color roles, type scale, spacing) and for screen/flow layouts.
+`docs/design-brief.md` only sets direction; Moonchild specializes it. Repo
+token files (`apps/mobile/global.css`, `ui/`) are the downstream sync of
+that system for NativeWind — see Stack below.
+
+### Before writing any UI code
+
+1. Confirm the target screen is listed in `docs/screens-status.md` with
+   Designed in Moonchild = `yes`. If not, stop and tell the user — do not
+   implement it.
+2. Attempt to pull that screen from Moonchild via MCP.
+3. If the pull fails, errors, or returns nothing: stop and tell the user.
+   Do not generate a layout yourself under any circumstance.
+4. If Moonchild MCP tools are not available in this session: stop and tell
+   the user. Do not generate a layout yourself under any circumstance.
+
+### When implementing a pulled screen
+
+- Sync tokens from Moonchild into `apps/mobile/global.css` and `ui/` as
+  needed. Components must use those tokens — never invent colors, spacing,
+  or type, and never leave Moonchild values only inlined on one screen.
+- Adapt into this repo’s patterns (Expo Router, NativeWind, `ui/`
+  primitives, `lib/` seams). Do not paste Moonchild-generated code
+  verbatim.
+- Moonchild is UI/UX only. Data modeling and on-device logic go through
+  `lib/storage.ts` and the other seams as you implement each screen
+  (Phase 4 in `docs/build-status.md`).
+- Update `docs/build-status.md` (Where we left off / phase checkboxes).
+  Update `docs/screens-status.md` only when the Moonchild inventory itself
+  changes.
+
+Moonchild MCP calls here are read/pull-only (fetch designs and tokens, not
+modify anything external). Prefer leaving those tools on auto-allow rather
+than confirming every pull during screen-by-screen builds.
+
+Non-UI work (storage, purchases, copy) and edits to already-built screens
+that only use already-synced tokens are allowed without a new Moonchild
+pull — still no new freehand layouts or new screens.
+
 ## Stack
 
 Expo SDK 56 · Expo Router · NativeWind v4 · React Native Reusables ·

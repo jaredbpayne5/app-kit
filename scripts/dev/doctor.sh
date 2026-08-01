@@ -150,6 +150,30 @@ else
   ok "no service-account JSON in repo root"
 fi
 
+printf '\n%sproduct docs%s\n' "$BOLD" "$RESET"
+PRODUCT_DOCS=(
+  docs/PRD.md
+  docs/design-brief.md
+  docs/screens-status.md
+  docs/build-status.md
+)
+product_docs_missing=0
+product_docs_placeholder=0
+for doc in "${PRODUCT_DOCS[@]}"; do
+  if [[ ! -f "$doc" ]]; then
+    bad 2 "product doc missing: $doc"
+    product_docs_missing=1
+  elif grep -q 'TEMPLATE_PLACEHOLDER' "$doc" 2>/dev/null; then
+    warn "$doc still has TEMPLATE_PLACEHOLDER — fill before building product UI"
+    product_docs_placeholder=1
+  fi
+done
+if [[ "$product_docs_missing" -eq 0 && "$product_docs_placeholder" -eq 0 ]]; then
+  ok "product docs present and placeholders cleared"
+elif [[ "$product_docs_missing" -eq 0 ]]; then
+  ok "product docs present (placeholders still template defaults — expected on a fresh clone)"
+fi
+
 printf '\n%slocal runtime%s\n' "$BOLD" "$RESET"
 ok "backend: none (local-first — no Docker / hosted BaaS checks)"
 
