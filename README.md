@@ -13,17 +13,18 @@ Play, and a marketing lander. No backend, no accounts, no server bill.
 ## Starting a new app
 
 1. Copy this repo to a new folder and `npm install`.
-2. Set your identity in **four** places (keep them in sync — see
+2. Set identity with one command (keeps the four surfaces in sync — see
    `docs/recipes/product-pipeline.md`):
-   - `apps/mobile/app.json` — `name`, `slug`, `scheme`,
-     `ios.bundleIdentifier`, `android.package`
-   - `apps/product.json` — `name`, `slug`, `tagline`, `contactEmail`,
-     privacy/terms URLs
-   - `apps/web/lander.json` — lander `appName`, copy, store badge URLs
-   - `apps/mobile/.env.local` — copy from `apps/mobile/.env.example`
 
-   Bundle identifiers are permanent once you upload to a store, so pick
-   something you'll be happy with (`com.yourname.yourapp`).
+   ```bash
+   npm run init-app -- --name "My App" --slug my-app --package com.yourname.myapp
+   ```
+
+   That rewrites `apps/mobile/app.json`, `apps/product.json`,
+   `apps/web/lander.json`, and `apps/mobile/.env.local` / `.env.example`
+   together (plus StoreKit product ID prefixes). Copy `.env.example` to
+   `.env.local` first if you have not already. Use `--dry-run` to preview.
+   Bundle identifiers are permanent once you upload to a store.
 
 3. `npm run doctor` to check your toolchain.
 4. Follow the product pipeline before writing UI:

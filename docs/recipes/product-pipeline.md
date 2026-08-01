@@ -6,6 +6,12 @@ credits or writing product UI.
 
 ## Identity (set once, keep in sync)
 
+Prefer one command so the four surfaces cannot drift:
+
+```bash
+npm run init-app -- --name "My App" --slug my-app --package com.yourname.myapp
+```
+
 | Field | File |
 | --- | --- |
 | App display name, slug, scheme, bundle IDs | `apps/mobile/app.json` |
@@ -14,14 +20,18 @@ credits or writing product UI.
 | Local env (`EXPO_PUBLIC_*`) | `apps/mobile/.env.local` (from `.env.example`) |
 
 Mismatch here is how you get “App Template” on device and “Example App” on
-the lander. Bundle IDs are permanent after the first store upload.
+the lander. Bundle IDs are permanent after the first store upload. Script:
+`scripts/factory/init-app.sh` (`npm run init-app`).
 
 ## Build order
 
 1. **PRD** — Write `docs/PRD.md` (problem, user, MVP, flows, out of scope).
    Remove `<!-- TEMPLATE_PLACEHOLDER -->`.
 2. **Design brief** — Write `docs/design-brief.md` as a *starting* direction
-   for Moonchild (tone, rough color/type feel). Not final hex/px.
+   for Moonchild (tone, rough color/type feel). Not final hex/px. Optionally
+   pick a mood-matched palette from `docs/recipes/brand-palette.md` into the
+   brief and `apps/mobile/assets/brand/brand.json` — do **not** treat those
+   hex values as final `global.css` tokens (Moonchild owns that).
 3. **Moonchild** — Connect the Moonchild MCP in Cursor and/or Claude Code.
    Create the design system from the brief + PRD, then generate full journeys
    (not isolated screens). Record DS and scene ids in `docs/moonchild.md`.
@@ -50,5 +60,7 @@ Prefer leaving Moonchild tools on auto-allow when they are read/pull-only.
 ## Related
 
 - Phase checklist: `docs/build-status.md`
+- Brand palette catalog: `docs/recipes/brand-palette.md`
+- Brand assets: `docs/recipes/brand-assets.md`
 - Store compliance: `docs/recipes/store-compliance.md`
 - Capability costs: `docs/CAPABILITIES.md`

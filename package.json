@@ -28,6 +28,7 @@
     "smoke:export": "bash scripts/dev/smoke-export.sh",
     "verify": "npm run check && npm run test && npm run smoke:export",
     "doctor": "bash scripts/dev/doctor.sh",
+    "init-app": "bash scripts/factory/init-app.sh",
     "session:up": "bash scripts/dev/session.sh up",
     "session:down": "bash scripts/dev/session.sh down",
     "session:status": "bash scripts/dev/session.sh status",

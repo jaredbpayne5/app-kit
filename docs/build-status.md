@@ -51,7 +51,7 @@ product-specific wiring, not inventing a component library.
 
 - [ ] Product navigation shell (routes for MVP screens)
 - [ ] Moonchild tokens synced into `apps/mobile/global.css` / `ui/`
-- [ ] Identity set in `apps/mobile/app.json` (not still `com.example.*`)
+- [ ] Identity set via `npm run init-app` (not still `com.example.*`)
 
 ### Phase 3 — Screen-by-screen UI build
 

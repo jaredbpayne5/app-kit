@@ -10,7 +10,10 @@ Replace these files before Harden / Launch (paths from `apps/mobile/app.json`):
 | `apps/mobile/assets/images/favicon.png` | Web favicon (optional for store) |
 
 Brand master for `npm run brand:generate`: `apps/brand/icon-master.png`
-(see `apps/mobile/assets/brand/` for `brand.json`).
+(see `apps/mobile/assets/brand/` for `brand.json`). For kickoff color
+direction, pick a contrast-checked palette from
+`docs/recipes/brand-palette.md` into `brand.json` / the design brief —
+Moonchild still owns final `global.css` tokens.
 
 ## Checklist
 
