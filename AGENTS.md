@@ -97,7 +97,8 @@ Reanimated · RevenueCat · TypeScript strict.
 - Prefer an existing `ui/` primitive over hand-rolling. Add new ones with
   `npx @react-native-reusables/cli@latest add <component>`.
 - Animation is Reanimated. Do not use the legacy `Animated` API.
-- Lists use `@shopify/flash-list`, not `FlatList`.
+- Data lists use `@shopify/flash-list`, not `FlatList`. A fixed-length
+  horizontal pager (e.g. onboarding slides) may keep `FlatList`.
 - Never call `cssInterop` on a component a library also renders (for example
   Reanimated's `Animated.View`). It mutates that component globally. Register
   a private copy instead — see `ui/motion.tsx`.
