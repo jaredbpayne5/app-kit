@@ -1,0 +1,51 @@
+#!/bin/sh
+#
+# Pre-commit: format + lint + types + basic secret scan.
+# Wired via package.json "prepare" → git config core.hooksPath .githooks
+
+set -e
+
+echo "pre-commit: checking formatting, lint, and types..."
+
+if ! npm run --silent format:check; then
+  echo
+  echo "✗ Formatting issues. Fix with:  npm run format"
+  exit 1
+fi
+
+if ! npm run --silent lint; then
+  echo
+  echo "✗ Lint errors above. Fix them, then re-commit."
+  exit 1
+fi
+
+if ! npm run --silent typecheck; then
+  echo
+  echo "✗ Type errors above. Fix them, then re-commit."
+  exit 1
+fi
+
+if command -v gitleaks >/dev/null 2>&1; then
+  if ! gitleaks protect --staged --redact --no-banner; then
+    echo
+    echo "✗ gitleaks found a possible secret in your staged changes."
+    exit 1
+  fi
+else
+  # Fallback: newly-ADDED lines only. Exclude hook scripts — they embed
+  # detector regexes that would self-match. Prefer installing gitleaks.
+  staged_added=$(
+    git diff --cached --no-color -U0 -- . \
+      ":(exclude).githooks/*" \
+      ":(exclude).claude/hooks/*" \
+      | grep "^+" | grep -v "^+++" || true
+  )
+  if printf "%s\n" "$staged_added" | grep -Eq "AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{22,}|-----BEGIN [A-Z ]*PRIVATE KEY-----"; then
+    echo
+    echo "✗ A staged change looks like it contains a secret."
+    echo "  Remove it and rotate the key if it was real. Install gitleaks for better coverage."
+    exit 1
+  fi
+fi
+
+echo "pre-commit: all checks passed."

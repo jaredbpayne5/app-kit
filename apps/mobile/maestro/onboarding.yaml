@@ -1,0 +1,62 @@
+# Onboarding appears exactly once; reset via Settings → Reset onboarding (__DEV__).
+# Requires Metro serving; Expo Go on iOS Simulator.
+# appId is injected at runtime by scripts/dev/test-e2e.sh.
+appId: host.exp.Exponent
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+- openLink: exp://127.0.0.1:${EXPO_PORT:-8081}
+- tapOn:
+    text: Continue
+    optional: true
+- runFlow:
+    when:
+      visible: Fast refresh
+    commands:
+      - tapOn:
+          point: 92%,12%
+- extendedWaitUntil:
+    visible:
+      id: onboarding-screen
+    timeout: 45000
+- assertVisible:
+    id: onboarding-screen
+- assertVisible:
+    id: onboarding-slide-0
+- tapOn:
+    id: btn-onboarding-skip
+- extendedWaitUntil:
+    visible:
+      id: home-screen
+    timeout: 15000
+- assertVisible:
+    id: home-screen
+# Second open without clearState — onboarding must not reappear.
+- openLink: exp://127.0.0.1:${EXPO_PORT:-8081}
+- extendedWaitUntil:
+    visible:
+      id: home-screen
+    timeout: 20000
+- assertVisible:
+    id: home-screen
+- assertNotVisible:
+    id: onboarding-screen
+# Reset via Settings (dev-only) and confirm onboarding returns once.
+- tapOn:
+    id: link-settings
+- assertVisible:
+    id: settings-screen
+- scrollUntilVisible:
+    element:
+      id: btn-reset-onboarding
+    direction: DOWN
+    timeout: 10000
+- tapOn:
+    id: btn-reset-onboarding
+- extendedWaitUntil:
+    visible:
+      id: onboarding-screen
+    timeout: 15000
+- assertVisible:
+    id: onboarding-screen

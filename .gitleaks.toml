@@ -1,0 +1,15 @@
+title = "tiny-app-factory gitleaks config"
+
+[extend]
+useDefault = true
+
+# IMPORTANT: use singular [allowlist], not [[allowlists]].
+# gitleaks 8.24.x (CI / gitleaks-action) ignores plural [[allowlists]] when
+# [extend] useDefault = true — demo JWTs in eas.json / .env.example then trip
+# the jwt rule. Singular [allowlist] merges correctly (verified 8.24.3 + 8.30.x).
+# Pattern matches the public fixed local-demo anon key (iss=supabase-demo) in ANY file.
+[allowlist]
+description = "Supabase local dev demo keys (public, fixed, non-secret)"
+regexes = [
+  '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1v''',
+]

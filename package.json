@@ -1,0 +1,67 @@
+{
+  "name": "expo-app-template",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "dev": "npm run dev -w mobile",
+    "dev:build:ios": "npm run dev:build:ios -w mobile",
+    "dev:build:android": "npm run dev:build:android -w mobile",
+    "dev:start": "npm run dev:start -w mobile",
+    "android": "npm run android -w mobile",
+    "ios": "npm run ios -w mobile",
+    "web": "npm run web -w mobile",
+    "lint": "eslint .",
+    "typecheck": "npm run typecheck -w mobile",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "contrast-check": "tsx scripts/dev/contrast-check.ts",
+    "design-lint": "bash scripts/dev/design-lint.sh",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run contrast-check && npm run design-lint",
+    "test": "npm run test -w mobile",
+    "test:e2e": "bash scripts/dev/test-e2e.sh",
+    "smoke:export": "bash scripts/dev/smoke-export.sh",
+    "verify": "npm run check && npm run test && npm run smoke:export",
+    "doctor": "bash scripts/dev/doctor.sh",
+    "session:up": "bash scripts/dev/session.sh up",
+    "session:down": "bash scripts/dev/session.sh down",
+    "session:status": "bash scripts/dev/session.sh status",
+    "open:ios": "bash scripts/dev/open-expo-go-ios.sh",
+    "open:android": "bash scripts/dev/open-expo-go-android.sh",
+    "bump-version": "bash scripts/dev/bump-version.sh",
+    "sync:legal": "tsx scripts/web/sync-legal.ts",
+    "web:build": "tsx scripts/web/build-lander.ts",
+    "web:deploy": "bash scripts/web/deploy-lander.sh",
+    "domain-attach": "bash scripts/web/attach-domain.sh",
+    "brand:generate": "tsx scripts/store/brand-generate.ts",
+    "generate-icon-master": "tsx scripts/dev/generate-icon-master.ts",
+    "gen-compliance": "tsx scripts/store/gen-compliance.ts",
+    "screenshots": "bash scripts/store/screenshots.sh",
+    "preflight": "bash scripts/store/review-preflight.sh",
+    "store:push": "bash scripts/store/store-push.sh",
+    "clean": "rm -rf .expo node_modules apps/mobile/.expo apps/mobile/node_modules apps/web/node_modules",
+    "prepare": "git config core.hooksPath .githooks || true"
+  },
+  "comments": {
+    "overrides": "@gorhom/bottom-sheet accepts gesture-handler >=2.16.1, which lets npm hoist a 3.x copy alongside the SDK-pinned 2.31.x one. Two copies of a native module means only one gets linked, and gesture-driven UI (sheet handle, backdrop, swipe actions) silently stops working. Keep this pinned to the version in expo/bundledNativeModules.json."
+  },
+  "overrides": {
+    "react-native-gesture-handler": "~2.31.1"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.10",
+    "eslint": "^9.39.5",
+    "eslint-config-expo": "~56.0.4",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.8.3",
+    "prettier-plugin-tailwindcss": "^0.8.0",
+    "sharp": "^0.35.3",
+    "tsx": "^4.23.1",
+    "typescript": "~5.9.2"
+  }
+}

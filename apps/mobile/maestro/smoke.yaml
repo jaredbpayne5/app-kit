@@ -1,0 +1,119 @@
+# Shell smoke: every tab loads, the bottom sheet saves an item, swipe-to-delete
+# removes it, legal links exist.
+# appId is injected at runtime by scripts/dev/test-e2e.sh — do not rely on this
+# placeholder for native package identity.
+#
+# Requires a development build: gesture-handler, flash-list, bottom-sheet, and
+# expo-symbols are native modules, so Expo Go can't run this flow.
+#
+# The item name is unique per run so rows left behind by an earlier failed run
+# can't satisfy or defeat the assertions below. Do not use clearState here: on a
+# development build it also wipes the dev-launcher's Metro server, leaving the
+# app stuck on the server picker.
+#
+# Legal links are asserted as present but not opened — the in-app browser would
+# land on an undeployed lander URL, which is expected and not a failure.
+appId: host.exp.exponent
+---
+# Fresh install / wipe re-shows Expo's first-run developer menu (covers the UI).
+# Maestro text selectors are full-string regex — use the full sentence, not a
+# prefix. Do not bare-tap "Continue" without this gate — onboarding uses it too.
+# After Continue, the full tools sheet can remain; dismiss with Back when shown.
+- extendedWaitUntil:
+    visible:
+      text: 'This is the developer menu\. It gives you access to useful tools in your development builds\.'
+    timeout: 15000
+    optional: true
+- runFlow:
+    when:
+      visible:
+        text: 'This is the developer menu\. It gives you access to useful tools in your development builds\.'
+    commands:
+      - tapOn:
+          text: 'Continue'
+- runFlow:
+    when:
+      visible:
+        text: 'Reload'
+    commands:
+      - pressKey: back
+# Wait for the JS bundle before checking onboarding — on a cold development
+# build the first visibility check can race the load and skip the skip.
+- extendedWaitUntil:
+    visible:
+      id: home-screen
+    timeout: 45000
+    optional: true
+# First launch may show onboarding — skip so shell smoke stays stable.
+- runFlow:
+    when:
+      visible:
+        id: onboarding-screen
+    commands:
+      - tapOn:
+          id: btn-onboarding-skip
+- extendedWaitUntil:
+    visible:
+      id: home-screen
+    timeout: 20000
+- assertVisible:
+    id: home-screen
+
+# Library tab: empty state → bottom sheet → persisted row
+- evalScript: ${output.item = 'Smoke item ' + Date.now()}
+- tapOn:
+    id: tab-library
+- assertVisible:
+    id: library-screen
+- tapOn:
+    id: btn-add-item
+- assertVisible:
+    id: input-item-title
+# Android hardware back must dismiss the sheet and stay on Library — not
+# change tabs underneath an open sheet (see lib/use-back-dismiss.ts).
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - pressKey: back
+      - assertNotVisible:
+          id: input-item-title
+      - assertVisible:
+          id: library-screen
+      - tapOn:
+          id: btn-add-item
+      - assertVisible:
+          id: input-item-title
+- tapOn:
+    id: input-item-title
+- inputText: ${output.item}
+- tapOn:
+    id: btn-save-item
+- assertVisible: ${output.item}
+
+# Swipe the saved row left to reveal the delete action, then remove it.
+- swipe:
+    from:
+      text: ${output.item}
+    direction: LEFT
+- tapOn:
+    id: btn-delete-item
+- assertNotVisible: ${output.item}
+
+# Settings tab: version + legal rows
+- tapOn:
+    id: tab-settings
+- assertVisible:
+    id: settings-screen
+- assertVisible:
+    id: settings-version
+- assertVisible:
+    id: link-privacy
+- assertVisible:
+    id: link-terms
+
+# Back to home
+- tapOn:
+    id: tab-home
+- assertVisible:
+    id: home-screen

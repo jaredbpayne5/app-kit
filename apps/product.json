@@ -1,0 +1,11 @@
+{
+  "name": "App Template",
+  "slug": "app-template",
+  "tagline": "A short pitch for the marketing lander.",
+  "brandColor": "#ffffff",
+  "contactEmail": "support@example.com",
+  "iosUrl": "#",
+  "androidUrl": "#",
+  "privacyUrl": "https://example.com/TBD",
+  "termsUrl": "https://example.com/TBD"
+}

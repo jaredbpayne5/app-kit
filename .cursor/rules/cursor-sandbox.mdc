@@ -1,0 +1,22 @@
+---
+alwaysApply: true
+---
+
+Cursor-only command guidance. Everything else lives in `AGENTS.md`, which
+Cursor reads natively — do not restate project conventions here.
+
+Run in the sandbox: `npm run lint`, `npm run typecheck`, `npm run check`,
+`npm run format:check`, `npm test`, `git status`.
+
+Request elevated permissions on the **first** attempt (these need network,
+simulators, Watchman, or paths outside the workspace — retrying in the
+sandbox just wastes a turn):
+
+- `npm install`, `npx expo install`
+- `npm run verify`, `npm run smoke:export`
+- `npm run dev` / `npx expo start` — always pass an explicit `--port`
+- `npm run test:e2e`, `maestro`, `adb`, simulator or emulator launches
+- `npm run screenshots`, `npm run doctor`
+
+Do not use elevated permissions for ordinary file edits, `git commit`, or
+`git push`.

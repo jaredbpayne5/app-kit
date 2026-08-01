@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "skipLibCheck": true,
+    "paths": {
+      "@/*": ["./apps/mobile/*"]
+    }
+  },
+  "exclude": ["node_modules", "apps/mobile/android", "apps/mobile/ios", "apps/web/dist"]
+}

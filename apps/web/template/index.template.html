@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{APP_NAME}}</title>
+    <meta name="description" content="{{ONE_LINER}}" />
+    <meta property="og:title" content="{{APP_NAME}}" />
+    <meta property="og:description" content="{{ONE_LINER}}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="{{OG_IMAGE_URL}}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{{APP_NAME}}" />
+    <meta name="twitter:description" content="{{ONE_LINER}}" />
+    <meta name="twitter:image" content="{{OG_IMAGE_URL}}" />
+    <link rel="canonical" href="{{CANONICAL_URL}}" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="application/ld+json">
+      {{STRUCTURED_DATA}}
+    </script>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="wrap">
+        <h1>{{APP_NAME}}</h1>
+        <p class="one-liner">{{ONE_LINER}}</p>
+        <div class="badges">
+          <a class="store-badge {{IOS_BADGE_CLASS}}" href="{{IOS_URL}}">
+            <img
+              src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
+              alt="Download on the App Store"
+              width="120"
+              height="40" />
+          </a>
+          <a class="store-badge {{ANDROID_BADGE_CLASS}}" href="{{ANDROID_URL}}">
+            <img
+              src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
+              alt="Get it on Google Play"
+              width="129"
+              height="50" />
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section aria-label="Screenshots">
+        <div class="wrap">
+          <h2>See it in action</h2>
+          <div class="shots">
+            <figure class="shot-frame">
+              <img
+                src="{{SCREENSHOT_1}}"
+                alt="{{APP_NAME}} screenshot 1"
+                width="390"
+                height="844" />
+            </figure>
+            <figure class="shot-frame">
+              <img
+                src="{{SCREENSHOT_2}}"
+                alt="{{APP_NAME}} screenshot 2"
+                width="390"
+                height="844" />
+            </figure>
+            <figure class="shot-frame">
+              <img
+                src="{{SCREENSHOT_3}}"
+                alt="{{APP_NAME}} screenshot 3"
+                width="390"
+                height="844" />
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section aria-label="Features">
+        <div class="wrap">
+          <h2>Why {{APP_NAME}}</h2>
+          <div class="features">
+            <article class="feature">
+              <h3>{{FEATURE_1_TITLE}}</h3>
+              <p>{{FEATURE_1_BODY}}</p>
+            </article>
+            <article class="feature">
+              <h3>{{FEATURE_2_TITLE}}</h3>
+              <p>{{FEATURE_2_BODY}}</p>
+            </article>
+            <article class="feature">
+              <h3>{{FEATURE_3_TITLE}}</h3>
+              <p>{{FEATURE_3_BODY}}</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="waitlist" aria-label="Email waitlist">
+        <div class="wrap">
+          <h2>Get launch updates</h2>
+          <p class="one-liner">Leave your email — we only use it for product news.</p>
+          <form id="waitlist-form" novalidate>
+            <label for="waitlist-email">Email</label>
+            <input
+              id="waitlist-email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              required
+              placeholder="you@example.com" />
+            <button type="submit">Join waitlist</button>
+            <p class="status" id="waitlist-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <nav aria-label="Legal">
+          <a href="privacy">Privacy</a>
+          <a href="terms">Terms</a>
+          <a href="mailto:{{CONTACT_EMAIL}}">{{CONTACT_EMAIL}}</a>
+        </nav>
+        <p>© {{APP_NAME}}</p>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        var form = document.getElementById('waitlist-form');
+        var statusEl = document.getElementById('waitlist-status');
+        if (!form) return;
+        form.addEventListener('submit', function (event) {
+          event.preventDefault();
+          var emailInput = document.getElementById('waitlist-email');
+          var email = emailInput && emailInput.value ? emailInput.value.trim() : '';
+          if (!email) {
+            statusEl.textContent = 'Enter a valid email.';
+            return;
+          }
+          // No backend waitlist in this template — mailto fallback.
+          statusEl.textContent = 'Opening mail…';
+          window.location.href =
+            'mailto:{{CONTACT_EMAIL}}?subject=' +
+            encodeURIComponent('Waitlist') +
+            '&body=' +
+            encodeURIComponent(email);
+        });
+      })();
+    </script>
+  </body>
+</html>

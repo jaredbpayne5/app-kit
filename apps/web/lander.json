@@ -1,0 +1,21 @@
+{
+  "appName": "Example App",
+  "oneLiner": "Local-first tools — nothing leaves your phone unless you choose a network feature.",
+  "features": [
+    {
+      "title": "On your device",
+      "body": "Your data stays on the phone by default. No account required for the template shell."
+    },
+    {
+      "title": "One legal source",
+      "body": "Privacy and terms stay in sync with the mobile app via sync:legal — hosted /privacy for the stores."
+    },
+    {
+      "title": "Store-ready",
+      "body": "Ship iOS and Android from the same product identity when you are ready."
+    }
+  ],
+  "iosUrl": "#",
+  "androidUrl": "#",
+  "contactEmail": "support@example.com"
+}

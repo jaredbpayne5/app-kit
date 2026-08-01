@@ -1,0 +1,11 @@
+{
+  "collects_accounts": false,
+  "collects_user_content": false,
+  "collects_purchases": false,
+  "analytics": "none",
+  "crash_reporting": "none",
+  "data_shared_with_third_parties": false,
+  "data_encrypted_in_transit": true,
+  "deletion_mechanism": "uninstall",
+  "contact_email": ""
+}

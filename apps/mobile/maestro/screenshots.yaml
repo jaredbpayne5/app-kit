@@ -1,0 +1,54 @@
+# Store screenshots for the template shell (home → settings → privacy).
+# Replace this flow with your app's 3–5 best screens before submitting.
+# appId is injected at runtime by scripts/store/screenshots.sh — do not hardcode.
+#
+# Captures land under --test-output-dir (raw/<device>/) as <name>.png.
+#
+# Privacy opens PRIVACY_URL via expo-web-browser. The template product.json uses
+# https://example.com/TBD → "Example Domain". Once the lander is deployed the
+# page title becomes "Privacy Policy". Accept either.
+appId: host.exp.exponent
+---
+- runFlow:
+    when:
+      visible:
+        id: onboarding-screen
+    commands:
+      - tapOn:
+          id: btn-onboarding-skip
+- extendedWaitUntil:
+    visible:
+      id: home-screen
+    timeout: 20000
+- assertVisible:
+    id: home-screen
+- takeScreenshot: home
+- tapOn:
+    id: tab-library
+- assertVisible:
+    id: library-screen
+- takeScreenshot: library
+- tapOn:
+    id: tab-settings
+- assertVisible:
+    id: settings-screen
+- takeScreenshot: settings
+- tapOn:
+    id: link-privacy
+# iOS Safari first-run tip can cover the page — dismiss when present.
+- runFlow:
+    when:
+      visible: 'View Bookmarks, Share Menu, and Open Tabs'
+    commands:
+      - tapOn:
+          point: '92%,46%'
+- runFlow:
+    when:
+      visible: 'Example Domain'
+    commands:
+      - takeScreenshot: privacy
+- runFlow:
+    when:
+      visible: 'Privacy Policy'
+    commands:
+      - takeScreenshot: privacy

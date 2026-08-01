@@ -1,0 +1,252 @@
+:root {
+  --bg: #f3f0ea;
+  --ink: #1a1a1a;
+  --muted: #5c5c5c;
+  --accent: #0f6a4f;
+  --frame: #d9d3c8;
+  --max: 68rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color: var(--ink);
+  background: linear-gradient(180deg, #ebe6dc 0%, var(--bg) 40%, #e7efe9 100%);
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  line-height: 1.5;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  color: var(--accent);
+}
+
+.wrap {
+  width: min(100% - 2rem, var(--max));
+  margin-inline: auto;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* —— Hero —— */
+.hero {
+  min-height: 100svh;
+  display: grid;
+  align-content: center;
+  padding: 3rem 0 4rem;
+  background:
+    radial-gradient(ellipse 80% 50% at 80% 0%, rgba(15, 106, 79, 0.12), transparent 60%),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.35), transparent 50%);
+}
+
+.hero h1 {
+  margin: 0 0 0.75rem;
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.hero .one-liner {
+  margin: 0 0 1.75rem;
+  max-width: 28rem;
+  font-size: clamp(1.05rem, 2.4vw, 1.25rem);
+  color: var(--muted);
+  font-family: 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.store-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.125rem;
+}
+
+.store-badge img {
+  width: auto;
+  object-fit: contain;
+}
+
+.store-badge:hover {
+  opacity: 0.86;
+}
+
+.store-badge:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* —— Sections —— */
+section {
+  padding: 3.5rem 0;
+}
+
+section h2 {
+  margin: 0 0 1.25rem;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.shots {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .shots {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.shot-frame {
+  border: 1px solid var(--frame);
+  background: #fff;
+  padding: 0.75rem;
+  box-shadow: 0 12px 28px rgba(26, 26, 26, 0.06);
+}
+
+.shot-frame img {
+  width: 100%;
+  aspect-ratio: 9 / 19.5;
+  object-fit: cover;
+  background: #ddd8cf;
+}
+
+.features {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .features {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.feature h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1.15rem;
+}
+
+.feature p {
+  margin: 0;
+  color: var(--muted);
+  font-family: 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+  font-size: 0.95rem;
+}
+
+.waitlist {
+  background: rgba(255, 255, 255, 0.45);
+  border-block: 1px solid var(--frame);
+}
+
+.waitlist form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  max-width: 32rem;
+}
+
+.waitlist label {
+  display: block;
+  width: 100%;
+  font-family: 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.waitlist input[type='email'] {
+  flex: 1 1 14rem;
+  min-height: 2.75rem;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--frame);
+  border-radius: 0.4rem;
+  font: inherit;
+  font-family: 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+  background: #fff;
+}
+
+.waitlist button {
+  min-height: 2.75rem;
+  padding: 0.6rem 1.1rem;
+  border: 0;
+  border-radius: 0.4rem;
+  background: var(--accent);
+  color: #fff;
+  font-family: 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.waitlist button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.waitlist .status {
+  width: 100%;
+  min-height: 1.25rem;
+  margin: 0.5rem 0 0;
+  font-family: 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+footer {
+  padding: 2.5rem 0 3rem;
+  font-family: 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+/* —— Legal pages —— */
+.legal {
+  padding: 2.5rem 0 4rem;
+  max-width: 40rem;
+}
+
+.legal h1 {
+  margin: 0 0 1rem;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+}
+
+.legal h2,
+.legal h3 {
+  margin: 1.5rem 0 0.5rem;
+}
+
+.legal p,
+.legal li {
+  font-family: 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+  color: var(--ink);
+}
+
+.legal ul {
+  padding-left: 1.25rem;
+}

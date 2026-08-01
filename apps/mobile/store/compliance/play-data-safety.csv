@@ -1,0 +1,8 @@
+"Question ID (machine readable)","Response (machine readable)","Response value","Answer requirement","Human-friendly question label"
+"PSL_DATA_TYPES_PERSONAL","PSL_EMAIL_ADDRESS","","MULTIPLE_CHOICE","Personal info Email address"
+"PSL_DATA_TYPES_PERSONAL","PSL_USER_IDS","","MULTIPLE_CHOICE","Personal info User IDs"
+"PSL_DATA_TYPES_PHOTOS_AND_VIDEOS","PSL_PHOTOS","","MULTIPLE_CHOICE","Photos and videos Photos (user content proxy)"
+"PSL_DATA_TYPES_APP_ACTIVITY","PSL_USER_GENERATED_CONTENT","","MULTIPLE_CHOICE","App activity User-generated content"
+"PSL_DATA_TYPES_FINANCIAL","PSL_PURCHASE_HISTORY","","MULTIPLE_CHOICE","Financial info Purchase history"
+"PSL_DATA_TYPES_APP_INFO_AND_PERFORMANCE","PSL_CRASH_LOGS","","MULTIPLE_CHOICE","App info and performance Crash logs"
+"PSL_DATA_TYPES_APP_INFO_AND_PERFORMANCE","PSL_OTHER_PERFORMANCE_DATA","","MULTIPLE_CHOICE","App info and performance Diagnostics / analytics"

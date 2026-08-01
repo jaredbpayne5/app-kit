@@ -1,0 +1,44 @@
+# frozen_string_literal: true
+
+# Fastlane lanes for store metadata + screenshots.
+# Binaries stay on EAS Submit (`npm run store:push` orchestrates both).
+#
+# Install: gem install fastlane   (or: bundle install if you add a Gemfile)
+# Layout:  ./store/metadata/{ios,android}/ (relative to apps/mobile) — see store/metadata/README.md
+#
+# Full E2E (live ASC / Play upload) is exercised on the first real app.
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Push App Store listing metadata + screenshots (no binary)"
+  lane :metadata do
+    deliver(
+      metadata_path: "./store/metadata/ios",
+      # Framed PNGs from npm run screenshots (iphone_6_9/ under en-US/images).
+      screenshots_path: "./store/metadata/ios",
+      skip_binary_upload: true,
+      skip_app_version_update: true,
+      force: true,
+      precheck_include_in_app_purchases: false,
+      run_precheck_before_submit: false,
+      submit_for_review: false,
+      automatic_release: false
+    )
+  end
+end
+
+platform :android do
+  desc "Push Play Store listing metadata + screenshots (no binary)"
+  lane :metadata do
+    # service account: ~/.app-factory/play/service-account.json (see eas.json)
+    supply(
+      metadata_path: "./store/metadata/android",
+      json_key: File.expand_path("~/.app-factory/play/service-account.json"),
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_changelogs: false,
+      track: "internal"
+    )
+  end
+end
