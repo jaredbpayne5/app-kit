@@ -1,6 +1,6 @@
 ---
 name: runner
-description: Runs commands and applies already-decided changes. Use for builds, test suites, linters, renames, mechanical edits, dependency installs, git chores, and reading logs. Do not use for diagnosing a bug whose cause is unknown.
+description: Runs commands and applies already-decided changes. Use for builds, test suites, linters, renames, mechanical edits, dependency installs, git chores, and reading logs. Do not use for diagnosing a bug whose cause is unknown, or for open-ended codebase exploration (use the built-in Explore agent for that).
 model: sonnet
 ---
 

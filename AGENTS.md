@@ -186,9 +186,10 @@ considering work done. `npm run test:e2e` drives Maestro against a simulator.
 
 Default: hand mechanical work to a cheaper subagent — builds, tests, decided
 fixes, renames, searches, logs, git, deps. That tier is Composer 2.5 in
-Cursor and Sonnet in Claude Code (`.claude/agents/`, never Haiku). Keep the
-stronger model for unknown-cause bugs, design trade-offs, purchase and
-entitlement logic, and library internals.
+Cursor and the `runner` agent (Sonnet) in Claude Code — never Haiku. Leave
+Claude Code's built-in Explore alone. Keep the stronger model for
+unknown-cause bugs, design trade-offs, purchase and entitlement logic, and
+library internals.
 
 If you can phrase it as "run X, then change Y to Z", delegate. If it
 starts with "figure out why", don't.
