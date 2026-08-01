@@ -22,8 +22,8 @@ FAIL=0
 # exception below: paywall.tsx's anchored-plan price is a 22px non-heading
 # emphasis number with no natural home in the scale — h2's pixel values match
 # but carry heading ARIA semantics that would be wrong for a price string,
-# and a single call site doesn't justify a new variant (see BACKPORT-SPEC.md
-# Part 3 Step 5d). Allowlisted explicitly rather than silently ignored.
+# and a single call site doesn't justify a new variant. Allowlisted explicitly
+# rather than silently ignored.
 TEXT_SIZE_ALLOWLIST='apps/mobile/components/paywall.tsx:'
 TEXT_SIZE_HITS="$(
   grep -rnE "text-\[[0-9]" \

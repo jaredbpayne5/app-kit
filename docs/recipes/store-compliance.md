@@ -40,4 +40,7 @@ Rules:
 
 ## Hard rule
 
-Never invent data practices in legal copy. Align with `apps/mobile/store/data-practices.json`.
+Never invent data practices in legal copy. Align with
+`apps/mobile/store/data-practices.json`. After editing that file, run
+`npm run gen-compliance` so Apple/Play answer sheets stay in sync —
+`npm run preflight` fails if the compliance fingerprint is stale.

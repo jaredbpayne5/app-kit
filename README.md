@@ -13,17 +13,25 @@ Play, and a marketing lander. No backend, no accounts, no server bill.
 ## Starting a new app
 
 1. Copy this repo to a new folder and `npm install`.
-2. Set your identity in two files:
+2. Set your identity in **four** places (keep them in sync — see
+   `docs/recipes/product-pipeline.md`):
    - `apps/mobile/app.json` — `name`, `slug`, `scheme`,
      `ios.bundleIdentifier`, `android.package`
-   - `apps/product.json` — `name`, `slug`, `tagline`, `contactEmail`
+   - `apps/product.json` — `name`, `slug`, `tagline`, `contactEmail`,
+     privacy/terms URLs
+   - `apps/web/lander.json` — lander `appName`, copy, store badge URLs
+   - `apps/mobile/.env.local` — copy from `apps/mobile/.env.example`
 
    Bundle identifiers are permanent once you upload to a store, so pick
    something you'll be happy with (`com.yourname.yourapp`).
 
-3. Copy `apps/mobile/.env.example` to `apps/mobile/.env.local`.
-4. `npm run doctor` to check your toolchain.
+3. `npm run doctor` to check your toolchain.
+4. Follow the product pipeline before writing UI:
+   `docs/recipes/product-pipeline.md` (PRD → design brief → Moonchild →
+   screens-status → code). Track progress in `docs/build-status.md`.
 5. `npm run dev` and press `i` for the iOS Simulator or `a` for Android.
+   Prefer a development build (`npm run dev:build:ios` /
+   `dev:build:android`) once you add native modules.
 
 ## Daily loop
 
@@ -168,3 +176,9 @@ npm run test:e2e   # Maestro flows against a simulator (free, local only)
 
 Maestro drives the real app like a user. It is not in CI because GitHub's Linux
 runners can't boot an iOS Simulator.
+
+**CI known limitation:** GitHub Actions runs format, lint, typecheck, unit
+tests, contrast/design lint, and a JS bundle export (`smoke:export`). It
+never compiles the native iOS or Android project. Before trusting a merge that
+adds a config plugin or native dependency, run
+`npm run dev:build:ios` and/or `npm run dev:build:android` locally.

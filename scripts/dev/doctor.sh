@@ -156,6 +156,7 @@ PRODUCT_DOCS=(
   docs/design-brief.md
   docs/screens-status.md
   docs/build-status.md
+  docs/moonchild.md
 )
 product_docs_missing=0
 product_docs_placeholder=0

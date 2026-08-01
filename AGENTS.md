@@ -22,13 +22,16 @@ it rather than adding a backend.
 
 Build order for a product clone: fill `docs/PRD.md`, then
 `docs/design-brief.md`, generate the design system and flows in Moonchild,
-update `docs/screens-status.md`, then implement in this repo. Track session
-progress in `docs/build-status.md`.
+fill `docs/moonchild.md` and `docs/screens-status.md`, then implement in
+this repo. Track session progress in `docs/build-status.md`. Full loop:
+`docs/recipes/product-pipeline.md`.
 
 - `docs/PRD.md` — authoritative for *what* to build. If a request goes beyond
   it, flag rather than expanding scope.
 - `docs/design-brief.md` — starting direction for Moonchild’s design-system
   prompt. Not final tokens.
+- `docs/moonchild.md` — which Moonchild design system and scene this clone
+  uses. Unfilled means the project is not linked yet.
 - `docs/screens-status.md` — Moonchild inventory for this product. Treat
   **Designed in Moonchild** as fact. Do not infer design readiness from
   memory or a vague MCP reply alone.

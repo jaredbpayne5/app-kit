@@ -31,7 +31,8 @@ to core-feature flow.")_
 - [ ] `docs/PRD.md` written and reviewed (sentinel removed)
 - [ ] `docs/design-brief.md` written and reviewed (sentinel removed)
 - [ ] Product clone / branch from this template
-- [ ] Moonchild MCP connected for this project
+- [ ] Moonchild MCP connected on this machine (Cursor and/or Claude Code)
+- [ ] `docs/moonchild.md` filled (DS + scene ids; sentinel removed)
 - [ ] This file’s sentinel removed; Current status filled
 - [ ] `docs/screens-status.md` sentinel removed when the screen list is real
 
@@ -41,6 +42,7 @@ to core-feature flow.")_
 - [ ] All MVP flows generated in Moonchild
 - [ ] Design reviewed and approved
 - [ ] `docs/screens-status.md` filled from those flows (`Designed` column)
+- [ ] `docs/moonchild.md` ids match the live Moonchild project
 
 ### Phase 2 — Repo scaffolding
 
@@ -103,3 +105,19 @@ See `docs/recipes/app-store.md`, `play-store.md`, `store-compliance.md`.
 ### Phase 8 — Post-launch
 
 - [ ] Next feature / iteration scoped (update PRD; loop toward Phase 0 / 1)
+
+---
+
+## Phase vocabulary (build-status vs preflight)
+
+`docs/build-status.md` phases (0–8) are the **product build** checklist.
+`npm run preflight` uses a different numbering for **store gates**:
+
+| Store command | Meaning | Roughly maps to build-status |
+| --- | --- | --- |
+| `npm run preflight -- --phase=4` | Harden / store-readiness (some checks deferred) | Late Phase 6 → early Phase 7 |
+| `npm run preflight` (default) | Full launch gate (phase 6) | Phase 7 before submit |
+| `npm run store:push` | Runs full preflight (phase 6), then submit | Phase 7 |
+
+Do not confuse “Phase 4 — On-device data” in this file with
+`preflight --phase=4`.
