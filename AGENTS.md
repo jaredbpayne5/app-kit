@@ -161,19 +161,14 @@ See `docs/CAPABILITIES.md` for what each module costs in permissions.
 
 ## Session teardown
 
-Do **not** invent ad-hoc kill commands. Use the existing session script:
+Do **not** invent ad-hoc kill commands. Use the existing session script
+(details: `scripts/dev/session.sh`):
 
 ```bash
 npm run session:down              # Metro, iOS sim, Android emu, Gradle, adb
 npm run session:down -- --watch   # same + re-kill for ~20s if agents relaunch
 npm run session:status            # what's still running
 ```
-
-`session:down` stops Expo/Metro (ports 8081–8083), iOS Simulator, the
-`pixel8` Android emulator, Gradle/Kotlin daemons, `adb`, and shell processes
-whose command lines match known relaunchers (`nohup emulator -avd pixel8`,
-`npm run dev -w mobile -- --port 8081`, etc.). It does **not** `killall node`
-or kill unrelated Java.
 
 ## Verify
 
@@ -183,17 +178,10 @@ considering work done. `npm run test:e2e` drives Maestro against a simulator.
 
 ## Delegate to a cheaper model
 
-Most work in this repo is mechanical. Hand it to a cheaper subagent (Composer
-2.5 or equivalent) by default rather than burning a frontier model on it:
-running builds and test suites, applying a fix that has already been decided,
-mechanical edits, searching for where something lives, reading logs, git and
-dependency chores.
+Default: hand mechanical work to a cheaper subagent (Composer 2.5 or
+equivalent) — builds, tests, decided fixes, renames, searches, logs, git,
+deps. Keep the stronger model for unknown-cause bugs, design trade-offs,
+purchase/entitlement logic, and library internals.
 
-Keep the stronger model for diagnosing bugs whose cause is unknown, design
-trade-offs, purchase and entitlement logic, and reading library internals.
-Cheap models pattern-match to the common fix and start changing unrelated
-things when it fails — ten guesses cost more than one correct diagnosis, and
-leave workarounds baked into every app cloned from this template.
-
-If you can phrase the task as "run X, then change Y to Z", delegate it. If it
+If you can phrase it as "run X, then change Y to Z", delegate. If it
 starts with "figure out why", don't.

@@ -13,6 +13,9 @@
 #   npm run session:down -- --deep    # alias for --watch (compat)
 #   npm run session:status
 #
+# session:down does NOT killall node or unrelated Java — only known
+# Expo/sim/emu/Gradle/adb patterns.
+#
 # Environment facts (non-interactive shells lack ~/.zshrc):
 #   ANDROID_HOME defaults to the Homebrew commandlinetools path used here.
 #   JAVA_HOME defaults to Temurin 17.
