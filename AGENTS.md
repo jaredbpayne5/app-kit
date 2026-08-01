@@ -92,6 +92,24 @@ See `docs/CAPABILITIES.md` for what each module costs in permissions.
   are generated, never hand-maintained
 - Changing `android.package` or `ios.bundleIdentifier` after a store upload
 - `git push`
+- Shutting down the local stack (`npm run session:down`) — Metro, sims, and
+  emulators may be in use by another agent
+
+## Session teardown
+
+Do **not** invent ad-hoc kill commands. Use the existing session script:
+
+```bash
+npm run session:down              # Metro, iOS sim, Android emu, Gradle, adb
+npm run session:down -- --watch   # same + re-kill for ~20s if agents relaunch
+npm run session:status            # what's still running
+```
+
+`session:down` stops Expo/Metro (ports 8081–8083), iOS Simulator, the
+`pixel8` Android emulator, Gradle/Kotlin daemons, `adb`, and shell processes
+whose command lines match known relaunchers (`nohup emulator -avd pixel8`,
+`npm run dev -w mobile -- --port 8081`, etc.). It does **not** `killall node`
+or kill unrelated Java.
 
 ## Verify
 

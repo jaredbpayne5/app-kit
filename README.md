@@ -28,10 +28,21 @@ Play, and a marketing lander. No backend, no accounts, no server bill.
 ## Daily loop
 
 ```bash
-npm run dev        # Metro + simulator
-npm run check      # format, lint, typecheck, contrast, design lint
-npm test           # unit tests
-npm run verify     # check + test + a real bundle export
+npm run session:up     # boot iOS Simulator (optional start of day)
+npm run dev            # Metro (+ press i / a for a device)
+npm run check          # format, lint, typecheck, contrast, design lint
+npm test               # unit tests
+npm run verify         # check + test + a real bundle export
+npm run session:down   # stop Metro, iOS sim, Android emu, Gradle, adb
+npm run session:status # what's still running
+```
+
+When Cursor agents (or `nohup`) keep relaunching Metro or the emulator after
+you stop them, hold the teardown open for a re-kill window:
+
+```bash
+npm run session:down -- --watch      # ~20s
+npm run session:down -- --watch=30   # custom seconds
 ```
 
 The development build (`npm run dev:build:ios` / `dev:build:android`) is the
