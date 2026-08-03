@@ -1,5 +1,6 @@
 import { BrandAtmosphere } from '@/components/brand-atmosphere';
 import { GroupedRow, GroupedSection } from '@/components/grouped';
+import { getAppDisplayName } from '@/lib/app-version';
 import { ONBOARDING_STORAGE_KEY } from '@/lib/onboarding';
 import { reportError } from '@/lib/report-error';
 import { getJSON } from '@/lib/storage';
@@ -10,7 +11,7 @@ import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 export default function HomeScreen() {
-  const appName = process.env.EXPO_PUBLIC_APP_NAME ?? 'App Template';
+  const appName = getAppDisplayName();
   const [onboardingReady, setOnboardingReady] = useState(false);
   const [onboardingSeen, setOnboardingSeen] = useState(true);
 

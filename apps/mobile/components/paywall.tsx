@@ -2,6 +2,7 @@ import { Button } from '@/ui/button';
 import { Icon } from '@/ui/icon';
 import { Text } from '@/ui/text';
 import { APP_CONFIG } from '@/lib/app-config';
+import { getAppDisplayName } from '@/lib/app-version';
 import {
   PREMIUM_BENEFITS,
   TRIAL_COPY,
@@ -92,7 +93,7 @@ function PaywallPaid({ onPurchased }: PaywallProps) {
 
   const { plans, others } = resolvePaywallPlans(packages);
   const hasUnconfirmedPrice = plans.some((plan) => !plan.fromStore);
-  const appName = process.env.EXPO_PUBLIC_APP_NAME ?? 'Premium';
+  const appName = getAppDisplayName();
 
   return (
     <View className="gap-4" testID="paywall">

@@ -26,18 +26,7 @@ jest.mock('nativewind', () => ({
   }),
 }));
 
-jest.mock('lucide-react-native', () => {
-  const React = require('react');
-  const { View } = require('react-native');
-  const Stub = () => <View />;
-  return {
-    CheckIcon: Stub,
-    ChevronRightIcon: Stub,
-    MoonStarIcon: Stub,
-    SettingsIcon: Stub,
-    SunIcon: Stub,
-  };
-});
+jest.mock('lucide-react-native', () => require('@/__tests__/test-utils').mockLucideIcons());
 
 jest.mock('@/lib/storage', () => ({
   getJSON: jest.fn(async () => true),
@@ -45,37 +34,9 @@ jest.mock('@/lib/storage', () => ({
   remove: jest.fn(async () => undefined),
 }));
 
-jest.mock('@/ui/text', () => {
-  const React = require('react');
-  const { Text } = require('react-native');
-  return {
-    Text: ({ children, ...props }: { children?: React.ReactNode }) => (
-      <Text {...props}>{children}</Text>
-    ),
-  };
-});
-
-jest.mock('@/ui/icon', () => {
-  const React = require('react');
-  const { View } = require('react-native');
-  return {
-    Icon: () => <View />,
-  };
-});
-
-jest.mock('@/ui/button', () => {
-  const React = require('react');
-  const { Pressable } = require('react-native');
-  return {
-    Button: ({
-      children,
-      ...props
-    }: {
-      children?: React.ReactNode;
-      accessibilityLabel?: string;
-    }) => <Pressable {...props}>{children}</Pressable>,
-  };
-});
+jest.mock('@/ui/text', () => require('@/__tests__/test-utils').mockUiText());
+jest.mock('@/ui/icon', () => require('@/__tests__/test-utils').mockUiIcon());
+jest.mock('@/ui/button', () => require('@/__tests__/test-utils').mockUiButton());
 
 jest.mock('expo-linear-gradient', () => {
   const React = require('react');

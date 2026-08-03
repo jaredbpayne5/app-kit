@@ -13,35 +13,8 @@ jest.mock('expo-router', () => {
   };
 });
 
-jest.mock('@/ui/button', () => {
-  const React = require('react');
-  const { Pressable } = require('react-native');
-  return {
-    Button: ({
-      children,
-      testID,
-      ...props
-    }: {
-      children?: React.ReactNode;
-      testID?: string;
-      accessibilityLabel?: string;
-    }) => (
-      <Pressable testID={testID} {...props}>
-        {children}
-      </Pressable>
-    ),
-  };
-});
-
-jest.mock('@/ui/text', () => {
-  const React = require('react');
-  const { Text } = require('react-native');
-  return {
-    Text: ({ children, ...props }: { children?: React.ReactNode }) => (
-      <Text {...props}>{children}</Text>
-    ),
-  };
-});
+jest.mock('@/ui/button', () => require('@/__tests__/test-utils').mockUiButton());
+jest.mock('@/ui/text', () => require('@/__tests__/test-utils').mockUiText());
 
 import NotFoundScreen from '@/app/+not-found';
 

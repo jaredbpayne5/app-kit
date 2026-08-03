@@ -3,48 +3,10 @@
 import { EmptyState } from '@/components/empty-state';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
-jest.mock('lucide-react-native', () => {
-  const React = require('react');
-  const { View } = require('react-native');
-  const Stub = () => <View />;
-  return { InboxIcon: Stub };
-});
-
-jest.mock('@/ui/icon', () => {
-  const React = require('react');
-  const { View } = require('react-native');
-  return { Icon: () => <View testID="empty-icon" /> };
-});
-
-jest.mock('@/ui/button', () => {
-  const React = require('react');
-  const { Pressable } = require('react-native');
-  return {
-    Button: ({
-      children,
-      testID,
-      onPress,
-    }: {
-      children?: React.ReactNode;
-      testID?: string;
-      onPress?: () => void;
-    }) => (
-      <Pressable testID={testID} onPress={onPress}>
-        {children}
-      </Pressable>
-    ),
-  };
-});
-
-jest.mock('@/ui/text', () => {
-  const React = require('react');
-  const { Text } = require('react-native');
-  return {
-    Text: ({ children, ...props }: { children?: React.ReactNode }) => (
-      <Text {...props}>{children}</Text>
-    ),
-  };
-});
+jest.mock('lucide-react-native', () => require('@/__tests__/test-utils').mockLucideIcons());
+jest.mock('@/ui/icon', () => require('@/__tests__/test-utils').mockUiIcon('empty-icon'));
+jest.mock('@/ui/button', () => require('@/__tests__/test-utils').mockUiButton());
+jest.mock('@/ui/text', () => require('@/__tests__/test-utils').mockUiText());
 
 import { InboxIcon } from 'lucide-react-native';
 

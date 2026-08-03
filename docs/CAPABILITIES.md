@@ -82,6 +82,30 @@ Shared compose kit (no extra native deps): `GroupedSection` / `GroupedRow` /
 | `expo-asset` | Bundled read-only datasets |
 | `expo-device` / `expo-application` / `expo-network` | Diagnostics / offline / version gating |
 
+## Starter kit vs shipped code
+
+Much of this template is **inventory**: wired, tested, and deliberately unused
+until a product needs it. A code review that treats "no importers" as "dead
+code" will delete the seams this factory exists to provide. Nothing in the list
+below is abandoned.
+
+| Dormant until a product needs it | Gated by |
+| --- | --- |
+| `lib/streak.ts`, `lib/review-prompt.ts`, `lib/local-notifications.ts` | nothing imports them yet — tested seams, ready to wire |
+| `withSql` / `registerMigrations` in `lib/storage.ts` | `APP_CONFIG.STORAGE` is `kv` |
+| `components/paywall.tsx`, `lib/purchases.ts`, `lib/paywall-plans.ts` | `APP_CONFIG.MONETIZATION` is `free` |
+| `ui/card`, `chart`, `input`, `label`, `separator`, `switch`, `textarea`, `alert-dialog`, `native-only-animated-view` | React Native Reusables kit — add screens, not primitives |
+| `components/date-field.tsx`, `number-wheel-field.tsx`, `header-overflow-menu.tsx` | compose kit for form/nav screens |
+| `PopIn` (`ui/motion.tsx`), `GroupedField`, `SettingsHeaderButton`, `haptics.tapMedium` / `error` | complete primitive APIs, partially used |
+| `app/(tabs)/index.tsx`, `library.tsx`, `onboarding.tsx` | demo screens; their own copy says replace on clone |
+
+**Prune at clone time, not before.** Once `docs/PRD.md` is filled and the
+product's real screens exist, delete whatever the product will never use —
+unused primitives and their deps, seams for features that aren't in the PRD,
+the SQL path if the product stays `kv`, the paywall stack if it stays `free`,
+and the demo screens. Deleting them while this is still the template only costs
+the next clone a re-scaffold.
+
 ## Out of scope — per-product only
 
 These carry extra store-review or privacy weight. Add one only when the product genuinely needs it, and update `data-practices.json` alongside it.

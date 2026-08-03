@@ -67,6 +67,9 @@ that system for NativeWind — see Stack below.
 - Sync tokens from Moonchild into `apps/mobile/global.css` and `ui/` as
   needed. Components must use those tokens — never invent colors, spacing,
   or type, and never leave Moonchild values only inlined on one screen.
+  After changing color tokens, run `npm run gen-theme` — `lib/theme-tokens.ts`
+  is generated from `global.css` and feeds the tab bar, navigation chrome,
+  bottom sheets, and charts. `npm run check` fails if it is stale.
 - Adapt into this repo’s patterns (Expo Router, NativeWind, `ui/`
   primitives, `lib/` seams). Do not paste Moonchild-generated code
   verbatim.
@@ -145,7 +148,9 @@ npx expo install expo-camera
 Then add its config plugin to `app.json` and update
 `apps/mobile/store/data-practices.json` if the data leaves the device.
 
-See `docs/CAPABILITIES.md` for what each module costs in permissions.
+See `docs/CAPABILITIES.md` for what each module costs in permissions, and its
+"Starter kit vs shipped code" section for which unused modules are deliberate
+inventory (do not delete them as dead code) versus prune-on-clone.
 
 ## Security
 
