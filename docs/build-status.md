@@ -12,6 +12,7 @@
 ## Current status
 
 - **Phase:** _(e.g. Phase 0 — Foundation & Planning)_
+- **Current task:** _(task id + name from `docs/build-spec.md`, or None)_
 - **Status:** _(Not started / In progress / Complete)_
 - **Last updated:** _(date)_
 
@@ -21,6 +22,24 @@ _(Specific enough that a fresh session can resume without re-reading the whole
 repo. Example: "Finished onboarding screens 1–2 of 3. Screen 3 pulled from
 Moonchild but not yet wired into the nav stack. Next: wire screen 3, then move
 to core-feature flow.")_
+
+## Blockers
+
+_(None, or: the specific blocker and the decision/information needed.)_
+
+## Deviations
+
+_(None, or: where the implementation knowingly departs from `docs/PRD.md`,
+`docs/design-spec.md`, or `docs/build-spec.md`, and why. A deviation recorded
+here is a decision; an unrecorded one is a bug.)_
+
+## Verification (last run)
+
+- `npm run check`: _(NOT RUN / pass / fail)_
+- `npm test`: _(NOT RUN / pass / fail)_
+- `npm run verify`: _(NOT RUN / pass / fail)_
+- `npm run test:e2e`: _(NOT RUN / pass / fail)_
+- Visual check on a device or simulator: _(NOT RUN / done — light + dark)_
 
 ---
 
@@ -35,8 +54,16 @@ to core-feature flow.")_
 - [ ] `docs/moonchild.md` filled (DS + scene ids; sentinel removed)
 - [ ] This file’s sentinel removed; Current status filled
 - [ ] `docs/screens-status.md` sentinel removed when the screen list is real
+- [ ] `docs/design-spec.md` written by the design tool (sentinel removed) —
+      lands during Phase 1
+- [ ] `docs/build-spec.md` compiled from PRD + design spec + repo (sentinel
+      removed) — after Phase 1, before Phase 2
 
 ### Phase 1 — Design system & screens in Moonchild
+
+The design tool’s output is both the artifacts *and* `docs/design-spec.md`
+(tracked in Phase 0). Compile `docs/build-spec.md` once this phase is approved —
+Phase 2 onward works from its task list.
 
 - [ ] Design system generated in Moonchild from PRD + design-brief
 - [ ] All MVP flows generated in Moonchild
@@ -86,6 +113,9 @@ No accounts or backend unless explicitly discussed (see `AGENTS.md`).
 - [ ] Loading states
 - [ ] Animations / transitions (Reanimated)
 - [ ] Dark mode (if in the design brief)
+- [ ] Final audit — implementation walked against `docs/PRD.md`,
+      `docs/design-spec.md`, and the Global acceptance criteria in
+      `docs/build-spec.md`; gaps fixed or recorded under Deviations
 - [ ] `npm run check` / `npm run verify` clean
 
 ### Phase 7 — Store prep & submission

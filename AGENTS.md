@@ -18,66 +18,99 @@ Google Play, and a marketing lander. Cloned per app.
 RevenueCat. If a feature needs accounts or server-side sync, stop and discuss
 it rather than adding a backend.
 
+## Authority hierarchy
+
+When sources disagree, this is the order:
+
+1. **This file** — repo invariants: no backend, the `lib/` seams, the "Ask
+   before" list, security. These outrank the product spec. A PRD that needs
+   accounts or server-side sync means *stop and discuss*, not implement.
+2. `docs/PRD.md` — what the product must do, and why.
+3. `docs/design-spec.md` plus the design artifact it points at — the approved
+   UX/UI.
+4. `docs/build-spec.md` — how it gets built: phases, tasks, acceptance criteria.
+5. `docs/build-status.md` — current execution state.
+6. Existing source code — what is actually there today.
+
+Never silently override a higher authority. If the conflict is material, stop
+and report it. If it is a minor implementation detail, make the smallest change
+that preserves the higher-level requirement and record it under **Deviations**
+in `docs/build-status.md`.
+
 ## Product & design reference
 
 Build order for a product clone: fill `docs/PRD.md`, then
-`docs/design-brief.md`, generate the design system and flows in Moonchild,
-fill `docs/moonchild.md` and `docs/screens-status.md`, then implement in
+`docs/design-brief.md`, generate the design system and flows in the design
+tool, land `docs/design-spec.md` + `docs/moonchild.md` +
+`docs/screens-status.md`, compile `docs/build-spec.md`, then implement in
 this repo. Track session progress in `docs/build-status.md`. Full loop:
 `docs/recipes/product-pipeline.md`.
 
 - `docs/PRD.md` — authoritative for *what* to build. If a request goes beyond
   it, flag rather than expanding scope.
-- `docs/design-brief.md` — starting direction for Moonchild’s design-system
-  prompt. Not final tokens.
-- `docs/moonchild.md` — which Moonchild design system and scene this clone
-  uses. Unfilled means the project is not linked yet.
-- `docs/screens-status.md` — Moonchild inventory for this product. Treat
+- `docs/design-brief.md` — starting direction for the design tool’s
+  design-system prompt. Not final tokens.
+- `docs/design-spec.md` — the approved UX/UI, written by the design tool.
+  Authoritative for design intent, states, and accessibility. Agents read it;
+  they never author or extend it.
+- `docs/moonchild.md` — the design tool of record for this clone, and its
+  project ids. Unfilled means the project is not linked yet.
+- `docs/screens-status.md` — design inventory for this product. Treat
   **Designed in Moonchild** as fact. Do not infer design readiness from
   memory or a vague MCP reply alone.
+- `docs/build-spec.md` — phases, tasks, and acceptance criteria. Compiled once
+  from the PRD + design spec + repo. Authoritative for *how* it gets built.
 - `docs/build-status.md` — phase checklist and session handoff. Read it at
   the start of every session before doing anything else. Update Current
   status and Where we left off before ending a session, or whenever a phase
   (or meaningful chunk) is completed.
 
 If any of these files still contains `<!-- TEMPLATE_PLACEHOLDER -->`, stop
-and tell the user. Do not invent an MVP, design system, or screen list.
+and tell the user. Do not invent an MVP, design system, screen list, or build
+plan.
 
-## Design system & Moonchild
+## Design system & design tool
 
-Moonchild (via MCP) is the source of truth for the **structured** design
-system (color roles, type scale, spacing) and for screen/flow layouts.
-`docs/design-brief.md` only sets direction; Moonchild specializes it. Repo
-token files (`apps/mobile/global.css`, `ui/`) are the downstream sync of
-that system for NativeWind — see Stack below.
+An external design tool — recorded in `docs/moonchild.md`, currently
+Moonchild — is the source of truth for the **structured** design system
+(color roles, type scale, spacing) and for screen/flow layouts.
+`docs/design-brief.md` only sets direction; the tool specializes it into
+`docs/design-spec.md`. Repo token files (`apps/mobile/global.css`, `ui/`) are
+the downstream sync of that system for NativeWind — see Stack below.
+
+`docs/design-spec.md` is the design *authority*. It is not a substitute for the
+artifact: prose is lossy next to a frame, so a screen still needs its real
+design fetched before anyone writes its layout.
 
 ### Before writing any UI code
 
 1. Confirm the target screen is listed in `docs/screens-status.md` with
    Designed in Moonchild = `yes`. If not, stop and tell the user — do not
    implement it.
-2. Attempt to pull that screen from Moonchild via MCP.
-3. If the pull fails, errors, or returns nothing: stop and tell the user.
-   Do not generate a layout yourself under any circumstance.
-4. If Moonchild MCP tools are not available in this session: stop and tell
-   the user. Do not generate a layout yourself under any circumstance.
+2. Confirm `docs/design-spec.md` actually specifies that screen. If it is
+   missing or too thin to implement from, stop and tell the user.
+3. Retrieve the screen’s artifact — pull it from the design tool via MCP, or
+   read an export committed to the repo.
+4. If the pull fails, errors, returns nothing, or the design tool’s MCP is not
+   available in this session and no committed export exists: stop and tell the
+   user. Do not generate a layout yourself under any circumstance.
 
 ### When implementing a pulled screen
 
-- Sync tokens from Moonchild into `apps/mobile/global.css` and `ui/` as
-  needed. Components must use those tokens — never invent colors, spacing,
-  or type, and never leave Moonchild values only inlined on one screen.
+- Sync tokens from the design system into `apps/mobile/global.css` and `ui/`
+  as needed. Components must use those tokens — never invent colors, spacing,
+  or type, and never leave design values only inlined on one screen.
   After changing color tokens, run `npm run gen-theme` — `lib/theme-tokens.ts`
   is generated from `global.css` and feeds the tab bar, navigation chrome,
   bottom sheets, and charts. `npm run check` fails if it is stale.
 - Adapt into this repo’s patterns (Expo Router, NativeWind, `ui/`
-  primitives, `lib/` seams). Do not paste Moonchild-generated code
+  primitives, `lib/` seams). Do not paste design-tool-generated code
   verbatim.
-- Moonchild is UI/UX only. Data modeling and on-device logic go through
+- The design tool is UI/UX only. Data modeling and on-device logic go through
   `lib/storage.ts` and the other seams as you implement each screen
   (Phase 4 in `docs/build-status.md`).
 - Update `docs/build-status.md` (Where we left off / phase checkboxes).
-  Update `docs/screens-status.md` only when the Moonchild inventory itself
+  Update `docs/screens-status.md` only when the design inventory itself
   changes.
 
 Moonchild MCP calls here are read/pull-only (fetch designs and tokens, not
@@ -85,7 +118,7 @@ modify anything external). Prefer leaving those tools on auto-allow rather
 than confirming every pull during screen-by-screen builds.
 
 Non-UI work (storage, purchases, copy) and edits to already-built screens
-that only use already-synced tokens are allowed without a new Moonchild
+that only use already-synced tokens are allowed without a new design
 pull — still no new freehand layouts or new screens.
 
 ## Stack
@@ -185,6 +218,31 @@ npm run session:down -- --watch   # same + re-kill for ~20s if agents relaunch
 npm run session:status            # what's still running
 ```
 
+## Task loop
+
+At session start, read `docs/build-status.md` before anything else.
+
+Then, per task:
+
+1. Find the current phase and the next incomplete task in `docs/build-spec.md`.
+2. Implement **only that task**, plus any prerequisite it directly requires.
+3. Run the checks that task names (see Verify below).
+4. Verify against the task’s acceptance criteria. Compiling is not passing.
+5. Update `docs/build-status.md` — current task, verification, deviations.
+6. Move to the next task only when the current one is genuinely complete.
+
+Before `docs/build-spec.md` exists (Phase 0–1 — writing the specs, generating
+the design), work from `docs/build-status.md`’s phase checklist instead. That is
+the one case where a missing build spec is not a stop.
+
+No unrelated refactors mid-task, and no reformatting untouched files. Reuse
+existing `ui/` primitives, `lib/` seams, components, and dependencies before
+adding anything new. Do not ask the user for information already in the repo.
+
+On completion, report what changed, what was verified, any deviations, and the
+next task. If blocked, name the specific blocker and the decision or
+information needed to clear it.
+
 ## Verify
 
 Run `npm run check` after edits (format, lint, typecheck, contrast, design
@@ -202,3 +260,12 @@ library internals.
 
 If you can phrase it as "run X, then change Y to Z", delegate. If it
 starts with "figure out why", don't.
+
+Some work looks routine but stays on the stronger model anyway: implementing a
+freshly pulled screen, purchase and entitlement logic, and any design
+trade-off. Escalate back to the stronger model mid-task when:
+
+- requirements conflict, or a higher authority contradicts a lower one
+- an architecture decision has to be made rather than followed
+- debugging is genuinely difficult
+- implementation reveals a real problem in the PRD, design spec, or build spec

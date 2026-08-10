@@ -154,7 +154,9 @@ printf '\n%sproduct docs%s\n' "$BOLD" "$RESET"
 PRODUCT_DOCS=(
   docs/PRD.md
   docs/design-brief.md
+  docs/design-spec.md
   docs/screens-status.md
+  docs/build-spec.md
   docs/build-status.md
   docs/moonchild.md
 )
