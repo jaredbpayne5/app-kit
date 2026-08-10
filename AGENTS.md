@@ -41,7 +41,8 @@ in `docs/build-status.md`.
 
 Build order for a product clone: finish `docs/PRD.md` (the only repo file
 given to the design tool), generate the design system and flows in the design
-tool, export artifacts into the clone, then one strong-model pass compiles
+tool, export artifacts into `docs/design-exports/`, then one strong-model pass
+using the master prompt in `docs/recipes/compile-specs.md` fills
 `docs/design-spec.md` + `docs/moonchild.md` + `docs/screens-status.md` +
 `docs/build-spec.md` and initializes `docs/build-status.md`. Implement from
 the build spec. Full loop: `docs/recipes/product-pipeline.md`.

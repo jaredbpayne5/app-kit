@@ -41,30 +41,27 @@ the lander. Bundle IDs are permanent after the first store upload. Script:
 2. **Design (outside the repo)** — In the design tool, create the design system
    and full journeys from the PRD. If the tool needs a kickoff prompt, write it
    in chat and paste it — **do not commit a design-brief file**. Export the
-   artifacts (frames / system) into the clone (or keep them pullable via MCP).
-3. **Design pointer & inventory** — Fill `docs/moonchild.md` (tool of record +
-   project ids and/or path to committed exports) and `docs/screens-status.md`
-   (`Designed` = yes/no per screen). Agents must not implement a screen until
-   that column is `yes`.
-4. **Design spec** — One strong-model pass **compiles** `docs/design-spec.md`
-   from the PRD + exported artifacts (faithful transcription of approved UX/UI:
-   IA, components, per-screen layout and states, accessibility). It must not
-   invent or extend the design beyond the exports. Coding agents during
-   implementation read it; they do not freestyle new screens from it alone.
-5. **Build spec** — Same strong-model session (or immediately after) compiles
-   `docs/build-spec.md` from PRD + design spec + this repo: architecture
-   choices, data model, and phases broken into tasks with acceptance criteria.
-   It must not add product requirements or redesign anything. Then initialize
-   `docs/build-status.md`.
-6. **Session handoff** — Keep `docs/build-status.md` current (phase, current
+   artifacts into `docs/design-exports/` (see that folder’s README), or keep
+   them pullable via MCP.
+3. **Compile specs (strong model, once)** — In Cursor, open
+   `docs/recipes/compile-specs.md` and paste the **Master prompt** into a
+   frontier-model chat. That pass fills `docs/moonchild.md`,
+   `docs/screens-status.md`, `docs/design-spec.md`, `docs/build-spec.md`, and
+   initializes `docs/build-status.md`. It must not invent scope or redesign
+   beyond the PRD and exports.
+4. **Design pointer & inventory** — Should already be filled by the compile
+   pass. Agents must not implement a screen until **Designed** = `yes` in
+   `docs/screens-status.md`.
+5. **Session handoff** — Keep `docs/build-status.md` current (phase, current
    task, where we left off, deviations). Read it at the start of every coding
    session.
-7. **Implement** — Work the next incomplete task in `docs/build-spec.md`. For
-   each designed screen: retrieve the artifact (MCP or committed export) → sync
-   tokens into `apps/mobile/global.css` / `ui/` → adapt into Expo Router /
-   NativeWind / seams. No freehand layouts.
-8. **Data & ship** — Phase 4+ in `docs/build-status.md` (on-device logic,
-   QA, polish, `npm run preflight`).
+6. **Implement** — Switch to a cheaper model. Work the next incomplete task in
+   `docs/build-spec.md`. For each designed screen: retrieve the artifact (MCP
+   or `docs/design-exports/`) → sync tokens into `apps/mobile/global.css` /
+   `ui/` → adapt into Expo Router / NativeWind / seams. No freehand layouts.
+7. **Data & ship** — Phase 4+ in `docs/build-status.md` (on-device logic, QA,
+   polish). Fill `apps/mobile/store/metadata/` and `apps/brand/` before
+   `npm run preflight`.
 
 ## Model tier per step
 
@@ -115,10 +112,14 @@ it (its connection checklist is per-tool), commit or link exports, keep
 
 ## Related
 
+- Compile prompt (Opus once): `docs/recipes/compile-specs.md`
+- Design exports folder: `docs/design-exports/`
 - Design authority: `docs/design-spec.md`
 - Task breakdown: `docs/build-spec.md`
 - Phase checklist: `docs/build-status.md`
+- Brand masters: `apps/brand/README.md`
 - Brand palette catalog: `docs/recipes/brand-palette.md`
 - Brand assets: `docs/recipes/brand-assets.md`
+- Store metadata stubs: `apps/mobile/store/metadata/`
 - Store compliance: `docs/recipes/store-compliance.md`
 - Capability costs: `docs/CAPABILITIES.md`

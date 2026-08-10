@@ -6,6 +6,9 @@ before submit — `npm run preflight` greps for it.
 
 ## Layout
 
+Stub files ship with `TBD` (and example.com URLs). Replace every `TBD` before
+submit — `npm run preflight` fails while any remain.
+
 ```
 store/metadata/
   ios/en-US/          # App Store Connect (fastlane deliver)

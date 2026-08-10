@@ -27,7 +27,7 @@ used) or that export paths exist before any UI pull (`AGENTS.md`).
 
 ## Committed exports (if no MCP)
 
-- **Path in repo:** _(e.g. `docs/design-exports/`)_
+- **Path in repo:** `docs/design-exports/` _(default; see that folder’s README)_
 - **What is included:** _(frames, tokens, etc.)_
 
 ## Machine checklist
