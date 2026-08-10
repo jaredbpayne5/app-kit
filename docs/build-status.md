@@ -19,8 +19,8 @@
 ## Where we left off
 
 _(Specific enough that a fresh session can resume without re-reading the whole
-repo. Example: "Finished onboarding screens 1–2 of 3. Screen 3 pulled from
-Moonchild but not yet wired into the nav stack. Next: wire screen 3, then move
+repo. Example: "Finished onboarding screens 1–2 of 3. Screen 3 artifact
+retrieved but not yet wired into the nav stack. Next: wire screen 3, then move
 to core-feature flow.")_
 
 ## Blockers
@@ -48,28 +48,27 @@ here is a decision; an unrecorded one is a bug.)_
 ### Phase 0 — Foundation & planning
 
 - [ ] `docs/PRD.md` written and reviewed (sentinel removed)
-- [ ] `docs/design-brief.md` written and reviewed (sentinel removed)
 - [ ] Product clone / branch from this template
-- [ ] Moonchild MCP connected on this machine (Cursor and/or Claude Code)
-- [ ] `docs/moonchild.md` filled (DS + scene ids; sentinel removed)
+- [ ] Design artifacts exported into the clone and/or design-tool MCP available
+- [ ] `docs/moonchild.md` filled (tool + project ids and/or export paths;
+      sentinel removed)
 - [ ] This file’s sentinel removed; Current status filled
-- [ ] `docs/screens-status.md` sentinel removed when the screen list is real
-- [ ] `docs/design-spec.md` written by the design tool (sentinel removed) —
-      lands during Phase 1
+- [ ] `docs/screens-status.md` filled from exports (`Designed` column; sentinel
+      removed)
+- [ ] `docs/design-spec.md` compiled from PRD + artifacts (sentinel removed)
 - [ ] `docs/build-spec.md` compiled from PRD + design spec + repo (sentinel
-      removed) — after Phase 1, before Phase 2
+      removed) — before Phase 2
 
-### Phase 1 — Design system & screens in Moonchild
+### Phase 1 — Design system & screens (design tool)
 
-The design tool’s output is both the artifacts *and* `docs/design-spec.md`
-(tracked in Phase 0). Compile `docs/build-spec.md` once this phase is approved —
-Phase 2 onward works from its task list.
+Done mostly **before** coding. Artifacts come from the design tool; prose specs
+are compiled in Phase 0. Phase 2 onward works from the build-spec task list.
 
-- [ ] Design system generated in Moonchild from PRD + design-brief
-- [ ] All MVP flows generated in Moonchild
-- [ ] Design reviewed and approved
-- [ ] `docs/screens-status.md` filled from those flows (`Designed` column)
-- [ ] `docs/moonchild.md` ids match the live Moonchild project
+- [ ] Design system generated in the design tool from the PRD
+- [ ] All MVP flows generated in the design tool
+- [ ] Design reviewed and approved; artifacts exported (or MCP-linked)
+- [ ] `docs/screens-status.md` matches those flows
+- [ ] `docs/moonchild.md` points at the live project and/or export paths
 
 ### Phase 2 — Repo scaffolding
 
@@ -77,16 +76,16 @@ Template already ships `ui/` primitives and NativeWind tokens. This phase is
 product-specific wiring, not inventing a component library.
 
 - [ ] Product navigation shell (routes for MVP screens)
-- [ ] Moonchild tokens synced into `apps/mobile/global.css` / `ui/`
+- [ ] Design tokens synced into `apps/mobile/global.css` / `ui/`
 - [ ] Identity set via `npm run init-app` (not still `com.example.*`)
 
 ### Phase 3 — Screen-by-screen UI build
 
-UI only — layout/nav against Moonchild designs. No data wiring yet.
+UI only — layout/nav against approved design artifacts. No data wiring yet.
 
-For each row in `docs/screens-status.md` with **Designed in Moonchild** = `yes`:
-pull via MCP, adapt into Expo Router / NativeWind / `ui/`, then note progress
-under **Where we left off**. Do not freehand layouts.
+For each row in `docs/screens-status.md` with **Designed** = `yes`: retrieve
+the artifact (MCP or committed export), adapt into Expo Router / NativeWind /
+`ui/`, then note progress under **Where we left off**. Do not freehand layouts.
 
 - [ ] All Designed screens pulled and built
 - [ ] Navigation between built screens works
@@ -112,7 +111,7 @@ No accounts or backend unless explicitly discussed (see `AGENTS.md`).
 - [ ] Accessibility pass
 - [ ] Loading states
 - [ ] Animations / transitions (Reanimated)
-- [ ] Dark mode (if in the design brief)
+- [ ] Dark mode (if in the design spec)
 - [ ] Final audit — implementation walked against `docs/PRD.md`,
       `docs/design-spec.md`, and the Global acceptance criteria in
       `docs/build-spec.md`; gaps fixed or recorded under Deviations

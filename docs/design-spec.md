@@ -2,14 +2,17 @@
 
 # Design specification
 
-The approved UX/UI for this product, written into the repo by the **design tool
-of record** (see `docs/moonchild.md`) from `docs/PRD.md` + `docs/design-brief.md`.
+The approved UX/UI for this product as prose. Compiled **once** by a strong
+model from `docs/PRD.md` + design artifacts from the tool of record (see
+`docs/moonchild.md`) — a faithful transcription of what the designer already
+approved, not a redesign and not a substitute for the frames.
 
 Three rules about this file:
 
-- **A coding agent does not author it.** It is the design tool's output. Agents
-  read it; they do not invent or extend it. If it is missing something a task
-  needs, stop and tell the user.
+- **Do not invent or extend the design.** The compile pass may write this file
+  from exports + PRD. After it exists, agents must not add screens, states, or
+  visual decisions that are not in the artifacts. If something a task needs is
+  missing, stop and tell the user.
 - **It does not replace fetching the artifact.** Prose is lossy next to a frame.
   A screen is implementable only once its actual artifact has been retrieved —
   MCP pull, or an export committed to the repo. See `AGENTS.md` → *Design system

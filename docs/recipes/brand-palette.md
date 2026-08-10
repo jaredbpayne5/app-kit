@@ -16,7 +16,7 @@ mechanical choice.
 Moonchild is the source of truth for the **structured** design system
 (color roles, type scale, spacing) that ends up in `apps/mobile/global.css`
 and `ui/`. This catalog is for **kickoff direction only** — feed mood and
-hex into the design brief and brand assets, then let Moonchild specialize.
+hex into the design tool (via an external kickoff prompt, not a repo file) and brand assets, then let Moonchild specialize.
 Do **not** paste catalog hex straight into `global.css` as final tokens
 and skip Moonchild.
 
@@ -28,8 +28,9 @@ and skip Moonchild.
    new one — but then you **must** run `npm run contrast-check` before
    treating it as a safe starting point.
 3. Copy the palette into:
-   - `docs/design-brief.md` — mood + these hex values under "Rough color
-     direction" (still a *starting* direction for Moonchild, not final).
+   - The design tool kickoff prompt (outside the repo) — mood + these hex
+     values under "Rough color direction" (still a *starting* direction for
+     Moonchild, not final).
    - `apps/mobile/assets/brand/brand.json` — at least `background`,
      `primary`, `accent`, `secondary` (used by icon/splash generation).
    - Optionally `apps/product.json` `brandColor` if the lander needs a

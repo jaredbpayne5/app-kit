@@ -12,7 +12,8 @@ Replace these files before Harden / Launch (paths from `apps/mobile/app.json`):
 Brand master for `npm run brand:generate`: `apps/brand/icon-master.png`
 (see `apps/mobile/assets/brand/` for `brand.json`). For kickoff color
 direction, pick a contrast-checked palette from
-`docs/recipes/brand-palette.md` into `brand.json` / the design brief —
+`docs/recipes/brand-palette.md` into `brand.json` and the design tool kickoff
+prompt (outside the repo) —
 Moonchild still owns final `global.css` tokens.
 
 ## Checklist

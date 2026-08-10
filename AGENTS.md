@@ -39,25 +39,28 @@ in `docs/build-status.md`.
 
 ## Product & design reference
 
-Build order for a product clone: fill `docs/PRD.md`, then
-`docs/design-brief.md`, generate the design system and flows in the design
-tool, land `docs/design-spec.md` + `docs/moonchild.md` +
-`docs/screens-status.md`, compile `docs/build-spec.md`, then implement in
-this repo. Track session progress in `docs/build-status.md`. Full loop:
-`docs/recipes/product-pipeline.md`.
+Build order for a product clone: finish `docs/PRD.md` (the only repo file
+given to the design tool), generate the design system and flows in the design
+tool, export artifacts into the clone, then one strong-model pass compiles
+`docs/design-spec.md` + `docs/moonchild.md` + `docs/screens-status.md` +
+`docs/build-spec.md` and initializes `docs/build-status.md`. Implement from
+the build spec. Full loop: `docs/recipes/product-pipeline.md`.
+
+There is **no** `docs/design-brief.md`. Kickoff prompts for the design tool
+stay outside the repo (chat paste only).
 
 - `docs/PRD.md` — authoritative for *what* to build. If a request goes beyond
   it, flag rather than expanding scope.
-- `docs/design-brief.md` — starting direction for the design tool’s
-  design-system prompt. Not final tokens.
-- `docs/design-spec.md` — the approved UX/UI, written by the design tool.
-  Authoritative for design intent, states, and accessibility. Agents read it;
-  they never author or extend it.
-- `docs/moonchild.md` — the design tool of record for this clone, and its
-  project ids. Unfilled means the project is not linked yet.
+- `docs/design-spec.md` — the approved UX/UI as prose. Compiled **once** by a
+  strong model from the PRD + committed (or MCP-pullable) design artifacts —
+  a faithful transcription, not a redesign. Authoritative for design intent,
+  states, and accessibility. After it exists, agents must not invent or extend
+  it; if something needed is missing, stop and tell the user.
+- `docs/moonchild.md` — the design tool of record for this clone, project ids,
+  and/or paths to committed exports. Unfilled means no design source is linked.
 - `docs/screens-status.md` — design inventory for this product. Treat
-  **Designed in Moonchild** as fact. Do not infer design readiness from
-  memory or a vague MCP reply alone.
+  **Designed** = `yes` as fact. Do not infer design readiness from memory or a
+  vague MCP reply alone.
 - `docs/build-spec.md` — phases, tasks, and acceptance criteria. Compiled once
   from the PRD + design spec + repo. Authoritative for *how* it gets built.
 - `docs/build-status.md` — phase checklist and session handoff. Read it at
@@ -67,26 +70,26 @@ this repo. Track session progress in `docs/build-status.md`. Full loop:
 
 If any of these files still contains `<!-- TEMPLATE_PLACEHOLDER -->`, stop
 and tell the user. Do not invent an MVP, design system, screen list, or build
-plan.
+plan. Exception: the one-time strong-model **compile** pass that creates
+`design-spec.md` / `build-spec.md` / inventory docs from PRD + exports may
+clear those placeholders as it writes them.
 
 ## Design system & design tool
 
-An external design tool — recorded in `docs/moonchild.md`, currently
-Moonchild — is the source of truth for the **structured** design system
-(color roles, type scale, spacing) and for screen/flow layouts.
-`docs/design-brief.md` only sets direction; the tool specializes it into
-`docs/design-spec.md`. Repo token files (`apps/mobile/global.css`, `ui/`) are
-the downstream sync of that system for NativeWind — see Stack below.
+An external design tool — recorded in `docs/moonchild.md` — owns the
+**structured** design system (color roles, type scale, spacing) and
+screen/flow layouts. The PRD is the only repo input to that tool. Repo token
+files (`apps/mobile/global.css`, `ui/`) are the downstream sync of that system
+for NativeWind — see Stack below.
 
-`docs/design-spec.md` is the design *authority*. It is not a substitute for the
-artifact: prose is lossy next to a frame, so a screen still needs its real
-design fetched before anyone writes its layout.
+`docs/design-spec.md` is the design *authority* in prose. It is not a
+substitute for the artifact: prose is lossy next to a frame, so a screen still
+needs its real design fetched before anyone writes its layout.
 
 ### Before writing any UI code
 
 1. Confirm the target screen is listed in `docs/screens-status.md` with
-   Designed in Moonchild = `yes`. If not, stop and tell the user — do not
-   implement it.
+   Designed = `yes`. If not, stop and tell the user — do not implement it.
 2. Confirm `docs/design-spec.md` actually specifies that screen. If it is
    missing or too thin to implement from, stop and tell the user.
 3. Retrieve the screen’s artifact — pull it from the design tool via MCP, or
@@ -113,7 +116,7 @@ design fetched before anyone writes its layout.
   Update `docs/screens-status.md` only when the design inventory itself
   changes.
 
-Moonchild MCP calls here are read/pull-only (fetch designs and tokens, not
+Design-tool MCP calls here are read/pull-only (fetch designs and tokens, not
 modify anything external). Prefer leaving those tools on auto-allow rather
 than confirming every pull during screen-by-screen builds.
 
@@ -231,9 +234,9 @@ Then, per task:
 5. Update `docs/build-status.md` — current task, verification, deviations.
 6. Move to the next task only when the current one is genuinely complete.
 
-Before `docs/build-spec.md` exists (Phase 0–1 — writing the specs, generating
-the design), work from `docs/build-status.md`’s phase checklist instead. That is
-the one case where a missing build spec is not a stop.
+Before `docs/build-spec.md` exists (Phase 0–1 — compiling specs from PRD +
+design exports), work from `docs/build-status.md`’s phase checklist instead.
+That is the one case where a missing build spec is not a stop.
 
 No unrelated refactors mid-task, and no reformatting untouched files. Reuse
 existing `ui/` primitives, `lib/` seams, components, and dependencies before

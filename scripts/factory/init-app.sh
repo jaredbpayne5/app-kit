@@ -305,5 +305,5 @@ Updated app identity:
   terms:      $TERMS_URL
 
 Next: npm run doctor
-Then follow docs/recipes/product-pipeline.md (PRD → design brief → Moonchild).
+Then follow docs/recipes/product-pipeline.md (PRD → design tool → specs → code).
 EOF

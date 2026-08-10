@@ -2,14 +2,19 @@
 
 # Product requirements
 
-Fill this before generating screens in the design tool. Until the sentinel above
+Fill this before handing it to the UI/UX design tool. Until the sentinel above
 is removed, agents must not invent an MVP or product scope.
 
-What to build and why — not how it looks and not how it is built. Do not
-prescribe navigation, colors, typography, component shapes, spacing, or visual
-style here unless a product requirement genuinely forces it; that belongs in
-`docs/design-brief.md` and `docs/design-spec.md`. Implementation belongs in
-`docs/build-spec.md`.
+**What to build and why** — not how it looks and not how it is built.
+
+- Do not prescribe navigation, colors, typography, component shapes, spacing,
+  or visual style here unless a product requirement genuinely forces it.
+- Product-imposed limits belong in **Design constraints** (below), not in a
+  separate design-brief file. Kickoff prompts for the design tool stay
+  **outside the repo** (chat paste only).
+- The only repo file you give the design tool is this PRD.
+- Implementation planning belongs in `docs/build-spec.md` after design exports
+  exist. Visual authority after design is `docs/design-spec.md` + artifacts.
 
 ## Problem
 
@@ -30,6 +35,12 @@ _(Why would this user care enough to install it?)_
 - _
 
 ### Non-goals
+
+- _
+
+## Core user outcomes
+
+What should users be able to accomplish?
 
 - _
 
@@ -93,16 +104,47 @@ What the app remembers. Modeled later through `lib/storage.ts`.
 
 - _
 
+## Platform & technical constraints
+
+Confirm or adjust. Prefills match this template’s defaults — change only when
+the product genuinely requires it. A need for accounts, a server, or
+server-side sync is a **stop and discuss** (see `AGENTS.md`), not something to
+quietly require here.
+
+- **Platform:** iOS + Android (Expo)
+- **Offline:** Works fully offline (local-first)
+- **Authentication:** None (template default)
+- **Persistence:** On-device via `lib/storage.ts` (`STORAGE`: `kv` or `sql`)
+- **Integrations:** None required for MVP (list any that are)
+- **Monetization:** `free` / `subscription` / `one-time` (see `app-config.ts`)
+- **Accessibility:** _(e.g. Dynamic Type, WCAG AA contrast, min touch targets)_
+- **Performance:** _(e.g. cold start, list scroll expectations)_
+- **Security / privacy:** On-device data stays on-device; no analytics by default
+
+## Design constraints
+
+Constraints imposed by the **product**, not visual design instructions for the
+designer. The design tool owns look-and-feel within these bounds.
+
+### Required
+
+- _
+
+### Prohibited
+
+- _
+
+Do not prescribe navigation, colors, typography, component shapes, spacing, or
+visual style unless a product requirement genuinely requires it.
+
 ## Deviations from template defaults
 
 This template already decides the technical shape: **no backend**, on-device
 storage, RevenueCat for purchases, and the flags in
 `apps/mobile/lib/app-config.ts` (`STORAGE`, `MONETIZATION`, `PURCHASES_MODE`).
-Do not re-decide those here.
 
-Record only where this product must depart from them, and why. A departure that
-needs accounts, a server, or server-side sync is a **stop and discuss**, not a
-requirement to write down (see `AGENTS.md`).
+Record only where this product must depart from them, and why — or write
+“None.”
 
 - _
 

@@ -28,8 +28,8 @@ Play, and a marketing lander. No backend, no accounts, no server bill.
 
 3. `npm run doctor` to check your toolchain.
 4. Follow the product pipeline before writing UI:
-   `docs/recipes/product-pipeline.md` (PRD → design brief → design tool →
-   design-spec + screens-status → build-spec → code). Track progress in
+   `docs/recipes/product-pipeline.md` (PRD → design tool → export artifacts →
+   design-spec + build-spec → code). Track progress in
    `docs/build-status.md`.
 5. `npm run dev` and press `i` for the iOS Simulator or `a` for Android.
    Prefer a development build (`npm run dev:build:ios` /
