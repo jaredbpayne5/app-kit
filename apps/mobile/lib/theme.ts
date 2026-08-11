@@ -10,11 +10,15 @@ import { THEME } from '@/lib/theme-tokens';
 export { THEME };
 export type { ThemeTokens } from '@/lib/theme-tokens';
 
-/** Append alpha to a generated `hsl(...)` token for props that need opacity. */
+/**
+ * Append alpha to a generated `hsl(...)` token for props that need opacity.
+ * Emits `hsla(...)` — React Native's color normalizer rejects slash-alpha on
+ * `hsl()` and only accepts it on `hsla()` (@react-native/normalize-colors).
+ */
 export function hslWithAlpha(hsl: string, alpha: number): string {
   const match = /^hsl\((.+)\)$/.exec(hsl.trim());
   if (!match) return hsl;
-  return `hsl(${match[1]} / ${alpha})`;
+  return `hsla(${match[1]} / ${alpha})`;
 }
 
 export const NAV_THEME: Record<'light' | 'dark', Theme> = {
