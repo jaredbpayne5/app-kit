@@ -43,7 +43,7 @@ function RightAction({ onPress }: { onPress: () => void }) {
       accessibilityLabel="Delete item"
       testID="btn-delete-item"
       className="w-20 items-center justify-center bg-destructive active:opacity-80">
-      <Icon as={Trash2Icon} className="size-5 text-white" />
+      <Icon as={Trash2Icon} className="size-5 text-destructive-foreground" />
     </Pressable>
   );
 }

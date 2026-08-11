@@ -61,14 +61,14 @@ fi
 HEX_CLASS_HITS="$(
   grep -rnE '\[#[0-9A-Fa-f]{3,8}\]' \
     --include='*.tsx' --include='*.ts' \
-    apps/mobile/app apps/mobile/components 2>/dev/null || true
+    apps/mobile/app apps/mobile/components apps/mobile/ui 2>/dev/null || true
 )"
 if [[ -n "$HEX_CLASS_HITS" ]]; then
   echo "design-lint: hardcoded hex color(s) via Tailwind arbitrary value — use a theme token:"
   echo "$HEX_CLASS_HITS" | sed 's/^/  /'
   FAIL=1
 else
-  echo "design-lint: no hardcoded hex Tailwind classes in app/ or components/"
+  echo "design-lint: no hardcoded hex Tailwind classes in app/, components/, or ui/"
 fi
 
 # --- 3b. Hardcoded hsl()/hsla()/rgb()/rgba() literals ------------------------
@@ -77,14 +77,40 @@ fi
 FUNC_COLOR_HITS="$(
   grep -rnE '\b(hsla?|rgba?)\s*\(' \
     --include='*.tsx' --include='*.ts' \
-    apps/mobile/app apps/mobile/components 2>/dev/null || true
+    apps/mobile/app apps/mobile/components apps/mobile/ui 2>/dev/null || true
 )"
 if [[ -n "$FUNC_COLOR_HITS" ]]; then
   echo "design-lint: hardcoded hsl/hsla/rgb/rgba literal(s) — use a theme token from lib/theme-tokens.ts:"
   echo "$FUNC_COLOR_HITS" | sed 's/^/  /'
   FAIL=1
 else
-  echo "design-lint: no hardcoded hsl/hsla/rgb/rgba literals in app/ or components/"
+  echo "design-lint: no hardcoded hsl/hsla/rgb/rgba literals in app/, components/, or ui/"
+fi
+
+# --- 3c. Hardcoded named Tailwind palette classes ----------------------------
+# Hex/hsl rules miss `text-white` and `bg-black/50`. Named palette classes
+# also bypass theme tokens. shadow-* is not in the utility list — shadow-black/5
+# is a shadow tint, not a surface or text colour.
+# Dismiss-scrims are a deliberate neutral overlay that must not invert with
+# the theme; routing them through a token would be wrong. Allowlisted
+# explicitly rather than loosening the pattern.
+NAMED_PALETTE='white|black|slate|gray|grey|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose'
+NAMED_COLOR_HITS="$(
+  grep -rnE "\\b(bg|text|border|ring|fill|stroke|from|to|via)-(${NAMED_PALETTE})(-(100|200|300|400|500|600|700|800|900))?(/[0-9.]+)?\\b" \
+    --include='*.tsx' --include='*.ts' \
+    apps/mobile/app apps/mobile/components apps/mobile/ui 2>/dev/null \
+    | grep -vE ':[0-9]+:[[:space:]]*[*/]' \
+    | grep -vE '^apps/mobile/ui/alert-dialog\.tsx:30:.*bg-black/50' \
+    | grep -vE '^apps/mobile/components/date-field\.tsx:86:.*bg-black/40' \
+    | grep -vE '^apps/mobile/components/number-wheel-field\.tsx:99:.*bg-black/40' \
+    || true
+)"
+if [[ -n "$NAMED_COLOR_HITS" ]]; then
+  echo "design-lint: hardcoded named Tailwind palette class(es) — use a theme token:"
+  echo "$NAMED_COLOR_HITS" | sed 's/^/  /'
+  FAIL=1
+else
+  echo "design-lint: no hardcoded named Tailwind palette classes in app/, components/, or ui/ (besides documented dismiss-scrims)"
 fi
 
 # --- 4. Empty catch blocks ----------------------------------------------------
