@@ -2,8 +2,9 @@
 alwaysApply: true
 ---
 
-Cursor-only command guidance. Everything else lives in `AGENTS.md`, which
-Cursor reads natively — do not restate project conventions here.
+Cursor-only command guidance. Project rules live in `AGENTS.md`, which Cursor
+reads natively; Cursor's role and the Claude handoff protocol live in
+`implementation-workflow.mdc` — do not restate either here.
 
 Run in the sandbox: `npm run lint`, `npm run typecheck`, `npm run check`,
 `npm run format:check`, `npm test`, `git status`.

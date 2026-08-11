@@ -1,8 +1,13 @@
 # AGENTS.md
 
-Instructions for AI coding agents working in this repo. This is the single
-source of truth. `CLAUDE.md` is a one-line shim that imports this file, and
-Cursor reads this file natively — do not duplicate rules into `.cursor/rules/`.
+Shared instructions for every AI agent working in this repo: what this project
+is, and the rules that hold no matter which agent is working. Cursor reads this
+file natively; `CLAUDE.md` imports it. Both agents get everything here.
+
+Agent-specific *roles* live elsewhere — `CLAUDE.md` for Claude, `.cursor/rules/`
+for Cursor. Those files describe how each agent works and how the two hand work
+to each other; they never override the project rules here. Do not restate
+project conventions in either of them.
 
 ## What this is
 
@@ -31,6 +36,11 @@ When sources disagree, this is the order:
 4. `docs/build-spec.md` — how it gets built: phases, tasks, acceptance criteria.
 5. `docs/build-status.md` — current execution state.
 6. Existing source code — what is actually there today.
+
+`.ai/current-task.md` is not in this hierarchy. It is agent-to-agent messaging
+about work already authorized by the build spec — never a source of
+requirements. If it conflicts with anything above, the file above wins and the
+task file is wrong.
 
 Never silently override a higher authority. If the conflict is material, stop
 and report it. If it is a minor implementation detail, make the smallest change

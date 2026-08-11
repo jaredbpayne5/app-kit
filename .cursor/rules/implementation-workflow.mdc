@@ -1,0 +1,33 @@
+---
+alwaysApply: true
+---
+
+Cursor is the implementation agent for this repo. Claude works the same local
+working copy as technical lead: it plans, writes tasks, and reviews what you
+built. Project rules live in `AGENTS.md` (read natively) — including the
+authority hierarchy and the delegation rules, both of which still apply
+unchanged. This file is only about how the two agents hand work back and forth.
+
+## Handoff
+
+`.ai/current-task.md` is the mailbox. When its Owner is `cursor` and Status is
+`ready-for-cursor`:
+
+1. Read the task. If it is ambiguous, contradicts `AGENTS.md`, or needs a
+   decision rather than an implementation, set Status `ready-for-review` with
+   the question and stop — do not guess.
+2. Set Status `in-progress`.
+3. Implement exactly that scope. No unrelated refactors, no reformatting
+   untouched files (`AGENTS.md` → Task loop).
+4. Run the checks the task names, plus `npm run check`.
+5. Update `docs/build-status.md` — that stays the durable record; the task
+   file is not a substitute.
+6. Fill the Implementation report, set Owner `claude`, Status
+   `ready-for-review`. Report deviations and blockers honestly; Claude reads
+   the diff, so an omission surfaces as a discrepancy.
+
+`.ai/current-task.md` carries no authority. If it conflicts with `AGENTS.md`
+or `docs/`, the higher authority wins and the task is wrong — say so rather
+than following it.
+
+When Owner is `claude`, do not write source files.
