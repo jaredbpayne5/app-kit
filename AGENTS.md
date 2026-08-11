@@ -171,10 +171,13 @@ If Context7 isn’t available in the session, proceed normally.
 
 **Lint-enforced.** `eslint.config.js` blocks these imports outside their seam
 via `no-restricted-imports`, along with `StyleSheet` / `Animated` / `FlatList`
-from `react-native` (see Stack above). `npm run lint` fails on a violation.
-The seam files themselves and tests are exempt; `app/onboarding.tsx` is exempt
-for `FlatList` only. If you have a genuine reason to bypass a seam, add an
-`eslint-disable-next-line` with that reason rather than editing the config.
+from `react-native` (see Stack above). It also blocks `console.error` /
+`console.log` / etc. via `no-console` (with `console.warn` allowed) so errors
+go through `lib/report-error.ts`. `npm run lint` fails on a violation. The seam
+files themselves and tests are exempt; `app/onboarding.tsx` is exempt for
+`FlatList` only; `lib/report-error.ts` is exempt for `no-console`. If you have
+a genuine reason to bypass a seam, add an `eslint-disable-next-line` with that
+reason rather than editing the config.
 
 ## Capability flags
 

@@ -19,6 +19,8 @@
     --accent: 0 0% 96.1%;
     --accent-foreground: 0 0% 9%;
     --destructive: 0 84.2% 60.2%;
+    /* Near-black: white fails WCAG AA (~3.8:1) on this destructive red. */
+    --destructive-foreground: 0 0% 3.9%;
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
     --ring: 0 0% 63%;
@@ -48,6 +50,8 @@
     --accent: 0 0% 14.9%;
     --accent-foreground: 0 0% 98%;
     --destructive: 0 70.9% 59.4%;
+    /* Near-black: white fails WCAG AA on this destructive red. */
+    --destructive-foreground: 0 0% 3.9%;
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
     --ring: 300 0% 45%;

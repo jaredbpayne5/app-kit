@@ -84,6 +84,9 @@ module.exports = defineConfig([
     files: ['apps/mobile/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-imports': RESTRICTED_IMPORTS,
+      // Route errors through lib/report-error.ts — bare console.error vanishes in
+      // production. warn is allowed for intentional non-fatal diagnostics.
+      'no-console': ['error', { allow: ['warn'] }],
     },
   },
   {
@@ -94,11 +97,19 @@ module.exports = defineConfig([
     },
   },
   {
+    // report-error is the seam that legitimately calls console.error in __DEV__.
+    files: ['apps/mobile/lib/report-error.ts'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
+  {
     // Tests mock the underlying libraries directly to prove the seam's behaviour
     // (e.g. that the RevenueCat SDK is NOT loaded in free/mock mode).
     files: ['apps/mobile/**/*.test.{ts,tsx}', 'apps/mobile/__tests__/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-imports': 'off',
+      'no-console': 'off',
     },
   },
   {
