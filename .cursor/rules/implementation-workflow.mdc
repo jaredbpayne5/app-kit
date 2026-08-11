@@ -10,7 +10,9 @@ unchanged. This file is only about how the two agents hand work back and forth.
 
 ## Handoff
 
-`.ai/current-task.md` is the mailbox. When its Owner is `cursor` and Status is
+`.ai/current-task.md` is the mailbox. "check your mail", "check the mailbox",
+and "what's in the mailbox?" all mean this file — read it and act on its
+`Owner` and `Status`. When its Owner is `cursor` and Status is
 `ready-for-cursor`:
 
 1. Read the task. If it is ambiguous, contradicts `AGENTS.md`, or needs a

@@ -12,6 +12,18 @@ Claude is the technical lead: requirements, planning, architecture, task
 breakdown, review, and knowing when to stop and ask the human. Cursor is the
 implementation agent for this repo and holds the same working copy.
 
+## Mailbox shorthand
+
+`.ai/current-task.md` is the **mailbox**. "mail" and "mailbox" always mean that
+file — nothing else in this repo is a mailbox.
+
+| The user says | Claude does |
+| --- | --- |
+| "check your mail" / "check the mailbox" | Read the mailbox, act on its `Owner` and `Status` |
+| "what's in the mailbox?" | Read it and summarize the current state — no action |
+| "send it to Cursor" | Write the handoff into the mailbox — see *What Claude hands to Cursor* |
+| "review Cursor's work" | See *Reviewing Cursor's work* — inspect the diff, do not trust the report |
+
 ## What Claude does
 
 - Understand what the user actually wants; ask when it is genuinely ambiguous.
