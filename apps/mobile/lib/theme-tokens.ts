@@ -27,6 +27,8 @@ export type ThemeTokens = {
   ring: string;
   radius: string;
   grouped: string;
+  atmosphereMid: string;
+  atmosphereWash: string;
   chart1: string;
   chart2: string;
   chart3: string;
@@ -57,6 +59,8 @@ export const THEME: Record<'light' | 'dark', ThemeTokens> = {
     ring: 'hsl(0 0% 63%)',
     radius: '0.625rem',
     grouped: 'hsl(0 0% 95%)',
+    atmosphereMid: 'hsl(0 0% 96%)',
+    atmosphereWash: 'hsl(0 0% 100%)',
     chart1: 'hsl(12 76% 61%)',
     chart2: 'hsl(173 58% 39%)',
     chart3: 'hsl(197 37% 24%)',
@@ -85,6 +89,8 @@ export const THEME: Record<'light' | 'dark', ThemeTokens> = {
     ring: 'hsl(300 0% 45%)',
     radius: '0.625rem',
     grouped: 'hsl(0 0% 7%)',
+    atmosphereMid: 'hsl(0 0% 9%)',
+    atmosphereWash: 'hsl(0 0% 4%)',
     chart1: 'hsl(220 70% 50%)',
     chart2: 'hsl(160 60% 45%)',
     chart3: 'hsl(30 80% 55%)',

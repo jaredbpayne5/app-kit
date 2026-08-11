@@ -30,6 +30,7 @@ const PAIRS: [fg: string, bg: string, label: string][] = [
   ['--muted-foreground', '--card', 'muted-foreground on card'],
   ['--muted-foreground', '--grouped', 'muted-foreground on grouped'],
   ['--accent-foreground', '--accent', 'accent-foreground on accent'],
+  ['--destructive-foreground', '--destructive', 'destructive-foreground on destructive'],
 ];
 
 const AA_NORMAL = 4.5;

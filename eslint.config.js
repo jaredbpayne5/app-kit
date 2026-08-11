@@ -52,6 +52,15 @@ const RESTRICTED_IMPORTS = [
           'Styling is NativeWind classes (no StyleSheet). Animation is Reanimated (not the legacy Animated API). Lists use @shopify/flash-list (not FlatList).',
       },
     ],
+    // Catch expo-sqlite/foo subpaths that aren't listed above (kv-store is also
+    // named explicitly so its message stays specific).
+    patterns: [
+      {
+        group: ['expo-sqlite/*'],
+        message:
+          "Use the storage seam ('@/lib/storage') instead of importing expo-sqlite subpaths directly.",
+      },
+    ],
   },
 ];
 
@@ -125,6 +134,7 @@ module.exports = defineConfig([
               ? { ...entry, importNames: ['StyleSheet', 'Animated'] }
               : entry
           ),
+          patterns: RESTRICTED_IMPORTS[1].patterns,
         },
       ],
     },

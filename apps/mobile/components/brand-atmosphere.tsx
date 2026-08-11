@@ -1,3 +1,4 @@
+import { THEME, hslWithAlpha } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useColorScheme } from 'nativewind';
@@ -21,10 +22,10 @@ export function BrandAtmosphere({
   const { colorScheme } = useColorScheme();
   const dark = colorScheme === 'dark';
   const rich = intensity === 'rich';
-
-  const colors = dark
-    ? (['hsla(0,0%,4%,1)', 'hsla(0,0%,9%,0.95)', 'hsla(0,0%,4%,1)'] as const)
-    : (['hsla(0,0%,100%,1)', 'hsla(0,0%,96%,0.95)', 'hsla(0,0%,100%,1)'] as const);
+  const tokens = THEME[dark ? 'dark' : 'light'];
+  // Light wash matches --background (100%); dark wash is the prior 4% end stop.
+  const wash = tokens.atmosphereWash;
+  const colors = [wash, hslWithAlpha(tokens.atmosphereMid, 0.95), wash] as const;
 
   return (
     <View

@@ -17,7 +17,7 @@
     "ios": "npm run ios -w mobile",
     "web": "npm run web -w mobile",
     "lint": "eslint .",
-    "typecheck": "npm run typecheck -w mobile",
+    "typecheck": "npm run typecheck -w mobile && tsc --noEmit -p tsconfig.scripts.json",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "contrast-check": "tsx scripts/dev/contrast-check.ts",

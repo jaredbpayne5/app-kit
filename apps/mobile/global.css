@@ -27,6 +27,10 @@
     --radius: 0.625rem;
     /* System-grouped background feel (iOS Settings) */
     --grouped: 0 0% 95%;
+    /* BrandAtmosphere gradient stops (exact prior hsla literals). Ends use
+       --background in light; mid is 96% (not secondary's 96.1%). */
+    --atmosphere-mid: 0 0% 96%;
+    --atmosphere-wash: 0 0% 100%;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -56,6 +60,9 @@
     --input: 0 0% 14.9%;
     --ring: 300 0% 45%;
     --grouped: 0 0% 7%;
+    /* BrandAtmosphere: prior hsla(0,0%,9%,0.95) mid / hsla(0,0%,4%,1) ends. */
+    --atmosphere-mid: 0 0% 9%;
+    --atmosphere-wash: 0 0% 4%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;

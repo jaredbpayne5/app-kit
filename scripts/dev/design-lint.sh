@@ -71,6 +71,22 @@ else
   echo "design-lint: no hardcoded hex Tailwind classes in app/ or components/"
 fi
 
+# --- 3b. Hardcoded hsl()/hsla()/rgb()/rgba() literals ------------------------
+# Same rule as hex: colors belong in global.css → theme-tokens, not inline in
+# screens/components. (Hex-only grep missed BrandAtmosphere's hsla() washes.)
+FUNC_COLOR_HITS="$(
+  grep -rnE '\b(hsla?|rgba?)\s*\(' \
+    --include='*.tsx' --include='*.ts' \
+    apps/mobile/app apps/mobile/components 2>/dev/null || true
+)"
+if [[ -n "$FUNC_COLOR_HITS" ]]; then
+  echo "design-lint: hardcoded hsl/hsla/rgb/rgba literal(s) — use a theme token from lib/theme-tokens.ts:"
+  echo "$FUNC_COLOR_HITS" | sed 's/^/  /'
+  FAIL=1
+else
+  echo "design-lint: no hardcoded hsl/hsla/rgb/rgba literals in app/ or components/"
+fi
+
 # --- 4. Empty catch blocks ----------------------------------------------------
 # Self-review rubric item 7 ("no unguarded JSON.parse; no unhandled promise
 # rejection; no empty catch") is mostly a judgment call, but a literal empty
