@@ -100,9 +100,9 @@ NAMED_COLOR_HITS="$(
     --include='*.tsx' --include='*.ts' \
     apps/mobile/app apps/mobile/components apps/mobile/ui 2>/dev/null \
     | grep -vE ':[0-9]+:[[:space:]]*[*/]' \
-    | grep -vE '^apps/mobile/ui/alert-dialog\.tsx:30:.*bg-black/50' \
-    | grep -vE '^apps/mobile/components/date-field\.tsx:86:.*bg-black/40' \
-    | grep -vE '^apps/mobile/components/number-wheel-field\.tsx:99:.*bg-black/40' \
+    | grep -vE '^apps/mobile/ui/alert-dialog\.tsx:[0-9]+:.*bg-black/50' \
+    | grep -vE '^apps/mobile/components/date-field\.tsx:[0-9]+:.*bg-black/40' \
+    | grep -vE '^apps/mobile/components/number-wheel-field\.tsx:[0-9]+:.*bg-black/40' \
     || true
 )"
 if [[ -n "$NAMED_COLOR_HITS" ]]; then
@@ -165,6 +165,47 @@ if [[ -n "$SAFE_AREA_MISS" ]]; then
   FAIL=1
 else
   echo "design-lint: every top-level screen references safe-area insets"
+fi
+
+# --- 6. New routes while the design inventory is still a placeholder ---------
+# Catches *new route files* under apps/mobile/app/ while screens-status.md
+# still carries its sentinel. Does not catch a freehand redesign of an
+# existing screen. The template ships the sentinel plus the 8 routes below;
+# fail only when a file appears that is not in this list. Update the list if
+# the template itself gains a route, or this check fires on the template.
+TEMPLATE_ROUTE_BASELINE=(
+  'apps/mobile/app/_layout.tsx'
+  'apps/mobile/app/onboarding.tsx'
+  'apps/mobile/app/+html.tsx'
+  'apps/mobile/app/+not-found.tsx'
+  'apps/mobile/app/(tabs)/_layout.tsx'
+  'apps/mobile/app/(tabs)/index.tsx'
+  'apps/mobile/app/(tabs)/library.tsx'
+  'apps/mobile/app/(tabs)/settings.tsx'
+)
+NEW_ROUTES=""
+if grep -q '<!-- TEMPLATE_PLACEHOLDER -->' docs/screens-status.md 2>/dev/null; then
+  while IFS= read -r f; do
+    [[ -f "$f" ]] || continue
+    is_baseline=0
+    for b in "${TEMPLATE_ROUTE_BASELINE[@]}"; do
+      if [[ "$f" == "$b" ]]; then
+        is_baseline=1
+        break
+      fi
+    done
+    if [[ "$is_baseline" -eq 0 ]]; then
+      NEW_ROUTES+="  $f"$'\n'
+    fi
+  done < <(find apps/mobile/app -type f -name '*.tsx' | sort)
+fi
+if [[ -n "$NEW_ROUTES" ]]; then
+  echo "design-lint: new route file(s) under apps/mobile/app/ while docs/screens-status.md still has its TEMPLATE_PLACEHOLDER sentinel:"
+  printf '%s' "$NEW_ROUTES"
+  echo "  Fill docs/screens-status.md (Designed = yes + artifact) and remove the sentinel before building the screen."
+  FAIL=1
+else
+  echo "design-lint: no new route files while the screens-status sentinel is present"
 fi
 
 if [[ "$FAIL" -eq 1 ]]; then
