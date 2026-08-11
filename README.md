@@ -7,8 +7,9 @@ Play, and a marketing lander. No backend, no accounts, no server bill.
 - `apps/web` — static marketing lander + hosted privacy/terms
 - `apps/product.json` — shared identity used by the app and the lander
 - `scripts/` — dev, store, and lander automation
-- `AGENTS.md` — instructions for AI coding agents (Cursor reads it natively;
-  `CLAUDE.md` is a one-line shim that imports it)
+- `AGENTS.md` — shared instructions for AI coding agents (Cursor reads it
+  natively; `CLAUDE.md` imports it and adds Claude-specific operating
+  instructions, and `.cursor/rules/` holds the Cursor-specific ones)
 
 ## Starting a new app
 
