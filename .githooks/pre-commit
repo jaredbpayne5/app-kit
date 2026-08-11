@@ -1,27 +1,25 @@
 #!/bin/sh
 #
-# Pre-commit: format + lint + types + basic secret scan.
+# Pre-commit: full npm run check + tests + basic secret scan.
 # Wired via package.json "prepare" → git config core.hooksPath .githooks
 
 set -e
 
-echo "pre-commit: checking formatting, lint, and types..."
+echo "pre-commit: running npm run check..."
 
-if ! npm run --silent format:check; then
+if ! npm run --silent check; then
   echo
-  echo "✗ Formatting issues. Fix with:  npm run format"
+  echo "✗ npm run check failed."
+  echo "  Formatting:  npm run format"
+  echo "  Lint/types/theme/contrast/design-lint: see output above."
   exit 1
 fi
 
-if ! npm run --silent lint; then
-  echo
-  echo "✗ Lint errors above. Fix them, then re-commit."
-  exit 1
-fi
+echo "pre-commit: running npm test..."
 
-if ! npm run --silent typecheck; then
+if ! npm run --silent test; then
   echo
-  echo "✗ Type errors above. Fix them, then re-commit."
+  echo "✗ Tests failed. Fix them, then re-commit."
   exit 1
 fi
 

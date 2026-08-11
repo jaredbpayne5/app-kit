@@ -17,12 +17,8 @@ jobs:
           cache: 'npm'
 
       - run: npm ci
-      - run: npm run format:check
-      - run: npm run lint
-      - run: npm run typecheck
+      - run: npm run check
       - run: npm test
-      - run: npm run contrast-check
-      - run: npm run design-lint
 
   smoke-export:
     runs-on: ubuntu-latest
