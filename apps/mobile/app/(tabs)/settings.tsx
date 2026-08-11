@@ -2,12 +2,10 @@ import { GroupedRow, GroupedSection } from '@/components/grouped';
 import { Paywall } from '@/components/paywall';
 import { APP_CONFIG } from '@/lib/app-config';
 import { getAppDisplayName, getAppVersion, getNativeBuildNumber } from '@/lib/app-version';
-import { ONBOARDING_STORAGE_KEY } from '@/lib/onboarding';
+import { resetOnboardingSeen } from '@/lib/onboarding';
 import { PRIVACY_URL, TERMS_URL } from '@/lib/product';
 import { reportError } from '@/lib/report-error';
-import { remove } from '@/lib/storage';
 import { Text } from '@/ui/text';
-import { router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { Alert, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -23,8 +21,9 @@ async function openInAppBrowser(url: string, label: string): Promise<void> {
 
 async function resetOnboarding(): Promise<void> {
   try {
-    await remove(ONBOARDING_STORAGE_KEY);
-    router.replace('/onboarding');
+    // The root gate reacts to this and swaps the protected route to onboarding;
+    // no manual navigation needed.
+    await resetOnboardingSeen();
   } catch (error) {
     reportError(error, { scope: 'settings.resetOnboarding' });
     Alert.alert('Couldn’t reset onboarding', 'Please try again.');

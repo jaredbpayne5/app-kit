@@ -74,3 +74,9 @@ apps/mobile/store/metadata/**/images/**
 
 # brand:generate output (lander OG); regenerate anytime
 apps/web/template/og-image.png
+
+# Claude Code per-machine overrides (absolute paths; regenerate locally)
+.claude/settings.local.json
+
+# Local audit backlog — not part of the template product
+REPO-EVALUATION.md

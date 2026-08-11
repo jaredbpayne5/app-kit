@@ -1,59 +1,26 @@
+// Demo screen — replace this with your product's home.
+//
+// The onboarding gate deliberately does NOT live here. It is in
+// `app/_layout.tsx` via `Stack.Protected`, so replacing this file cannot
+// silently remove onboarding. Do not move gating logic back into a screen.
 import { BrandAtmosphere } from '@/components/brand-atmosphere';
 import { GroupedRow, GroupedSection } from '@/components/grouped';
 import { getAppDisplayName } from '@/lib/app-version';
-import { ONBOARDING_STORAGE_KEY } from '@/lib/onboarding';
-import { reportError } from '@/lib/report-error';
-import { getJSON } from '@/lib/storage';
 import { FadeSlideIn } from '@/ui/motion';
 import { Text } from '@/ui/text';
-import { Redirect, router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { router } from 'expo-router';
 import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const appName = getAppDisplayName();
-  const [onboardingReady, setOnboardingReady] = useState(false);
-  const [onboardingSeen, setOnboardingSeen] = useState(true);
-
-  useEffect(() => {
-    let mounted = true;
-    void (async () => {
-      try {
-        const seen = await getJSON<boolean>(ONBOARDING_STORAGE_KEY);
-        if (!mounted) return;
-        setOnboardingSeen(seen === true);
-      } catch (error) {
-        reportError(error, { scope: 'home.onboardingGate' });
-        // Fail open to onboarding so cold start never blank-screens forever.
-        if (!mounted) return;
-        setOnboardingSeen(false);
-      } finally {
-        if (mounted) setOnboardingReady(true);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  if (!onboardingReady) {
-    return (
-      <View
-        className="flex-1 bg-grouped"
-        testID="home-loading"
-        accessibilityLabel="Loading"
-        accessibilityRole="progressbar"
-        accessibilityState={{ busy: true }}
-      />
-    );
-  }
-
-  if (!onboardingSeen) {
-    return <Redirect href="/onboarding" />;
-  }
+  const insets = useSafeAreaInsets();
 
   return (
-    <View className="flex-1 bg-grouped" testID="home-screen">
+    <View
+      className="flex-1 bg-grouped"
+      style={{ paddingBottom: Math.max(insets.bottom, 0) }}
+      testID="home-screen">
       <BrandAtmosphere intensity="soft" />
       <FadeSlideIn className="flex-1 justify-center gap-6 p-6">
         <View className="gap-2">

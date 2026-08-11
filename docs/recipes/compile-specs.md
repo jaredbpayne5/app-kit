@@ -58,6 +58,11 @@ design beyond the PRD and the exported artifacts.
    - Compile once from PRD + design-spec + this repo.
    - Phases matching `docs/build-status.md` (0–8).
    - Tasks with clear acceptance criteria.
+   - **Every task's acceptance criteria must end with:** “`docs/build-status.md`
+     updated (current task, verification, any deviations).” The implementing
+     model is a cheaper/faster one that follows per-task acceptance criteria far
+     more reliably than a general instruction in `AGENTS.md` — and if the status
+     file goes stale, the next session resumes from a false picture.
    - Do **not** add product requirements or redesign the UX.
    - Prefer existing `ui/` primitives and `lib/` seams.
 

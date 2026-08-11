@@ -12,9 +12,29 @@
  *
  *   jest.mock('@/ui/text', () => require('@/__tests__/test-utils').mockUiText());
  */
-import type { ReactNode } from 'react';
+import { render } from '@testing-library/react-native';
+import type { ReactElement, ReactNode } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 type StubProps = Record<string, unknown> & { children?: ReactNode };
+
+/**
+ * Render a screen inside a `SafeAreaProvider` with deterministic metrics.
+ *
+ * `useSafeAreaInsets` throws without a provider, and design-lint requires every
+ * screen that paints UI to use it — so screen tests need this wrapper.
+ */
+export function renderWithSafeArea(ui: ReactElement) {
+  return render(
+    <SafeAreaProvider
+      initialMetrics={{
+        frame: { x: 0, y: 0, width: 390, height: 844 },
+        insets: { top: 47, left: 0, right: 0, bottom: 34 },
+      }}>
+      {ui}
+    </SafeAreaProvider>
+  );
+}
 
 /** `ui/text` -> React Native `Text`, forwarding testID/accessibility props. */
 export function mockUiText() {

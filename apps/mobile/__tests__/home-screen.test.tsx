@@ -10,7 +10,6 @@ jest.mock('expo-router', () => {
   const React = require('react');
   return {
     Link: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-    Redirect: () => null,
     router: {
       push: (...args: unknown[]) => mockPush(...args),
     },
@@ -28,12 +27,6 @@ jest.mock('nativewind', () => ({
 
 jest.mock('lucide-react-native', () => require('@/__tests__/test-utils').mockLucideIcons());
 
-jest.mock('@/lib/storage', () => ({
-  getJSON: jest.fn(async () => true),
-  setJSON: jest.fn(async () => undefined),
-  remove: jest.fn(async () => undefined),
-}));
-
 jest.mock('@/ui/text', () => require('@/__tests__/test-utils').mockUiText());
 jest.mock('@/ui/icon', () => require('@/__tests__/test-utils').mockUiIcon());
 jest.mock('@/ui/button', () => require('@/__tests__/test-utils').mockUiButton());
@@ -49,6 +42,7 @@ jest.mock('expo-linear-gradient', () => {
 });
 
 import HomeScreen from '@/app/(tabs)/index';
+import { renderWithSafeArea } from '@/__tests__/test-utils';
 import { ThemeToggle } from '@/components/header-chrome';
 
 describe('HomeScreen', () => {
@@ -58,7 +52,7 @@ describe('HomeScreen', () => {
   });
 
   it('renders the home shell with settings entry', async () => {
-    render(<HomeScreen />);
+    renderWithSafeArea(<HomeScreen />);
     await waitFor(() => {
       expect(screen.getByTestId('home-screen')).toBeTruthy();
     });
@@ -66,7 +60,7 @@ describe('HomeScreen', () => {
   });
 
   it('exposes accessibility labels for settings', async () => {
-    render(<HomeScreen />);
+    renderWithSafeArea(<HomeScreen />);
     await waitFor(() => {
       expect(screen.getByTestId('home-screen')).toBeTruthy();
     });
@@ -74,12 +68,23 @@ describe('HomeScreen', () => {
   });
 
   it('navigates to settings from the grouped row', async () => {
-    render(<HomeScreen />);
+    renderWithSafeArea(<HomeScreen />);
     await waitFor(() => {
       expect(screen.getByTestId('link-settings')).toBeTruthy();
     });
     fireEvent.press(screen.getByTestId('link-settings'));
     expect(mockPush).toHaveBeenCalledWith('/settings');
+  });
+
+  // Regression guard for the gate that used to live in this file. The gate now
+  // belongs to app/_layout.tsx; if it creeps back into a screen, replacing the
+  // demo home screen silently deletes onboarding again.
+  it('does not gate on onboarding itself', () => {
+    const source = require('fs').readFileSync(
+      require('path').join(__dirname, '..', 'app', '(tabs)', 'index.tsx'),
+      'utf8'
+    );
+    expect(source).not.toMatch(/ONBOARDING_STORAGE_KEY|useOnboardingGate|<Redirect/);
   });
 });
 

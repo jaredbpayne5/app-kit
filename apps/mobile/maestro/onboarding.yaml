@@ -24,6 +24,18 @@ appId: host.exp.Exponent
     id: onboarding-screen
 - assertVisible:
     id: onboarding-slide-0
+# Deep links must not bypass the gate. The gate lives in app/_layout.tsx via
+# Stack.Protected, which removes (tabs) from the navigator entirely while
+# onboarding is unseen — a screen-level redirect could not prevent this.
+- openLink: exp://127.0.0.1:${EXPO_PORT:-8081}/--/library
+- extendedWaitUntil:
+    visible:
+      id: onboarding-screen
+    timeout: 20000
+- assertVisible:
+    id: onboarding-screen
+- assertNotVisible:
+    id: library-screen
 - tapOn:
     id: btn-onboarding-skip
 - extendedWaitUntil:

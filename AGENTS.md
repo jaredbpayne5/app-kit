@@ -71,9 +71,19 @@ stay outside the repo (chat paste only).
 
 If any of these files still contains `<!-- TEMPLATE_PLACEHOLDER -->`, stop
 and tell the user. Do not invent an MVP, design system, screen list, or build
-plan. Exception: the one-time strong-model **compile** pass that creates
-`design-spec.md` / `build-spec.md` / inventory docs from PRD + exports may
-clear those placeholders as it writes them.
+plan.
+
+Two carve-outs, both narrow:
+
+1. The one-time strong-model **compile** pass that creates `design-spec.md` /
+   `build-spec.md` / inventory docs from PRD + exports may clear those
+   placeholders as it writes them.
+2. Reading and ticking the **Phase 0–1 checklist** in `docs/build-status.md`
+   while its own sentinel is still present is allowed — that is the bootstrap
+   path described under Task loop below, not a licence to invent content.
+
+What stays forbidden in both cases: inventing product scope, screens, design
+tokens, or a build plan that the PRD and design exports do not support.
 
 ## Design system & design tool
 
@@ -158,6 +168,13 @@ If Context7 isn’t available in the session, proceed normally.
 | Error reporting | `lib/report-error.ts` | `console.error`, Sentry directly |
 | Haptics | `lib/haptics.ts` | `expo-haptics` directly |
 | Local reminders | `lib/local-notifications.ts` | `expo-notifications` directly |
+
+**Lint-enforced.** `eslint.config.js` blocks these imports outside their seam
+via `no-restricted-imports`, along with `StyleSheet` / `Animated` / `FlatList`
+from `react-native` (see Stack above). `npm run lint` fails on a violation.
+The seam files themselves and tests are exempt; `app/onboarding.tsx` is exempt
+for `FlatList` only. If you have a genuine reason to bypass a seam, add an
+`eslint-disable-next-line` with that reason rather than editing the config.
 
 ## Capability flags
 

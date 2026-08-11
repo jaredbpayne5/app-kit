@@ -48,14 +48,21 @@ export type SqlMigration = {
 };
 
 /**
- * Built-in starter migrations. Product apps append via `registerMigrations`
- * before the first `withSql` call, or replace this list when you design your schema.
+ * Built-in starter migration (version 1).
+ *
+ * Product apps **append** via `registerMigrations` starting at version 2, or
+ * pass `{ replaceBuiltins: true }` to drop this demo table and own version 1.
+ *
+ * Registering your own version 1 without `replaceBuiltins` is an error rather
+ * than a silent no-op: `PRAGMA user_version` would already be 1 after the
+ * builtin ran, so your migration would be skipped, your tables would never be
+ * created, and every query would fail at runtime with nothing pointing at the
+ * cause.
  */
 const BUILTIN_MIGRATIONS: SqlMigration[] = [
   {
     version: 1,
     sql: `
-      PRAGMA journal_mode = WAL;
       CREATE TABLE IF NOT EXISTS records (
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         payload TEXT NOT NULL,
@@ -66,22 +73,72 @@ const BUILTIN_MIGRATIONS: SqlMigration[] = [
 ];
 
 let extraMigrations: SqlMigration[] = [];
+let useBuiltinMigrations = true;
 let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
 
-/** Register additional migrations (must be called before first `withSql`). */
-export function registerMigrations(migrations: SqlMigration[]): void {
-  extraMigrations = migrations;
-  dbPromise = null;
+export type RegisterMigrationsOptions = {
+  /** Drop the builtin starter migration so this product owns version 1. */
+  replaceBuiltins?: boolean;
+};
+
+/**
+ * Register product migrations. Additive — call it more than once and the sets
+ * merge, rather than the last call silently discarding earlier ones.
+ *
+ * Must be called before the first `withSql`.
+ */
+export function registerMigrations(
+  migrations: SqlMigration[],
+  options: RegisterMigrationsOptions = {}
+): void {
+  if (dbPromise) {
+    throw new Error(
+      'registerMigrations must be called before the first withSql() — the database is already open ' +
+        'and its migrations have run. Move this call to module init.'
+    );
+  }
+  if (options.replaceBuiltins) useBuiltinMigrations = false;
+  const merged = [...extraMigrations, ...migrations];
+  assertUniqueVersions(useBuiltinMigrations ? [...BUILTIN_MIGRATIONS, ...merged] : merged);
+  extraMigrations = merged;
 }
 
-/** Reset cached DB handle (tests only). */
-export function __resetSqlCacheForTests(): void {
+/** Reset cached DB handle and registrations (tests only). */
+export async function __resetSqlCacheForTests(): Promise<void> {
+  const pending = dbPromise;
   dbPromise = null;
   extraMigrations = [];
+  useBuiltinMigrations = true;
+  if (!pending) return;
+  // Close the handle rather than orphaning it — an open SQLite connection
+  // survives the cleared promise and leaks across tests.
+  try {
+    const db = await pending;
+    await db.closeAsync();
+  } catch {
+    // Handle already closed or never opened — nothing to release.
+  }
+}
+
+function assertUniqueVersions(migrations: SqlMigration[]): void {
+  const seen = new Set<number>();
+  for (const migration of migrations) {
+    if (seen.has(migration.version)) {
+      throw new Error(
+        `Duplicate SQL migration version ${migration.version}. Versions must be unique — ` +
+          'append starting at version 2, or call registerMigrations(..., { replaceBuiltins: true }) ' +
+          'to own version 1. A duplicate would be skipped and its tables never created.'
+      );
+    }
+    seen.add(migration.version);
+  }
 }
 
 function allMigrations(): SqlMigration[] {
-  return [...BUILTIN_MIGRATIONS, ...extraMigrations].sort((a, b) => a.version - b.version);
+  const base = useBuiltinMigrations ? BUILTIN_MIGRATIONS : [];
+  const merged = [...base, ...extraMigrations];
+  assertUniqueVersions(merged);
+  return merged.sort((a, b) => a.version - b.version);
 }
 
 async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
@@ -93,8 +150,14 @@ async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
 
   for (const migration of migrations) {
     if (migration.version <= current) continue;
-    await db.execAsync(migration.sql);
-    await db.execAsync(`PRAGMA user_version = ${migration.version}`);
+    // One transaction per migration: applying the SQL and recording the new
+    // user_version must be atomic, or a crash between them re-runs the
+    // migration on next launch. That is only survivable when every statement
+    // is idempotent — an ALTER TABLE or UPDATE would corrupt or hard-fail.
+    await db.withTransactionAsync(async () => {
+      await db.execAsync(migration.sql);
+      await db.execAsync(`PRAGMA user_version = ${migration.version}`);
+    });
     current = migration.version;
   }
 }
@@ -106,6 +169,10 @@ async function openAppDatabase(): Promise<SQLite.SQLiteDatabase> {
   if (!dbPromise) {
     dbPromise = (async () => {
       const db = await SQLite.openDatabaseAsync(APP_DB_NAME);
+      // Connection-level PRAGMAs (journal_mode, foreign_keys) cannot run inside a
+      // transaction — SQLite errors or silently no-ops. Never put them in migration
+      // SQL; migrations run inside withTransactionAsync.
+      await db.execAsync('PRAGMA journal_mode = WAL;');
       await runMigrations(db);
       return db;
     })();

@@ -93,18 +93,30 @@ fi
 # a real rendering check would need a device/simulator, but every screen
 # that paints its own UI (i.e. isn't a pure redirect stub) should at least
 # reference useSafeAreaInsets/SafeAreaView somewhere.
+#
+# Discovery is a recursive find over apps/mobile/app rather than a fixed list of
+# globs. An earlier version hardcoded `app/*.tsx` and `app/(app)/*.tsx`; the real
+# route group is `(tabs)`, so every screen an agent actually builds went
+# unchecked while this reported success. Any route group — existing or added
+# later — is covered now.
 SAFE_AREA_MISS=""
-for f in apps/mobile/app/*.tsx "apps/mobile/app/(app)"/*.tsx; do
+while IFS= read -r f; do
   [[ -f "$f" ]] || continue
   base="$(basename "$f")"
   case "$base" in
     _layout.tsx | +not-found.tsx | +html.tsx) continue ;;
+    *.test.tsx) continue ;;
   esac
-  grep -q '<Redirect' "$f" && continue # redirect-only stub, paints nothing
+  # Redirect-only stub — paints nothing, so safe-area is meaningless. A file
+  # that redirects *and* renders styled UI is a real screen and must still be
+  # checked, so require the absence of any NativeWind class before skipping.
+  if grep -q '<Redirect' "$f" && ! grep -q 'className=' "$f"; then
+    continue
+  fi
   if ! grep -q 'useSafeAreaInsets\|SafeAreaView' "$f"; then
     SAFE_AREA_MISS+="  $f"$'\n'
   fi
-done
+done < <(find apps/mobile/app -type f -name '*.tsx' | sort)
 if [[ -n "$SAFE_AREA_MISS" ]]; then
   echo "design-lint: screen(s) with no useSafeAreaInsets/SafeAreaView reference:"
   printf '%s' "$SAFE_AREA_MISS"

@@ -1,10 +1,8 @@
 import { Button } from '@/ui/button';
 import { Text } from '@/ui/text';
 import { getAppDisplayName } from '@/lib/app-version';
-import { ONBOARDING_STORAGE_KEY } from '@/lib/onboarding';
+import { markOnboardingSeen } from '@/lib/onboarding';
 import { reportError } from '@/lib/report-error';
-import { setJSON } from '@/lib/storage';
-import { router } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
 import {
   Alert,
@@ -56,8 +54,9 @@ export default function OnboardingScreen() {
 
   async function finish() {
     try {
-      await setJSON(ONBOARDING_STORAGE_KEY, true);
-      router.replace('/');
+      // The root gate reacts to this and swaps the protected route to (tabs);
+      // no manual navigation needed.
+      await markOnboardingSeen();
     } catch (error) {
       reportError(error, { scope: 'onboarding.finish' });
       Alert.alert('Couldn’t finish onboarding', 'Please try again.');
