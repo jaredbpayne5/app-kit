@@ -3,7 +3,7 @@
 **Warn:** cloud builds burn Expo credits. Do not run without developer yes
 (ask before running).
 
-## Profiles (see `eas.json`)
+## Profiles (see `apps/mobile/eas.json`)
 
 | Profile | Use |
 |---------|-----|

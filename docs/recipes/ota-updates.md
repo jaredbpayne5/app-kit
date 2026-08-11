@@ -54,4 +54,3 @@ If the bad change required a native bump, OTA cannot fix it — ship a store bui
 
 - `npm run bump-version` prints an OTA vs store-build reminder.
 - Ask first: `eas update`, `eas build`, `eas submit`.
-- Go-live / prod env: `docs/FACTORY-PLAN.md (no backend go-live in this template)` (Stage 3 Part D).

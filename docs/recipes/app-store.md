@@ -8,7 +8,7 @@ Android/Play remains first-class too — see `docs/recipes/play-store.md`.
 | Path | Needs Apple Developer Program ($99/yr)? |
 |------|-----------------------------------------|
 | iOS Simulator + Expo Go (`npm run open:ios`, `test:e2e -- --platform=ios`) | **No** |
-| EAS `development` / `preview` **simulator** builds (`eas.json` has `"ios": { "simulator": true }`) | **No** Apple listing fee (EAS credits still apply if you run cloud builds) |
+| EAS `development` / `preview` **simulator** builds (`apps/mobile/eas.json` has `"ios": { "simulator": true }`) | **No** Apple listing fee (EAS credits still apply if you run cloud builds) |
 | TestFlight / App Store / device-signed production | **Yes** — no free public listing path (unlike Play’s one-time fee) |
 
 **Warn:** EAS iOS production builds burn credits and need an Apple Developer
@@ -28,7 +28,7 @@ Ship a real on-device job (clear value beyond a static website or single stub).
 2. Create the app in [App Store Connect](https://appstoreconnect.apple.com).
 3. Note the numeric **Apple ID** of the app (App Information → General —
    this is `ascAppId`, not the bundle id).
-4. Replace `REPLACE_WITH_APP_STORE_CONNECT_APP_ID` in `eas.json`
+4. Replace `REPLACE_WITH_APP_STORE_CONNECT_APP_ID` in `apps/mobile/eas.json`
    `submit.production.ios.ascAppId`.
 5. Ask before changing submit config or running `eas submit`.
 

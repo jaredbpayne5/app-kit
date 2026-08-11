@@ -11,11 +11,18 @@ Play, and a marketing lander. No backend, no accounts, no server bill.
   natively; `CLAUDE.md` imports it and adds Claude-specific operating
   instructions, and `.cursor/rules/` holds the Cursor-specific ones)
 
+## Requirements
+
+- **Node ≥ 24** — matches `.nvmrc` and `package.json` `engines` (`>=24.0.0`).
+- **`jq`** — `brew install jq`. All three `.claude/hooks` scripts fail closed
+  without it, which makes Claude Code non-functional in this repo.
+
 ## Starting a new app
 
 1. Copy this repo to a new folder and `npm install`.
 2. Set identity with one command (keeps the four surfaces in sync — see
-   `docs/recipes/product-pipeline.md`):
+   `docs/recipes/product-pipeline.md`). Copy `.env.example` to `.env.local`
+   first if you have not already:
 
    ```bash
    npm run init-app -- --name "My App" --slug my-app --package com.yourname.myapp
@@ -23,8 +30,7 @@ Play, and a marketing lander. No backend, no accounts, no server bill.
 
    That rewrites `apps/mobile/app.json`, `apps/product.json`,
    `apps/web/lander.json`, and `apps/mobile/.env.local` / `.env.example`
-   together (plus StoreKit product ID prefixes). Copy `.env.example` to
-   `.env.local` first if you have not already. Use `--dry-run` to preview.
+   together (plus StoreKit product ID prefixes). Use `--dry-run` to preview.
    Bundle identifiers are permanent once you upload to a store.
 
 3. `npm run doctor` to check your toolchain.

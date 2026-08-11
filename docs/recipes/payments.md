@@ -73,4 +73,4 @@ RevenueCat dashboard that uses the same product ID, and set
 - [ ] Replace placeholder product IDs if you changed them
 - [ ] Sandbox testers (Apple) / license testers (Google)
 - [ ] Confirm `useEntitlement('<entitlement_id>')` flips after purchase
-- [ ] Run Harden / `preflight --phase=4` before submit
+- [ ] Run Harden / `preflight -- --phase=4` before submit

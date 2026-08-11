@@ -98,9 +98,9 @@ Adding **any** attribution / ads SDK **requires**, in the same change set:
 4. Resubmit / update Play Data safety + Apple App Privacy labels
 5. Re-run `npm run preflight` before `store:push`
 
-### Preflight check 11 (ships dormant in the template)
+### Preflight check 12 (ships dormant in the template)
 
-`scripts/store/review-preflight.sh` already includes **check 11 —
+`scripts/store/review-preflight.sh` already includes **check 12 —
 `attribution_undeclared`**: if `package.json` lists a known attribution SDK
 (`react-native-appsflyer`, `react-native-fbsdk*`, `react-native-adjust`,
 `react-native-branch`, or a Meta/Facebook ads SDK) **and**
@@ -109,11 +109,11 @@ Adding **any** attribution / ads SDK **requires**, in the same change set:
 On a stock template (no attribution SDK) the check is a **no-op** (passes).
 
 **On first use of this recipe:** after adding the SDK package, run
-`npm run preflight` and **confirm check 11 fails** with `attribution_undeclared`
+`npm run preflight` and **confirm check 12 fails** with `attribution_undeclared`
 until you update `data-practices.json` + `gen-compliance`. That proves the guard
 is live for this product. Then fix data-practices so it goes green.
 
-Do not ship paid-ads builds while check 11 is red.
+Do not ship paid-ads builds while check 12 is red.
 
 ## 4. Product analytics (separate — deferred)
 
@@ -135,6 +135,6 @@ later, it still updates `data-practices.json` + `gen-compliance` the same way.
 - [ ] Packages + plugins installed (ask before `npx expo install`)
 - [ ] ATT copy reviewed; SKAdNetwork IDs filled
 - [ ] `data-practices.json` updated; `gen-compliance` + `sync:legal` run
-- [ ] **Preflight check 11 fires** after adding the SDK (then goes green once data-practices is updated)
+- [ ] **Preflight check 12 fires** after adding the SDK (then goes green once data-practices is updated)
 - [ ] Privacy labels updated in both store consoles
 - [ ] `npm run preflight` green before submit

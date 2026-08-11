@@ -1,7 +1,9 @@
 /**
  * Example screen. Delete it when you build your real product — it exists to
  * show how FlashList, the bottom sheet, swipe actions, on-device storage, and
- * haptics fit together in this template.
+ * haptics fit together in this template. Removing this file also means
+ * removing the `<Tabs.Screen name="library" …>` block in
+ * `apps/mobile/app/(tabs)/_layout.tsx`, or the tab route stays registered.
  */
 import { EmptyState } from '@/components/empty-state';
 import { success, tapLight, warning } from '@/lib/haptics';

@@ -1,7 +1,7 @@
 # Google Play Store
 
 **Warn:** creating a Play developer account costs a one-time Google fee.
-EAS Submit can publish builds — keep `eas.json` submit track on `internal`
+EAS Submit can publish builds — keep `apps/mobile/eas.json` submit track on `internal`
 and `releaseStatus: draft` until you intentionally promote.
 
 ## Checklist
