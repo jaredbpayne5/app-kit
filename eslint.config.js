@@ -96,6 +96,9 @@ module.exports = defineConfig([
       // Route errors through lib/report-error.ts — bare console.error vanishes in
       // production. warn is allowed for intentional non-fatal diagnostics.
       'no-console': ['error', { allow: ['warn'] }],
+      // Expo sets this to warn; require() bypasses no-restricted-imports, so a
+      // seam library loaded via require() would otherwise leave lint green.
+      '@typescript-eslint/no-require-imports': 'error',
     },
   },
   {
