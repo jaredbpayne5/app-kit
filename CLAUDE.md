@@ -28,7 +28,9 @@ implementation agent for this repo and holds the same working copy.
 Routine and mechanical implementation: writing the code for a decided design,
 tests, refactors, renames, running tooling, fixing issues Claude has already
 diagnosed. Write the task to `.ai/current-task.md` (see that file for the
-shape), set Owner to `cursor`, then stop. Do not also implement it.
+shape), set Owner to `cursor` and Mode to `product` or `template`, then stop.
+Do not also implement it. Mode is always explicit — never leave Cursor to
+infer whether it is building the app or developing this template.
 
 Claude does not manage Cursor's model selection or its internal delegation.
 Cursor decides what it runs on. Do not put model instructions in the task.
@@ -56,7 +58,9 @@ Cursor's report is a claim, not evidence. Review the implementation itself:
    not passing.
 4. Re-run `npm run check` and `npm test` yourself rather than trusting the
    reported result.
-5. Confirm `docs/build-status.md` was updated.
+5. Product mode: confirm `docs/build-status.md` was updated. Template mode:
+   confirm the opposite — that no `docs/` placeholder was disturbed — and that
+   any `REPO-EVALUATION.md` item moved to §1 carries its proof.
 
 Green checks are necessary, not sufficient. This toolchain's blind spot is
 runtime behaviour — typecheck, lint, and a full passing test suite once cleared

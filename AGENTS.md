@@ -269,6 +269,12 @@ Before `docs/build-spec.md` exists (Phase 0–1 — compiling specs from PRD +
 design exports), work from `docs/build-status.md`’s phase checklist instead.
 That is the one case where a missing build spec is not a stop.
 
+Work on this template repo itself — hardening the scaffolding rather than
+building a product in a clone — is not product work, and this loop does not
+apply to it. Its backlog lives outside `docs/`. Do not fill in placeholders,
+and do not record template work in `docs/build-status.md`; those files ship
+blank to every clone. The sentinel rule above still stands for product work.
+
 No unrelated refactors mid-task, and no reformatting untouched files. Reuse
 existing `ui/` primitives, `lib/` seams, components, and dependencies before
 adding anything new. Do not ask the user for information already in the repo.
