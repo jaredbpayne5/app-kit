@@ -39,7 +39,7 @@ export function BrandAtmosphere({
         colors={[...colors]}
         start={{ x: 0.1, y: 0 }}
         end={{ x: 0.9, y: 1 }}
-        style={{ position: 'absolute', inset: 0 }}
+        style={{ position: 'absolute', inset: 0 }} /* native-required: LinearGradient fill */
       />
       <View
         className={cn(

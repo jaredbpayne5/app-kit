@@ -85,7 +85,8 @@ export function HeaderOverflowMenu({ items, trailing }: HeaderOverflowMenuProps)
           <View
             testID="overflow-menu-dropdown"
             className="absolute overflow-hidden rounded-xl border border-border bg-card shadow-lg"
-            style={{ top, left, width: DROPDOWN_WIDTH }}>
+            style={{ top, left, width: DROPDOWN_WIDTH }} /* native-required: measureInWindow */
+          >
             {items.map((item, index) => (
               <Pressable
                 key={item.testID}

@@ -33,7 +33,13 @@ export function Chart({
   const innerH = height - pad * 2;
 
   if (points.length === 0) {
-    return <View style={{ width, height }} testID={testID} accessibilityLabel="Empty chart" />;
+    return (
+      <View
+        style={{ width, height }} /* native-required: measured SVG host */
+        testID={testID}
+        accessibilityLabel="Empty chart"
+      />
+    );
   }
 
   const xs = points.map((p) => p.x);

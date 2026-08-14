@@ -19,7 +19,7 @@ export default function HomeScreen() {
   return (
     <View
       className="flex-1 bg-grouped"
-      style={{ paddingBottom: Math.max(insets.bottom, 0) }}
+      style={{ paddingBottom: Math.max(insets.bottom, 0) }} /* native-required: dynamic inset */
       testID="home-screen">
       <BrandAtmosphere intensity="soft" />
       <FadeSlideIn className="flex-1 justify-center gap-6 p-6">

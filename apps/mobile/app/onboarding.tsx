@@ -86,7 +86,7 @@ export default function OnboardingScreen() {
   return (
     <View
       className="flex-1 bg-background"
-      style={{ paddingTop: insets.top }}
+      style={{ paddingTop: insets.top }} /* native-required: dynamic inset */
       testID="onboarding-screen">
       <FlatList
         ref={listRef}
@@ -103,7 +103,7 @@ export default function OnboardingScreen() {
         }}
         renderItem={({ item, index: i }) => (
           <View
-            style={{ width: PAGE_WIDTH }}
+            style={{ width: PAGE_WIDTH }} /* native-required: pager page width */
             className="flex-1 justify-center gap-3 px-8"
             testID={`onboarding-slide-${i}`}>
             <Text variant="h3">{item.title}</Text>
@@ -126,7 +126,10 @@ export default function OnboardingScreen() {
         ))}
       </View>
 
-      <View className="gap-3 px-6 pt-2" style={{ paddingBottom: insets.bottom + 24 }}>
+      <View
+        className="gap-3 px-6 pt-2"
+        style={{ paddingBottom: insets.bottom + 24 }} /* native-required: dynamic inset */
+      >
         <Button
           testID="btn-onboarding-continue"
           accessibilityLabel={index >= slides.length - 1 ? 'Get started' : 'Continue'}

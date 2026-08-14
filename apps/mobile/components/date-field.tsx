@@ -110,7 +110,7 @@ export function DateField({
                 maximumDate={maximumDate}
                 minimumDate={minimumDate}
                 onChange={onPickerChange}
-                style={{ alignSelf: 'stretch' }}
+                style={{ alignSelf: 'stretch' }} /* native-required: native picker */
               />
             </Pressable>
           </Pressable>
