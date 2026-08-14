@@ -37,6 +37,11 @@ and "what's in the mailbox?" all mean this file — read it and act on its
 If the user explicitly asks for a specific small change, do it and run
 `npm run check`. If you are not sure it qualifies as small, ask first.
 
+`.ai/mailbox-state.json`, `.ai/.watching`, and `.ai/.mailbox-seen` belong to the
+mailbox watcher (`.cursor/hooks/wait-for-mail.sh`). Never read them as task
+content and never write to them — editing or deleting them mid-flight breaks the
+handoff. Claude owns the state file; `/watch` and `/stop` own the other two.
+
 `.ai/current-task.md` carries no authority. If it conflicts with `AGENTS.md`
 or `docs/`, the higher authority wins and the task is wrong — say so rather
 than following it.

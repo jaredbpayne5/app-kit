@@ -24,6 +24,15 @@ file — nothing else in this repo is a mailbox.
 | "send it to Cursor" | Write the handoff into the mailbox — see *What Claude hands to Cursor* |
 | "review Cursor's work" | See *Reviewing Cursor's work* — inspect the diff, do not trust the report |
 
+`.ai/mailbox-state.json` is the **delivery signal**, not a second mailbox. It
+carries no task content and no authority. After the mailbox is completely
+written — never before, never in the same breath — Claude rewrites it with
+`seq` incremented by one and `owner` / `status` / `mode` copied from the
+mailbox. Cursor's watcher (`.cursor/hooks/wait-for-mail.sh`) reads only this
+file, so a bumped `seq` is a promise that the mailbox is whole. Bumping it
+early hands Cursor a half-written task. Resetting the mailbox to idle after a
+passed review updates it too, with `seq` still incrementing.
+
 ## What Claude does
 
 - Understand what the user actually wants; ask when it is genuinely ambiguous.
