@@ -18,6 +18,7 @@ describe('parseIsoDateLocal', () => {
 
   it('returns null for invalid input', () => {
     expect(parseIsoDateLocal('nope')).toBeNull();
+    expect(parseIsoDateLocal('2026-02-31')).toBeNull();
   });
 });
 

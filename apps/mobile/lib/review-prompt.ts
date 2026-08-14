@@ -1,8 +1,8 @@
 /**
  * In-app review prompt — once per install, after a positive moment.
  *
- * Lazily requires `expo-store-review`. Writes the "already asked" flag *before*
- * `requestReview` so a dismissed prompt never becomes a second ask.
+ * Lazily requires `expo-store-review`. Writes the "already asked" flag *after*
+ * `requestReview` succeeds so a failed prompt can be retried.
  */
 import { reportError } from '@/lib/report-error';
 import { getJSON, setJSON } from '@/lib/storage';
@@ -42,8 +42,8 @@ export async function maybeRequestReview(): Promise<ReviewPromptOutcome> {
     const mod = loadStoreReview();
     if (!(await mod.isAvailableAsync())) return 'unavailable';
 
-    await setJSON(REVIEW_PROMPTED_STORAGE_KEY, true);
     await mod.requestReview();
+    await setJSON(REVIEW_PROMPTED_STORAGE_KEY, true);
     return 'prompted';
   } catch (error) {
     reportError(error, { scope: 'reviewPrompt.maybeRequestReview' });

@@ -11,11 +11,19 @@ export function toIsoDateLocal(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-/** Parse `YYYY-MM-DD` into a local Date at midnight. */
+/** Parse `YYYY-MM-DD` into a local Date at midnight. Invalid calendar dates return null. */
 export function parseIsoDateLocal(isoDate: string): Date | null {
-  const [year, month, day] = isoDate.split('-').map((part) => Number.parseInt(part, 10));
-  if (!year || !month || !day) return null;
-  return new Date(year, month - 1, day);
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate);
+  if (!match) return null;
+  const year = Number.parseInt(match[1], 10);
+  const month = Number.parseInt(match[2], 10);
+  const day = Number.parseInt(match[3], 10);
+  if (!year || month < 1 || month > 12 || day < 1 || day > 31) return null;
+  const date = new Date(year, month - 1, day);
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+    return null;
+  }
+  return date;
 }
 
 /** Locale-aware long date label for an ISO local date. */

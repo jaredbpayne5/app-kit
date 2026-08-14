@@ -32,10 +32,10 @@ describe('maybeRequestReview', () => {
     mockRequestReview.mockResolvedValue(undefined);
   });
 
-  it('prompts once and stores the flag before requesting', async () => {
+  it('prompts once and stores the flag after requesting', async () => {
     await expect(maybeRequestReview()).resolves.toBe('prompted');
-    expect(setJSON).toHaveBeenCalledWith(REVIEW_PROMPTED_STORAGE_KEY, true);
     expect(mockRequestReview).toHaveBeenCalledTimes(1);
+    expect(setJSON).toHaveBeenCalledWith(REVIEW_PROMPTED_STORAGE_KEY, true);
   });
 
   it('skips when already prompted', async () => {
