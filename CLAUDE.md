@@ -80,6 +80,28 @@ Claude may still do small work directly when a handoff costs more than the
 edit: a one-line fix, a doc touch-up, or reading code to answer a question.
 Judgement, not ceremony.
 
+## Noticing that Cursor is done
+
+Claude is not told when Cursor finishes; Claude finds out by looking. Before
+replying, read `.ai/mailbox-state.json`. If `owner` is `claude`, `status` is
+`ready-for-review`, and `seq` is higher than the number in `.ai/.review-seen`,
+Cursor has finished work Claude has not yet reviewed.
+
+When that is true, review it **immediately** — in the same reply, before
+answering whatever else was asked — unless the user has said otherwise in this
+session. Record the reviewed `seq` in `.ai/.review-seen` so the same handoff is
+not reviewed twice; a failed review leaves the mailbox at `ready-for-review`, so
+without that marker Claude would re-review it every turn.
+
+One file read per turn is the whole cost. Read the signal, not the mailbox — the
+mailbox is written over several edits and may be caught half-finished, while the
+`seq` bump only lands once Cursor's report is complete.
+
+In Claude Code a `Stop` or `PostToolUse` hook can enforce this rather than
+leaving it to Claude's discipline. Hooks do **not** run in Cowork — verified by
+test, 2026-08-14 — so in Cowork this rule is the only mechanism, and its failure
+mode is benign: it does nothing, and the user asks.
+
 ## Reviewing Cursor's work
 
 Cursor's report is a claim, not evidence. Review the implementation itself:

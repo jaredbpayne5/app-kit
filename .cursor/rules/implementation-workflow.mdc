@@ -33,14 +33,24 @@ and "what's in the mailbox?" all mean this file — read it and act on its
 6. Fill the Implementation report, set Owner `claude`, Status
    `ready-for-review`. Report deviations and blockers honestly; Claude reads
    the diff, so an omission surfaces as a discrepancy.
+7. **Last, after the mailbox is completely written — never before, never in the
+   same breath —** rewrite `.ai/mailbox-state.json` with `seq` incremented by
+   one, `owner` `claude`, `status` `ready-for-review`, and `mode` unchanged.
+   That bump is how Claude learns the work is ready. Bumping it early, or
+   instead of finishing the report, hands Claude a half-written report to
+   review.
 
 If the user explicitly asks for a specific small change, do it and run
 `npm run check`. If you are not sure it qualifies as small, ask first.
 
-`.ai/mailbox-state.json`, `.ai/.watching`, and `.ai/.mailbox-seen` belong to the
-mailbox watcher (`.cursor/hooks/wait-for-mail.sh`). Never read them as task
-content and never write to them — editing or deleting them mid-flight breaks the
-handoff. Claude owns the state file; `/watch` and `/stop` own the other two.
+`.ai/mailbox-state.json` is the delivery signal both ways. Never read it as task
+content. Write it in exactly one situation: step 7 above, on completion. Both
+agents follow the same discipline — write the mailbox first, bump the signal
+last.
+
+`.ai/.watching`, `.ai/.mailbox-seen`, and `.ai/.review-seen` belong to the
+watchers. Never read or write them; editing or deleting one mid-flight breaks the
+handoff. `/watch` and `/stop` own `.watching`, the hooks own the rest.
 
 `.ai/current-task.md` carries no authority. If it conflicts with `AGENTS.md`
 or `docs/`, the higher authority wins and the task is wrong — say so rather

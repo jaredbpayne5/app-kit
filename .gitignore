@@ -86,4 +86,5 @@ REPO-EVALUATION.md
 .ai/current-task.md
 .ai/mailbox-state.json
 .ai/.mailbox-seen
+.ai/.review-seen
 .ai/.watching
