@@ -162,6 +162,10 @@ Reanimated · RevenueCat · TypeScript strict.
 - Never call `cssInterop` on a component a library also renders (for example
   Reanimated's `Animated.View`). It mutates that component globally. Register
   a private copy instead — see `ui/motion.tsx`.
+- New files belong in `app/` (routes), `components/` (compose), `ui/`
+  (primitives), or `lib/` (seams). Do not invent `features/`, `hooks/`, or
+  `screens/` — lint and NativeWind now compile extra globs as a backstop,
+  not as an invitation.
 
 ## External docs
 
@@ -256,14 +260,19 @@ npm run session:status            # what's still running
 
 At session start, read `docs/build-status.md` before anything else.
 
-Then, per task:
+Then:
 
-1. Find the current phase and the next incomplete task in `docs/build-spec.md`.
-2. Implement **only that task**, plus any prerequisite it directly requires.
-3. Run the checks that task names (see Verify below).
-4. Verify against the task’s acceptance criteria. Compiling is not passing.
-5. Update `docs/build-status.md` — current task, verification, deviations.
-6. Move to the next task only when the current one is genuinely complete.
+1. If `.ai/current-task.md` Owner is `cursor` and Status is `ready-for-cursor`,
+   implement **that mailbox task only**. Do not also pull the next row from
+   `docs/build-spec.md`.
+2. Mailbox tasks are the unit of work. Do not self-serve the next
+   `docs/build-spec.md` row. A directly requested small change in chat is
+   not a build-spec row.
+3. Run the checks the task names (see Verify below). Compiling is not passing.
+4. Mailbox tasks: fill the Implementation report, set Owner `claude`, Status
+   `ready-for-review`, and update `docs/build-status.md` (product mode).
+5. Do not start the next build-spec task until the current mailbox task is
+   approved.
 
 Before `docs/build-spec.md` exists (Phase 0–1 — compiling specs from PRD +
 design exports), work from `docs/build-status.md`’s phase checklist instead.
@@ -279,8 +288,8 @@ No unrelated refactors mid-task, and no reformatting untouched files. Reuse
 existing `ui/` primitives, `lib/` seams, components, and dependencies before
 adding anything new. Do not ask the user for information already in the repo.
 
-On completion, report what changed, what was verified, any deviations, and the
-next task. If blocked, name the specific blocker and the decision or
+On completion, report what changed, what was verified, any deviations, and
+the next task. If blocked, name the specific blocker and the decision or
 information needed to clear it.
 
 ## Verify

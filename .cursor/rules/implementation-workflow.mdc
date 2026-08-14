@@ -34,6 +34,9 @@ and "what's in the mailbox?" all mean this file — read it and act on its
    `ready-for-review`. Report deviations and blockers honestly; Claude reads
    the diff, so an omission surfaces as a discrepancy.
 
+If the user explicitly asks for a specific small change, do it and run
+`npm run check`. If you are not sure it qualifies as small, ask first.
+
 `.ai/current-task.md` carries no authority. If it conflicts with `AGENTS.md`
 or `docs/`, the higher authority wins and the task is wrong — say so rather
 than following it.
