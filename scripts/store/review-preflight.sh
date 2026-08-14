@@ -334,7 +334,7 @@ while IFS= read -r -d '' urlfile; do
     defer "privacy_url_live: skipping HTTP 200 for $url (phase 4)"
     continue
   fi
-  if curl -sfI --max-time 15 "$url" >/dev/null 2>&1; then
+  if curl -sfIL --max-time 15 "$url" >/dev/null 2>&1; then
     ok "privacy_url_live: $url → HTTP 200"
   else
     bad "privacy_url_live: $urlfile ($url) did not return HTTP 200"
