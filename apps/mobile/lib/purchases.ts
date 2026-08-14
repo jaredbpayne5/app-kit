@@ -2,7 +2,8 @@
  * Purchases seam — RevenueCat mock | live behind flags.
  *
  * `MONETIZATION: 'free'` never loads `react-native-purchases` (R5 / Expo Go).
- * `PURCHASES_MODE: 'mock'` drives entitlement from `MOCK_ENTITLED` (no SDK, no account).
+ * `PURCHASES_MODE: 'mock'` starts from `MOCK_ENTITLED`; a successful mock
+ * `purchase()` unlocks for the rest of the session (no SDK, no account).
  * `PURCHASES_MODE: 'live'` loads the SDK only when monetization is paid (dev build).
  *
  * [VOLATILE] API checked 2026-07-24 via Context7 `/revenuecat/react-native-purchases`:
@@ -27,6 +28,8 @@ export type OfferingPackage = {
 export type PurchaseResult =
   { ok: true; productId: string } | { ok: false; error: string; cancelled?: boolean };
 
+export type RestoreResult = { restored: boolean };
+
 type PurchasesSdk = typeof import('react-native-purchases').default;
 
 let sdk: PurchasesSdk | null = null;
@@ -34,6 +37,9 @@ let sdkConfigured = false;
 /** Live-mode cache: package identifier → native PurchasesPackage */
 const livePackageById = new Map<string, PurchasesPackage>();
 let cachedCustomerInfo: CustomerInfo | null = null;
+/** `null` = follow `MOCK_ENTITLED`; boolean = session override after mock purchase. */
+let mockEntitledOverride: boolean | null = null;
+const mockListeners = new Set<() => void>();
 
 function isPaid(): boolean {
   return APP_CONFIG.MONETIZATION !== 'free';
@@ -41,6 +47,19 @@ function isPaid(): boolean {
 
 function isLive(): boolean {
   return isPaid() && PURCHASES_MODE === 'live';
+}
+
+function currentMockEntitled(): boolean {
+  return mockEntitledOverride ?? MOCK_ENTITLED;
+}
+
+function notifyMockListeners(): void {
+  for (const listener of mockListeners) listener();
+}
+
+function setMockEntitled(value: boolean): void {
+  mockEntitledOverride = value;
+  notifyMockListeners();
 }
 
 /** Test/observability helper — true only after a live-path require(). */
@@ -54,6 +73,8 @@ export function __resetPurchasesForTests(): void {
   sdkConfigured = false;
   livePackageById.clear();
   cachedCustomerInfo = null;
+  mockEntitledOverride = null;
+  mockListeners.clear();
 }
 
 function loadSdk(): PurchasesSdk {
@@ -110,6 +131,13 @@ function mapPackages(offerings: PurchasesOfferings): OfferingPackage[] {
 function mockPackages(): OfferingPackage[] {
   return [
     {
+      identifier: 'annual',
+      productId: 'com.example.mobileapp.premium.annual',
+      title: 'Premium Annual',
+      description: 'Mock offering (PURCHASES_MODE=mock)',
+      price: '$39.99',
+    },
+    {
       identifier: 'monthly',
       productId: 'com.example.mobileapp.premium.monthly',
       title: 'Premium Monthly',
@@ -158,6 +186,7 @@ export async function purchase(packageIdentifier: string): Promise<PurchaseResul
     return { ok: false, error: 'Purchases disabled (MONETIZATION=free)' };
   }
   if (!isLive()) {
+    setMockEntitled(true);
     return { ok: true, productId: packageIdentifier };
   }
 
@@ -184,10 +213,13 @@ export async function purchase(packageIdentifier: string): Promise<PurchaseResul
   }
 }
 
-export async function restore(): Promise<void> {
-  if (!isPaid() || !isLive()) return;
+export async function restore(): Promise<RestoreResult> {
+  if (!isPaid()) return { restored: false };
+  if (!isLive()) return { restored: currentMockEntitled() };
   const Purchases = await ensureConfigured();
   cachedCustomerInfo = await Purchases.restorePurchases();
+  const active = cachedCustomerInfo.entitlements.active;
+  return { restored: Object.keys(active).length > 0 };
 }
 
 /**
@@ -195,7 +227,7 @@ export async function restore(): Promise<void> {
  */
 export async function isEntitlementActive(key: string): Promise<boolean> {
   if (!isPaid()) return false;
-  if (!isLive()) return MOCK_ENTITLED;
+  if (!isLive()) return currentMockEntitled();
 
   try {
     const Purchases = await ensureConfigured();
@@ -214,8 +246,18 @@ export function useEntitlement(key: string): { active: boolean; isLoading: boole
   const paid = isPaid();
   const live = isLive();
 
+  const [mockActive, setMockActive] = useState(currentMockEntitled);
   const [liveActive, setLiveActive] = useState(() => entitlementActive(cachedCustomerInfo, key));
   const [liveLoading, setLiveLoading] = useState(true);
+
+  useEffect(() => {
+    if (!paid || live) return;
+    const listener = () => setMockActive(currentMockEntitled());
+    mockListeners.add(listener);
+    return () => {
+      mockListeners.delete(listener);
+    };
+  }, [paid, live]);
 
   useEffect(() => {
     if (!paid || !live) return;
@@ -255,6 +297,6 @@ export function useEntitlement(key: string): { active: boolean; isLoading: boole
   }, [key, paid, live]);
 
   if (!paid) return { active: false, isLoading: false };
-  if (!live) return { active: MOCK_ENTITLED, isLoading: false };
+  if (!live) return { active: mockActive, isLoading: false };
   return { active: liveActive, isLoading: liveLoading };
 }

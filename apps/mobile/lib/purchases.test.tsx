@@ -1,11 +1,13 @@
 import {
   __resetPurchasesForTests,
   getOfferings,
+  isEntitlementActive,
   isPurchasesSdkLoaded,
   purchase,
+  restore,
   useEntitlement,
 } from '@/lib/purchases';
-import { renderHook, waitFor } from '@testing-library/react-native';
+import { act, renderHook, waitFor } from '@testing-library/react-native';
 
 type TestConfig = {
   APP_CONFIG: {
@@ -96,8 +98,11 @@ describe('purchases seam', () => {
     expect(isPurchasesSdkLoaded()).toBe(false);
 
     const offerings = await getOfferings();
-    expect(offerings.length).toBeGreaterThan(0);
-    const bought = await purchase(offerings[0]!.identifier);
+    expect(offerings.map((pkg) => pkg.identifier)).toEqual(['annual', 'monthly']);
+    let bought: Awaited<ReturnType<typeof purchase>> | undefined;
+    await act(async () => {
+      bought = await purchase(offerings[0]!.identifier);
+    });
     expect(bought).toEqual({ ok: true, productId: offerings[0]!.identifier });
   });
 
@@ -110,6 +115,25 @@ describe('purchases seam', () => {
     const { result } = renderHook(() => useEntitlement('premium'));
     expect(result.current.isLoading).toBe(false);
     expect(result.current.active).toBe(false);
+  });
+
+  it('subscription+mock: purchase unlocks after starting locked', async () => {
+    setConfig({
+      APP_CONFIG: { STORAGE: 'kv', MONETIZATION: 'subscription' },
+      PURCHASES_MODE: 'mock',
+      MOCK_ENTITLED: false,
+    });
+    const { result } = renderHook(() => useEntitlement('premium'));
+    expect(result.current.active).toBe(false);
+    expect(await isEntitlementActive('premium')).toBe(false);
+    expect(await restore()).toEqual({ restored: false });
+
+    await act(async () => {
+      await purchase('monthly');
+    });
+    await waitFor(() => expect(result.current.active).toBe(true));
+    expect(await isEntitlementActive('premium')).toBe(true);
+    expect(await restore()).toEqual({ restored: true });
   });
 
   it('subscription+live: active when entitlement present', async () => {

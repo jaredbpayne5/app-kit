@@ -53,7 +53,11 @@ jest.mock('@/lib/purchases', () => ({
     },
   ]),
   purchase: jest.fn(),
-  restore: jest.fn(),
+  restore: jest.fn(async () => ({ restored: false })),
+}));
+
+jest.mock('expo-web-browser', () => ({
+  openBrowserAsync: jest.fn(),
 }));
 
 describe('Paywall', () => {
@@ -85,5 +89,7 @@ describe('Paywall', () => {
     expect(screen.getByTestId('plan-card-annual')).toBeTruthy();
     expect(screen.getByLabelText(/Monthly plan/)).toBeTruthy();
     expect(screen.getByLabelText('Restore purchases')).toBeTruthy();
+    expect(screen.getByTestId('paywall-link-privacy')).toBeTruthy();
+    expect(screen.getByTestId('paywall-link-terms')).toBeTruthy();
   });
 });

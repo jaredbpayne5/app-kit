@@ -4,6 +4,7 @@ import { APP_CONFIG } from '@/lib/app-config';
 import { getAppDisplayName, getAppVersion, getNativeBuildNumber } from '@/lib/app-version';
 import { resetOnboardingSeen } from '@/lib/onboarding';
 import { PRIVACY_URL, TERMS_URL } from '@/lib/product';
+import { useEntitlement } from '@/lib/purchases';
 import { reportError } from '@/lib/report-error';
 import { Text } from '@/ui/text';
 import * as WebBrowser from 'expo-web-browser';
@@ -35,6 +36,7 @@ export default function SettingsScreen() {
   const version = getAppVersion();
   const build = getNativeBuildNumber();
   const insets = useSafeAreaInsets();
+  const premium = useEntitlement('premium');
 
   return (
     <ScrollView
@@ -73,6 +75,16 @@ export default function SettingsScreen() {
           }}
         />
       </GroupedSection>
+
+      {APP_CONFIG.MONETIZATION !== 'free' ? (
+        <GroupedSection header="Premium" testID="settings-premium">
+          <GroupedRow
+            label="Status"
+            value={premium.isLoading ? 'Checking…' : premium.active ? 'Active' : 'Locked'}
+            last
+          />
+        </GroupedSection>
+      ) : null}
 
       {APP_CONFIG.MONETIZATION !== 'free' ? <Paywall /> : null}
 

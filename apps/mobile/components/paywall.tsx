@@ -10,7 +10,9 @@ import {
   type ResolvedPlan,
 } from '@/lib/paywall-plans';
 import { getOfferings, purchase, restore } from '@/lib/purchases';
+import { PRIVACY_URL, TERMS_URL } from '@/lib/product';
 import { reportError } from '@/lib/report-error';
+import * as WebBrowser from 'expo-web-browser';
 import { RefreshCw, Sparkles } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
@@ -81,8 +83,8 @@ function PaywallPaid({ onPurchased }: PaywallProps) {
     setBusy(true);
     setMessage(null);
     try {
-      await restore();
-      setMessage('Restore complete. Entitlements refresh via RevenueCat.');
+      const result = await restore();
+      setMessage(result.restored ? 'Restore complete.' : 'No purchases to restore.');
     } catch (err) {
       reportError(err, { screen: 'paywall', action: 'restore' });
       setMessage(err instanceof Error ? err.message : 'Restore failed');
@@ -172,6 +174,31 @@ function PaywallPaid({ onPurchased }: PaywallProps) {
         onPress={() => void onRestore()}>
         <Text className="text-center text-primary">Restore purchases</Text>
       </Pressable>
+
+      <View className="flex-row justify-center gap-4">
+        <Pressable
+          testID="paywall-link-privacy"
+          accessibilityRole="link"
+          accessibilityLabel="Privacy Policy"
+          onPress={() => {
+            void WebBrowser.openBrowserAsync(PRIVACY_URL);
+          }}>
+          <Text variant="small" className="text-muted-foreground underline">
+            Privacy Policy
+          </Text>
+        </Pressable>
+        <Pressable
+          testID="paywall-link-terms"
+          accessibilityRole="link"
+          accessibilityLabel="Terms of Use"
+          onPress={() => {
+            void WebBrowser.openBrowserAsync(TERMS_URL);
+          }}>
+          <Text variant="small" className="text-muted-foreground underline">
+            Terms of Use
+          </Text>
+        </Pressable>
+      </View>
 
       {message ? (
         <Text variant="muted" testID="paywall-message">
