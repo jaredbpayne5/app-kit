@@ -162,20 +162,58 @@ async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
   }
 }
 
+/**
+ * Open + configure one connection.
+ *
+ * `openDatabaseAsync` stays outside the try: if it fails there is no handle to
+ * release. Everything after it is guarded, because once it resolves the native
+ * connection is live even when WAL or the migrations then throw. Orphaning that
+ * handle leaks it for the app's lifetime, and its WAL lock can make the retry
+ * fail with SQLITE_BUSY — turning a transient error into a permanent one. Same
+ * reason `__resetSqlCacheForTests` closes rather than drops.
+ */
+async function setUpAppDatabase(): Promise<SQLite.SQLiteDatabase> {
+  const db = await SQLite.openDatabaseAsync(APP_DB_NAME);
+  try {
+    // Connection-level PRAGMAs (journal_mode, foreign_keys) cannot run inside a
+    // transaction — SQLite errors or silently no-ops. Never put them in migration
+    // SQL; migrations run inside withTransactionAsync.
+    await db.execAsync('PRAGMA journal_mode = WAL;');
+    await runMigrations(db);
+    return db;
+  } catch (error) {
+    try {
+      await db.closeAsync();
+    } catch {
+      // Close failure must not mask the original setup error.
+    }
+    throw error;
+  }
+}
+
 async function openAppDatabase(): Promise<SQLite.SQLiteDatabase> {
   if (APP_CONFIG.STORAGE !== 'sql') {
     throw new Error('openAppDatabase requires APP_CONFIG.STORAGE === "sql"');
   }
   if (!dbPromise) {
-    dbPromise = (async () => {
-      const db = await SQLite.openDatabaseAsync(APP_DB_NAME);
-      // Connection-level PRAGMAs (journal_mode, foreign_keys) cannot run inside a
-      // transaction — SQLite errors or silently no-ops. Never put them in migration
-      // SQL; migrations run inside withTransactionAsync.
-      await db.execAsync('PRAGMA journal_mode = WAL;');
-      await runMigrations(db);
-      return db;
-    })();
+    // Un-cache on failure. A rejected promise is truthy, so caching one made the
+    // guard above see a "live" handle forever: every later withSql replayed the
+    // same error with no way back short of a reinstall. One transient open — or
+    // one bad migration — wedged all SQL storage.
+    //
+    // Migrations retry too, deliberately. Each runs in its own transaction (see
+    // runMigrations), so a rejection rolls back to the last applied version and
+    // re-running from there is safe. Classifying failures as transient vs
+    // permanent would just re-create the wedge for a disk-full migration. Retries
+    // are caller-driven — one attempt per withSql, never a self-driven loop.
+    const pending: Promise<SQLite.SQLiteDatabase> = setUpAppDatabase().catch((error) => {
+      // Not a tautology, and not safe to simplify away: a reset + reopen can race
+      // ahead of a slow failure, so `pending` may no longer be the cached attempt.
+      // Clearing unconditionally would orphan that newer, healthy handle.
+      if (dbPromise === pending) dbPromise = null;
+      throw error;
+    });
+    dbPromise = pending;
   }
   return dbPromise;
 }

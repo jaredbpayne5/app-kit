@@ -26,7 +26,8 @@ jest.mock('expo-sqlite/kv-store', () => ({
 
 type FakeRow = { id: number; payload: string; created_at: string };
 
-function createMockSqlite() {
+function createMockSqlite(options: { failSqlOnce?: RegExp } = {}) {
+  let failSqlOnce = options.failSqlOnce;
   let userVersion = 0;
   let nextId = 1;
   let closed = false;
@@ -49,6 +50,10 @@ function createMockSqlite() {
     }),
     execAsync: jest.fn(async (sql: string) => {
       const trimmed = sql.trim();
+      if (failSqlOnce?.test(trimmed)) {
+        failSqlOnce = undefined;
+        throw new Error(`simulated SQL failure: ${trimmed}`);
+      }
       // Mirror SQLite: journal_mode cannot change inside a transaction.
       if (txDepth > 0 && /PRAGMA\s+journal_mode/i.test(trimmed)) {
         throw new Error('cannot change into wal mode from within a transaction');
@@ -334,5 +339,67 @@ describe('lib/storage (sql)', () => {
     await __resetSqlCacheForTests();
 
     expect(mockSqlite.isClosed()).toBe(true);
+  });
+
+  it('does not memoize a transient open failure', async () => {
+    const failing = createMockSqlite();
+    failing.openDatabaseAsync.mockRejectedValueOnce(new Error('transient open failure'));
+    const succeeding = createMockSqlite();
+
+    mockSqlite.openDatabaseAsync.mockReset();
+    mockSqlite.openDatabaseAsync
+      .mockImplementationOnce(failing.openDatabaseAsync)
+      .mockImplementationOnce(succeeding.openDatabaseAsync);
+
+    await expect(withSql(async (sql) => sql.getAll('SELECT id FROM records'))).rejects.toThrow(
+      /transient open failure/
+    );
+    await expect(withSql(async (sql) => sql.getAll('SELECT id FROM records'))).resolves.toEqual([]);
+
+    expect(mockSqlite.openDatabaseAsync).toHaveBeenCalledTimes(2);
+  });
+
+  it('closes the half-open handle after a migration failure and retries clean', async () => {
+    const failing = createMockSqlite({
+      failSqlOnce: /ALTER TABLE records ADD COLUMN archived/,
+    });
+    const succeeding = createMockSqlite();
+
+    mockSqlite.openDatabaseAsync.mockReset();
+    mockSqlite.openDatabaseAsync
+      .mockImplementationOnce(failing.openDatabaseAsync)
+      .mockImplementationOnce(succeeding.openDatabaseAsync);
+
+    registerMigrations([
+      {
+        version: 2,
+        sql: 'ALTER TABLE records ADD COLUMN archived INTEGER NOT NULL DEFAULT 0;',
+      },
+    ]);
+
+    await expect(withSql(async (sql) => sql.getAll('SELECT id FROM records'))).rejects.toThrow(
+      /simulated SQL failure/
+    );
+    expect(failing.isClosed()).toBe(true);
+    expect(failing.getUserVersion()).toBe(1);
+
+    await expect(withSql(async (sql) => sql.getAll('SELECT id FROM records'))).resolves.toEqual([]);
+    expect(succeeding.getUserVersion()).toBe(2);
+    expect(succeeding.isClosed()).toBe(false);
+  });
+
+  it('shares one failed open among concurrent callers', async () => {
+    const failing = createMockSqlite();
+    failing.openDatabaseAsync.mockRejectedValueOnce(new Error('shared open failure'));
+
+    mockSqlite.openDatabaseAsync.mockReset();
+    mockSqlite.openDatabaseAsync.mockImplementationOnce(failing.openDatabaseAsync);
+
+    const first = withSql(async (sql) => sql.getAll('SELECT id FROM records'));
+    const second = withSql(async (sql) => sql.getAll('SELECT id FROM records'));
+
+    await expect(first).rejects.toThrow(/shared open failure/);
+    await expect(second).rejects.toThrow(/shared open failure/);
+    expect(mockSqlite.openDatabaseAsync).toHaveBeenCalledTimes(1);
   });
 });

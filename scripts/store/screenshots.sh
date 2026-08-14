@@ -23,6 +23,8 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT"
 # shellcheck source=scripts/dev/maestro-hygiene.sh
 source "$ROOT/scripts/dev/maestro-hygiene.sh"
+# shellcheck source=scripts/lib/ensure-ios-sim.sh
+source "$ROOT/scripts/lib/ensure-ios-sim.sh"
 
 PLATFORM=""
 PORT="${EXPO_PORT:-8081}"
@@ -171,7 +173,7 @@ boot_ios_udid() {
   if [[ "$state" != "Booted" ]]; then
     xcrun simctl boot "$udid" >/dev/null 2>&1 || true
     open -a Simulator >/dev/null 2>&1 || true
-    xcrun simctl bootstatus "$udid" -b >/dev/null 2>&1 || bad "Timed out booting $udid"
+    wait_for_boot "$udid" 120 || bad "Timed out booting $udid"
   fi
 }
 

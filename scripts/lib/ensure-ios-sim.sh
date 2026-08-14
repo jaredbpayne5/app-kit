@@ -15,6 +15,25 @@
 # Requires: macOS, xcrun simctl, jq.
 #
 
+# bootstatus -b blocks until booted; bound the wait. Silence status spam.
+wait_for_boot() {
+  local udid="$1"
+  local secs="${2:-120}"
+  perl -e '
+    my $secs = shift; my $pid = fork();
+    die "fork: $!" unless defined $pid;
+    if ($pid == 0) {
+      open STDOUT, ">", "/dev/null";
+      open STDERR, ">", "/dev/null";
+      exec @ARGV; exit 127
+    }
+    local $SIG{ALRM} = sub { kill "TERM", $pid; sleep 1; kill "KILL", $pid; exit 1 };
+    alarm $secs;
+    waitpid($pid, 0);
+    exit($? == 0 ? 0 : 1);
+  ' "$secs" xcrun simctl bootstatus "$udid" -b
+}
+
 ensure_ios_sim() {
   if [[ "$(uname -s)" != "Darwin" ]]; then
     printf 'ensure_ios_sim: requires macOS (uname=%s)\n' "$(uname -s)" >&2
@@ -86,20 +105,7 @@ ensure_ios_sim() {
   fi
   open -a Simulator >/dev/null 2>&1 || true
 
-  # bootstatus -b blocks until booted; bound to 120s. Silence status spam.
-  if ! perl -e '
-    my $secs = shift; my $pid = fork();
-    die "fork: $!" unless defined $pid;
-    if ($pid == 0) {
-      open STDOUT, ">", "/dev/null";
-      open STDERR, ">", "/dev/null";
-      exec @ARGV; exit 127
-    }
-    local $SIG{ALRM} = sub { kill "TERM", $pid; sleep 1; kill "KILL", $pid; exit 1 };
-    alarm $secs;
-    waitpid($pid, 0);
-    exit($? == 0 ? 0 : 1);
-  ' 120 xcrun simctl bootstatus "$udid" -b; then
+  if ! wait_for_boot "$udid" 120; then
     printf 'ensure_ios_sim: timed out after 120s waiting for %s (%s) to boot\n' "$name" "$udid" >&2
     return 1
   fi
