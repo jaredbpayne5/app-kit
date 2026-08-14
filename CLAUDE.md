@@ -39,6 +39,13 @@ churn does not belong in a product clone's history. Only the blank master copy
 in a fresh clone; if either is missing when Claude needs it, recreate it from
 the template rather than inventing a shape.
 
+Never retype the mailbox. To reset it, copy the template over it
+(`cp .ai/current-task.template.md .ai/current-task.md`); to write a handoff, copy
+first and then edit only the header fields and the Task section. Retyping the
+whole file costs ~20x the output tokens and lets the live copy drift from the
+master. The same rule holds anywhere a known-good file already exists: copy and
+edit, never regenerate from memory.
+
 ## What Claude does
 
 - Understand what the user actually wants; ask when it is genuinely ambiguous.
