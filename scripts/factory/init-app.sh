@@ -7,14 +7,13 @@
 #   npm run init-app -- --name "My App" --slug my-app --package com.me.my_app \
 #     --bundle-id com.me.myapp
 #   npm run init-app -- --name "My App" --slug my-app --package com.me.myapp \
-#     --bundle-id com.me.myapp --scheme myapp --contact-email hi@me.com --dry-run
+#     --bundle-id com.me.myapp --scheme myapp --contact-email hi@me.com \
+#     --copyright-holder "Jane Doe" --dry-run
 #
 # Writes: apps/mobile/app.json, .env*, apps/product.json, apps/web/lander.json,
 # and StoreKit productIDs. Privacy/terms URLs use https://<slug>.pages.dev/…
 #
-# Display names may contain spaces. Values are passed to Node via env
-# (quoted heredoc) so special characters do not break the script.
-#
+# Display names may contain spaces. Slug must be URL-safe lowercase.
 # Android package ids may include underscores. iOS bundle ids may not —
 # if --package is invalid as an iOS id, pass an explicit --bundle-id.
 #
@@ -32,12 +31,15 @@ BUNDLE_ID=""
 BUNDLE_ID_SET=0
 SCHEME=""
 CONTACT_EMAIL=""
+COPYRIGHT_HOLDER=""
 DRY_RUN=0
 
 # Android: lowercase, digits, underscore, dots (Java package style).
 ANDROID_PKG_RE='^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$'
 # iOS: letters, digits, hyphens, dots — no underscores (Apple reverse-DNS).
 IOS_BUNDLE_RE='^[A-Za-z][A-Za-z0-9-]*(\.[A-Za-z][A-Za-z0-9-]*)+$'
+# Expo slug / pages.dev / deep-link scheme source: lowercase, digits, hyphens.
+SLUG_RE='^[a-z0-9]+(-[a-z0-9]+)*$'
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -47,9 +49,10 @@ while [[ $# -gt 0 ]]; do
     --bundle-id) BUNDLE_ID="${2:-}"; BUNDLE_ID_SET=1; shift 2 ;;
     --scheme) SCHEME="${2:-}"; shift 2 ;;
     --contact-email) CONTACT_EMAIL="${2:-}"; shift 2 ;;
+    --copyright-holder) COPYRIGHT_HOLDER="${2:-}"; shift 2 ;;
     --dry-run) DRY_RUN=1; shift ;;
     -h|--help)
-      sed -n '2,22p' "$0"
+      sed -n '2,19p' "$0"
       exit 0
       ;;
     *)
@@ -72,11 +75,17 @@ Optional:
   --bundle-id com.company.app   (defaults to --package when that id is also valid on iOS)
   --scheme myapp                (defaults from slug, alphanumeric)
   --contact-email you@domain    (defaults to support@<slug>.app — replace before store launch)
+  --copyright-holder "Name"     (stamps LICENSE; omitted leaves the placeholder)
   --dry-run                     (print resolved values; do not write files)
 
 Note: Android packages may use underscores (_). iOS bundle ids may not.
 If --package contains _ (or otherwise fails the iOS rule), pass --bundle-id explicitly.
 EOF
+  exit 2
+fi
+
+if [[ ! "$SLUG" =~ $SLUG_RE ]]; then
+  echo "Invalid --slug \"$SLUG\". Use lowercase letters, digits, and hyphens (e.g. my-app), no spaces." >&2
   exit 2
 fi
 
@@ -133,6 +142,10 @@ ENV_LOCAL="$ROOT/apps/mobile/.env.local"
 PRODUCT_JSON="$ROOT/apps/product.json"
 LANDER_JSON="$ROOT/apps/web/lander.json"
 STOREKIT="$ROOT/apps/mobile/store/storekit/Products.storekit"
+DATA_PRACTICES="$ROOT/apps/mobile/store/data-practices.json"
+IOS_PRIVACY_URL_FILE="$ROOT/apps/mobile/store/metadata/ios/en-US/privacy_url.txt"
+IOS_SUPPORT_URL_FILE="$ROOT/apps/mobile/store/metadata/ios/en-US/support_url.txt"
+LICENSE_FILE="$ROOT/LICENSE"
 PRIVACY_URL="https://${SLUG}.pages.dev/privacy"
 TERMS_URL="https://${SLUG}.pages.dev/terms"
 
@@ -152,6 +165,7 @@ Resolved identity:
   android:    $PACKAGE
   ios:        $BUNDLE_ID
   contact:    $CONTACT_EMAIL
+  copyright:  ${COPYRIGHT_HOLDER:-"(omit — LICENSE placeholder stays)"}
   privacy:    $PRIVACY_URL
   terms:      $TERMS_URL
 
@@ -162,6 +176,9 @@ Intended edits:
   • $PRODUCT_JSON — name, slug, contactEmail, privacyUrl, termsUrl (iosUrl/androidUrl stay # until listing live)
   • $LANDER_JSON — appName, contactEmail
   • $STOREKIT — productID prefixes from bundle id; warn if _developerTeamID still REPLACE_WITH_*
+  • $DATA_PRACTICES — contact_email
+  • $IOS_PRIVACY_URL_FILE / $IOS_SUPPORT_URL_FILE — live lander URLs
+  • $LICENSE_FILE — copyright holder from --copyright-holder (skipped if omitted)
 EOF
   exit 0
 fi
@@ -171,6 +188,11 @@ APP_JSON="$APP_JSON" \
 PRODUCT_JSON="$PRODUCT_JSON" \
 LANDER_JSON="$LANDER_JSON" \
 STOREKIT="$STOREKIT" \
+DATA_PRACTICES="$DATA_PRACTICES" \
+IOS_PRIVACY_URL_FILE="$IOS_PRIVACY_URL_FILE" \
+IOS_SUPPORT_URL_FILE="$IOS_SUPPORT_URL_FILE" \
+LICENSE_FILE="$LICENSE_FILE" \
+COPYRIGHT_HOLDER="$COPYRIGHT_HOLDER" \
 NAME="$NAME" \
 SLUG="$SLUG" \
 SCHEME="$SCHEME" \
@@ -271,6 +293,32 @@ if (storekitPath && fs.existsSync(storekitPath)) {
     );
   }
 }
+
+const practicesPath = process.env.DATA_PRACTICES;
+if (practicesPath && fs.existsSync(practicesPath)) {
+  const practices = JSON.parse(fs.readFileSync(practicesPath, 'utf8'));
+  practices.contact_email = contact;
+  fs.writeFileSync(practicesPath, JSON.stringify(practices, null, 2) + '\n');
+}
+
+function writeText(filePath, contents) {
+  if (!filePath || !fs.existsSync(filePath)) return;
+  fs.writeFileSync(filePath, contents.endsWith('\n') ? contents : `${contents}\n`);
+}
+writeText(process.env.IOS_PRIVACY_URL_FILE, privacyUrl);
+writeText(process.env.IOS_SUPPORT_URL_FILE, privacyUrl.replace(/\/privacy$/, ''));
+
+const licensePath = process.env.LICENSE_FILE;
+const copyrightHolder = process.env.COPYRIGHT_HOLDER || '';
+if (copyrightHolder && licensePath && fs.existsSync(licensePath)) {
+  const year = new Date().getFullYear();
+  const license = fs.readFileSync(licensePath, 'utf8');
+  const next = license.replace(
+    /Copyright \(c\) .+/,
+    `Copyright (c) ${year} ${copyrightHolder}`
+  );
+  fs.writeFileSync(licensePath, next);
+}
 NODE
 
 # JSON.stringify expands short arrays; Prettier wants them inline. Format the
@@ -285,7 +333,7 @@ elif [[ -x "$ROOT/node_modules/.bin/prettier" ]]; then
 fi
 if [[ -n "$PRETTIER" ]]; then
   format_targets=()
-  for f in "$APP_JSON" "$PRODUCT_JSON" "$LANDER_JSON"; do
+  for f in "$APP_JSON" "$PRODUCT_JSON" "$LANDER_JSON" "$DATA_PRACTICES"; do
     [[ -f "$f" ]] && format_targets+=("$f")
   done
   if ((${#format_targets[@]} > 0)); then
