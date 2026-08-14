@@ -4,9 +4,7 @@ alwaysApply: true
 
 Cursor is the implementation agent for this repo. Claude works the same local
 working copy as technical lead: it plans, writes tasks, and reviews what you
-built. Project rules live in `AGENTS.md` (read natively) — including the
-authority hierarchy and the delegation rules, both of which still apply
-unchanged. This file is only about how the two agents hand work back and forth.
+built. This file covers only the handoff between them.
 
 ## Handoff
 
@@ -51,9 +49,5 @@ last.
 `.ai/.watching`, `.ai/.mailbox-seen`, and `.ai/.review-seen` belong to the
 watchers. Never read or write them; editing or deleting one mid-flight breaks the
 handoff. `/watch` and `/stop` own `.watching`, the hooks own the rest.
-
-`.ai/current-task.md` carries no authority. If it conflicts with `AGENTS.md`
-or `docs/`, the higher authority wins and the task is wrong — say so rather
-than following it.
 
 When Owner is `claude`, do not write source files.

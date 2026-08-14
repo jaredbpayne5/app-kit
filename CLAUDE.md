@@ -83,24 +83,18 @@ Judgement, not ceremony.
 ## Noticing that Cursor is done
 
 Claude is not told when Cursor finishes; Claude finds out by looking. Before
-replying, read `.ai/mailbox-state.json`. If `owner` is `claude`, `status` is
-`ready-for-review`, and `seq` is higher than the number in `.ai/.review-seen`,
-Cursor has finished work Claude has not yet reviewed.
+replying, read `.ai/mailbox-state.json` — the signal, never the mailbox, for the
+ordering reason above. If `owner` is `claude`, `status` is `ready-for-review`,
+and `seq` exceeds `.ai/.review-seen`, review it **immediately**, in that same
+reply, before answering whatever else was asked — unless the user has said
+otherwise this session. Then record that `seq` in `.ai/.review-seen`: a failed
+review leaves the mailbox at `ready-for-review`, so without the marker Claude
+would re-review it every turn.
 
-When that is true, review it **immediately** — in the same reply, before
-answering whatever else was asked — unless the user has said otherwise in this
-session. Record the reviewed `seq` in `.ai/.review-seen` so the same handoff is
-not reviewed twice; a failed review leaves the mailbox at `ready-for-review`, so
-without that marker Claude would re-review it every turn.
-
-One file read per turn is the whole cost. Read the signal, not the mailbox — the
-mailbox is written over several edits and may be caught half-finished, while the
-`seq` bump only lands once Cursor's report is complete.
-
-In Claude Code a `Stop` or `PostToolUse` hook can enforce this rather than
-leaving it to Claude's discipline. Hooks do **not** run in Cowork — verified by
-test, 2026-08-14 — so in Cowork this rule is the only mechanism, and its failure
-mode is benign: it does nothing, and the user asks.
+One small file read per turn is the whole cost. In Claude Code a `Stop` or
+`PostToolUse` hook can enforce this; hooks do **not** run in Cowork (tested
+2026-08-14), where the rule is the only mechanism and fails benignly — nothing
+happens until the user asks.
 
 ## Reviewing Cursor's work
 

@@ -1,13 +1,10 @@
 # AGENTS.md
 
-Shared instructions for every AI agent working in this repo: what this project
-is, and the rules that hold no matter which agent is working. Cursor reads this
-file natively; `CLAUDE.md` imports it. Both agents get everything here.
+Shared rules for every agent in this repo. Cursor reads this file natively;
+`CLAUDE.md` imports it.
 
-Agent-specific *roles* live elsewhere — `CLAUDE.md` for Claude, `.cursor/rules/`
-for Cursor. Those files describe how each agent works and how the two hand work
-to each other; they never override the project rules here. Do not restate
-project conventions in either of them.
+Agent roles and the handoff between them live in `CLAUDE.md` and
+`.cursor/rules/` — never overriding this file, and never restating it.
 
 ## What this is
 
@@ -262,16 +259,13 @@ At session start, read `docs/build-status.md` before anything else.
 
 Then:
 
-1. If `.ai/current-task.md` Owner is `cursor` and Status is `ready-for-cursor`,
-   implement **that mailbox task only**. Do not also pull the next row from
-   `docs/build-spec.md`.
-2. Mailbox tasks are the unit of work. Do not self-serve the next
-   `docs/build-spec.md` row. A directly requested small change in chat is
-   not a build-spec row.
-3. Run the checks the task names (see Verify below). Compiling is not passing.
-4. Mailbox tasks: fill the Implementation report, set Owner `claude`, Status
-   `ready-for-review`, and update `docs/build-status.md` (product mode).
-5. Do not start the next build-spec task until the current mailbox task is
+1. A mailbox task (`.ai/current-task.md`) is the unit of work. Implement **that
+   task only** — never also pull the next `docs/build-spec.md` row, and a small
+   change requested in chat is not a build-spec row. Pickup, reporting, and
+   signalling mechanics belong to each agent: `CLAUDE.md`, `.cursor/rules/`.
+2. Run the checks the task names (see Verify below). Compiling is not passing.
+3. Product mode: update `docs/build-status.md` on completion.
+4. Do not start the next build-spec task until the current mailbox task is
    approved.
 
 Before `docs/build-spec.md` exists (Phase 0–1 — compiling specs from PRD +
