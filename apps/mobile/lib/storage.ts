@@ -38,7 +38,7 @@ export async function remove(key: string): Promise<void> {
 
 // --- SQL (STORAGE: 'sql') -------------------------------------------------------
 
-const APP_DB_NAME = 'tiny-app.db';
+const APP_DB_NAME = 'app.db';
 
 /** Versioned migrations — bump `version` and append; never edit applied versions. */
 export type SqlMigration = {
