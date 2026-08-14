@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# scripts/factory/bump-version.sh — bump expo.version + android.versionCode (+ ios.buildNumber).
+# scripts/dev/bump-version.sh — bump expo.version + android.versionCode (+ ios.buildNumber).
 #
 # Usage:
 #   npm run bump-version                 # patch: 1.0.0 → 1.0.1, versionCode +1

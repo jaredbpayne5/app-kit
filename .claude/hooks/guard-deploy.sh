@@ -40,7 +40,7 @@ fi
 # Cloudflare Pages lander deploy — ask (CLAUDE.md Hard Stop / web:deploy).
 # npm run web:deploy always matched; direct-bash path must be scripts/web/ (monorepo).
 is_web_deploy=false
-if echo "$command" | grep -Eq '\b(npm run )?web:deploy\b|\bbash scripts/web/deploy-lander\.sh\b'; then
+if echo "$command" | grep -Eq '\b(npm run )?web:deploy\b|scripts/web/deploy-lander\.sh'; then
   is_web_deploy=true
 fi
 if echo "$command" | grep -Eq '\bwrangler pages deploy\b|\bnpx wrangler pages deploy\b'; then
@@ -50,7 +50,7 @@ fi
 # Custom domain attach — ask (mutates public DNS / Pages domains).
 # Prefer scripts/web/ path; bare attach-domain also matches npm run domain-attach.
 is_domain_attach=false
-if echo "$command" | grep -Eq '\b(npm run )?domain-attach\b|\b(npm run )?attach-domain\b|\bbash scripts/web/attach-domain\.sh\b'; then
+if echo "$command" | grep -Eq '\b(npm run )?domain-attach\b|\b(npm run )?attach-domain\b|scripts/web/attach-domain\.sh'; then
   is_domain_attach=true
 fi
 if echo "$command" | grep -Eq '\bwrangler pages domains?\b|\bnpx wrangler pages domains?\b'; then
@@ -64,7 +64,7 @@ fi
 # Store listing / binary push — ask (store:push + fastlane deliver/supply).
 # npm run store:push always matched; direct-bash path must be scripts/store/ (monorepo).
 is_store_push=false
-if echo "$command" | grep -Eq '\b(npm run )?store:push\b|\bbash scripts/store/store-push\.sh\b'; then
+if echo "$command" | grep -Eq '\b(npm run )?store:push\b|scripts/store/store-push\.sh'; then
   is_store_push=true
 fi
 if echo "$command" | grep -Eq '\b(bundle exec )?fastlane\b|\bnpx fastlane\b'; then

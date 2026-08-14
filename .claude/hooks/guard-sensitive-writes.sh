@@ -12,6 +12,17 @@ fi
 
 input=$(cat)
 file_path=$(echo "$input" | jq -r '.tool_input.file_path // .tool_input.path // empty')
+command=$(echo "$input" | jq -r '.tool_input.command // empty')
+
+if [[ -z "$file_path" && -n "$command" ]]; then
+  if echo "$command" | grep -Eq '\.env|eas\.json(/|$)|app\.json|data-practices\.json|service-account|\.keystore|\.jks|credentials\.json'; then
+    cat <<'JSON'
+{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "ask", "permissionDecisionReason": "This Bash command looks like it writes env/secrets/app identity. CLAUDE.md requires explicit sign-off — confirm this is intentional."}}
+JSON
+    exit 0
+  fi
+  exit 0
+fi
 
 if [[ -z "$file_path" ]]; then
   exit 0

@@ -76,17 +76,18 @@ mtime_file() {
 }
 
 read_app_config() {
-  # Prints STORAGE, MONETIZATION (tab-separated).
+  # Prints STORAGE, MONETIZATION, PURCHASES_MODE (tab-separated).
   node <<'NODE'
 const fs = require("fs");
 const s = fs.readFileSync("apps/mobile/lib/app-config.ts", "utf8");
 const storage = /STORAGE:\s*['"]([^'"]+)['"]/.exec(s);
 const mon = /MONETIZATION:\s*['"]([^'"]+)['"]/.exec(s);
-if (!storage || !mon) {
+const mode = /PURCHASES_MODE:\s*['"]([^'"]+)['"]/.exec(s);
+if (!storage || !mon || !mode) {
   console.error("could not parse app-config");
   process.exit(1);
 }
-console.log([storage[1], mon[1]].join("\t"));
+console.log([storage[1], mon[1], mode[1]].join("\t"));
 NODE
 }
 
@@ -188,9 +189,10 @@ if [[ "$FAIL" -eq "$LIMIT_FAIL_BEFORE" ]]; then
 fi
 
 # --- 4. App config + data-practices purchases / RevenueCat --------------------
-CFG="$(read_app_config)" || { bad "app_config: could not parse apps/mobile/lib/app-config.ts"; CFG=$'\t\t'; }
+CFG="$(read_app_config)" || { bad "app_config: could not parse apps/mobile/lib/app-config.ts"; CFG=$'\t\t\t'; }
 # STORAGE also present in CFG (field 1); the purchases gate uses MONETIZATION only.
 MONETIZATION="$(printf '%s' "$CFG" | cut -f2)"
+PURCHASES_MODE="$(printf '%s' "$CFG" | cut -f3)"
 
 if [[ ! -f apps/mobile/store/data-practices.json ]]; then
   bad "data_practices: apps/mobile/store/data-practices.json missing"
@@ -213,6 +215,16 @@ NODE
     bad "purchases_declared: MONETIZATION=$MONETIZATION but data-practices.json must have collects_purchases: true and data_shared_with_third_parties: true (RevenueCat receives purchase history + app-user id)"
   else
     ok "purchases_declared: MONETIZATION=$MONETIZATION matches data-practices purchases/sharing flags"
+  fi
+
+  if [[ "$MONETIZATION" != "free" && "$PURCHASES_MODE" == "mock" ]]; then
+    if [[ "$PHASE" == "4" ]]; then
+      defer "purchases_mode: PURCHASES_MODE=mock (flip to live before store launch)"
+    else
+      bad "purchases_mode: MONETIZATION=$MONETIZATION still has PURCHASES_MODE=mock — a mock paywall must not reach TestFlight"
+    fi
+  else
+    ok "purchases_mode: PURCHASES_MODE=$PURCHASES_MODE"
   fi
 
   CONTACT_OK="$(
@@ -479,8 +491,9 @@ fi
 # --- 13. Leftover scaffold / demo wording (FAIL, not warn) --------------------
 # "placeholder" is also a legitimate TextInput prop and a normal word in doc
 # comments, so filter those out — otherwise every real app trips this forever.
+# Also match the actual demo copy this template ships (generic words miss it).
 SCAFFOLD_HITS="$(
-  grep -rniE 'demo|placeholder|todo|lorem ipsum|example screen' \
+  grep -rniE 'demo|placeholder|todo|lorem ipsum|example screen|Replace this screen with your product|Describe the core loop in one short sentence' \
     --include='*.ts' --include='*.tsx' \
     --exclude='*.test.ts' --exclude='*.test.tsx' \
     apps/mobile/app apps/mobile/components 2>/dev/null \
@@ -494,6 +507,20 @@ if [[ -n "$SCAFFOLD_HITS" ]]; then
   done <<< "$SCAFFOLD_HITS"
 else
   ok "scaffold_text: no demo/placeholder/TODO wording in app/ or components/"
+fi
+
+# --- 13b. Canonical legal markdown still template copy (launch only) ----------
+LEGAL_PLACEHOLDER="$(
+  grep -lE 'template placeholder|<!-- TBD:' apps/web/content/privacy.md apps/web/content/terms.md 2>/dev/null || true
+)"
+if [[ -n "$LEGAL_PLACEHOLDER" ]]; then
+  if [[ "$PHASE" == "4" ]]; then
+    defer "legal_copy: privacy/terms markdown still has template placeholder text"
+  else
+    bad "legal_copy: replace template placeholder copy in: $LEGAL_PLACEHOLDER"
+  fi
+else
+  ok "legal_copy: privacy/terms markdown is not the template placeholder"
 fi
 
 # --- 14. verify suite (always after checks, unless --skip-heavy) --------------

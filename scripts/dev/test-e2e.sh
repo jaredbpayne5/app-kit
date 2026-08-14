@@ -2,8 +2,8 @@
 # Local Maestro e2e smoke. Not required in CI (no emulator tax).
 #
 # Modes:
-#   expo-go (default) — Expo Go appId (platform-specific; see below)
-#   native            — appId from app.json package / bundleIdentifier
+#   expo-go           — Expo Go appId (platform-specific; see below)
+#   native (**default**) — appId from app.json package / bundleIdentifier
 #
 # Platforms:
 #   ios (default) — also honor E2E_PLATFORM; day-to-day on Mac / Xcode Simulator
@@ -29,7 +29,7 @@ cd "$ROOT"
 # shellcheck source=scripts/dev/maestro-hygiene.sh
 source "$ROOT/scripts/dev/maestro-hygiene.sh"
 
-MODE="${E2E_MODE:-expo-go}"
+MODE="${E2E_MODE:-native}"
 PLATFORM="${E2E_PLATFORM:-ios}"
 PORT="${EXPO_PORT:-8081}"
 FLOW="${E2E_FLOW:-smoke}"
