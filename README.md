@@ -34,10 +34,14 @@ Play, and a marketing lander. No backend, no accounts, no server bill.
    Bundle identifiers are permanent once you upload to a store.
 
 3. `npm run doctor` to check your toolchain.
-4. Follow the product pipeline before writing UI:
-   `docs/recipes/product-pipeline.md` (PRD → design tool → export into
-   `docs/design-exports/` → Opus compile via `docs/recipes/compile-specs.md`
-   → code). Track progress in `docs/build-status.md`.
+4. Follow the product pipeline (`docs/recipes/product-pipeline.md`):
+   1. `init-app` (identity)
+   2. Write `docs/PRD.md` (strong model)
+   3. Generate UI in Moonchild from the PRD; drop exports in `docs/design-exports/`
+   4. Compile specs (`docs/recipes/compile-specs.md` master prompt)
+   5. Human skim: delete anything the compile pass invented
+   6. Strong model assigns one mailbox task; Composer implements; strong model reviews
+   7. Repeat until the build spec is done, then `npm run verify` and `npm run preflight`
 5. `npm run dev` and press `i` for the iOS Simulator or `a` for Android.
    Prefer a development build (`npm run dev:build:ios` /
    `dev:build:android`) once you add native modules.
@@ -74,10 +78,10 @@ Everything below is free and needs no accounts:
   [Android toolchain](#android-toolchain-macos) — Studio is optional)
 - Running on your own iPhone via free personal-team provisioning (7-day certs)
 - Running on any Android device over USB
-- **Testing purchases** — `apps/mobile/store/storekit/Products.storekit` is an
-  Xcode StoreKit configuration file. Combined with `PURCHASES_MODE: 'mock'` in
-  `lib/app-config.ts`, you can build and test the whole paywall, including
-  restore and renewal, without paying Apple anything.
+- **Testing purchases** — with `PURCHASES_MODE: 'mock'` you can exercise lock →
+  buy → unlock and restore without a store account. Accelerated renewal still
+  needs `apps/mobile/store/storekit/Products.storekit` in a native Xcode run,
+  not mock JS.
 - Screenshots, compliance docs, and the lander build
 
 You only need to pay when you publish: Google Play is $25 once, Apple is $99
@@ -180,8 +184,13 @@ build from this template shares one copy and nothing sensitive can be committed:
 
 ```bash
 npm test           # Jest unit tests
-npm run test:e2e   # Maestro flows against a simulator (free, local only)
+npm run test:e2e   # Maestro against a locally built app (see below)
 ```
+
+Default `npm run test:e2e` needs a locally built native app (`npx expo run:ios`
+or a dev build already installed on the simulator). That is still free and
+needs no paid Apple account. Expo Go is the exception:
+`npm run test:e2e -- --mode=expo-go --flow=onboarding`.
 
 Maestro drives the real app like a user. It is not in CI because GitHub's Linux
 runners can't boot an iOS Simulator.
