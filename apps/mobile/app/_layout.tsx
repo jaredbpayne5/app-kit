@@ -1,5 +1,6 @@
 import '../global.css';
 
+import { initNotificationHandler } from '@/lib/local-notifications';
 import { useOnboardingGate } from '@/lib/onboarding';
 import { initSentryIfConfigured, wrapRoot } from '@/lib/sentry';
 import { NAV_THEME } from '@/lib/theme';
@@ -21,6 +22,10 @@ export {
 
 // Dormant until EXPO_PUBLIC_SENTRY_DSN is non-empty — no SDK load / no network.
 const sentryActive = initSentryIfConfigured();
+
+// Eager: a reminder scheduled earlier can fire before any screen calls the
+// seam. Registers the foreground handler only — does not request permission.
+initNotificationHandler();
 
 // Hold the splash while the onboarding gate resolves, so the first frame is the
 // correct destination rather than a blank view that then redirects.
@@ -64,7 +69,7 @@ function RootLayout() {
   const { colorScheme } = useColorScheme();
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1 }} /* native-required: RNGH root */>
       <SafeAreaProvider>
         <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
           <BottomSheetModalProvider>

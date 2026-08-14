@@ -1,8 +1,9 @@
 /**
  * Local notifications seam — scheduled reminders only (no remote push).
  *
- * `expo-notifications` is required lazily so importing this module never
- * requests permission or touches the native module.
+ * Importing this module does not request permission. The native module is
+ * loaded the first time a seam function runs, or when
+ * `initNotificationHandler` is called from `app/_layout.tsx`.
  */
 import { Platform } from 'react-native';
 
@@ -18,8 +19,29 @@ function loadNotifications(): NotificationsModule {
   if (!notifications) {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     notifications = require('expo-notifications') as NotificationsModule;
+    notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+        shouldShowBanner: true,
+        shouldShowList: true,
+      }),
+    });
   }
   return notifications;
+}
+
+/**
+ * Register the foreground handler so a reminder scheduled earlier is not
+ * swallowed on cold start. Call once from `app/_layout.tsx`.
+ *
+ * Eager on purpose: iOS delivers the notification before any screen can
+ * call a seam function. This loads the native module but does not request
+ * permission. Clones that never schedule reminders still pay that load —
+ * that is the cost of the handler existing before the first fire.
+ */
+export function initNotificationHandler(): void {
+  loadNotifications();
 }
 
 /** True after expo-notifications has been required (tests / observability). */

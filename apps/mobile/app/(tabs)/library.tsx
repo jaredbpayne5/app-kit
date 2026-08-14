@@ -30,6 +30,7 @@ import { useColorScheme } from 'nativewind';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const STORAGE_KEY = 'library.items';
+let nextItemId = 0;
 
 type Item = {
   id: string;
@@ -91,7 +92,11 @@ export default function LibraryScreen() {
     const title = draft.trim();
     if (!title) return;
     const next: Item[] = [
-      { id: `${Date.now()}`, title, createdAt: new Date().toISOString() },
+      {
+        id: `${Date.now()}-${nextItemId++}`,
+        title,
+        createdAt: new Date().toISOString(),
+      },
       ...items,
     ];
     void persist(next);
@@ -149,7 +154,10 @@ export default function LibraryScreen() {
         />
       )}
 
-      <View className="px-6" style={{ paddingBottom: Math.max(insets.bottom, 16) }}>
+      <View
+        className="px-6"
+        style={{ paddingBottom: Math.max(insets.bottom, 16) }} /* native-required: dynamic inset */
+      >
         <Button
           testID="btn-add-item"
           accessibilityLabel="Add item"
@@ -171,7 +179,13 @@ export default function LibraryScreen() {
         backdropComponent={renderBackdrop}
         backgroundStyle={{ backgroundColor: theme.card }}
         handleIndicatorStyle={{ backgroundColor: theme.mutedForeground }}>
-        <BottomSheetView style={{ paddingHorizontal: 24, paddingBottom: 24, gap: 16 }}>
+        <BottomSheetView
+          style={{
+            // native-required: gorhom sheet
+            paddingHorizontal: 24,
+            paddingBottom: 24,
+            gap: 16,
+          }}>
           <Text variant="h4">New item</Text>
           <BottomSheetTextInput
             value={draft}
@@ -183,6 +197,7 @@ export default function LibraryScreen() {
             returnKeyType="done"
             onSubmitEditing={addItem}
             style={{
+              // native-required: BottomSheetTextInput does not take className
               height: 44,
               borderRadius: 10,
               paddingHorizontal: 12,

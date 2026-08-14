@@ -3,6 +3,7 @@ import {
   __resetNotificationsForTests,
   cancelAll,
   cancelReminder,
+  initNotificationHandler,
   isNotificationsModuleLoaded,
   listScheduled,
   requestPermission,
@@ -28,6 +29,7 @@ jest.mock('expo-notifications', () => ({
   getAllScheduledNotificationsAsync: (...args: unknown[]) =>
     mockGetAllScheduledNotificationsAsync(...args),
   setNotificationChannelAsync: (...args: unknown[]) => mockSetNotificationChannelAsync(...args),
+  setNotificationHandler: jest.fn(),
   AndroidImportance: { DEFAULT: 5 },
   SchedulableTriggerInputTypes: { DAILY: 'daily', DATE: 'date' },
 }));
@@ -54,6 +56,15 @@ describe('local notifications seam', () => {
 
   it('does not load the native module on import', () => {
     expect(isNotificationsModuleLoaded()).toBe(false);
+  });
+
+  it('initNotificationHandler loads the module and registers the foreground handler', () => {
+    const { setNotificationHandler } = jest.requireMock('expo-notifications') as {
+      setNotificationHandler: jest.Mock;
+    };
+    initNotificationHandler();
+    expect(isNotificationsModuleLoaded()).toBe(true);
+    expect(setNotificationHandler).toHaveBeenCalledTimes(1);
   });
 
   it('permission denied: requestPermission returns denied without throwing', async () => {
