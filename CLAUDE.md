@@ -79,9 +79,16 @@ runtime behaviour — typecheck, lint, and a full passing test suite once cleare
 a colour value React Native rejects outright. Anything touching native modules,
 colour strings, routing, or async lifecycle needs a device or a targeted test.
 
-If the implementation is wrong, say what is wrong and why, and hand it back
-with a corrected task. Do not quietly fix it and move on — that hides a real
-signal about the task or the spec.
+If the work passes, say so and reset the mailbox to idle — Owner `none`,
+Status `idle`, Mode `none`. Approving the work and clearing the mailbox are
+one action, not two; a mailbox left at `ready-for-review` reads as unfinished
+work to the next session.
+
+If the implementation is wrong, say what is wrong and why, then bring the
+corrected task to the user for approval **before** writing it to the mailbox.
+Claude does not re-assign work on its own — a failed review means the task,
+the spec, or the implementation was wrong, and which one it was is the user's
+call. Do not quietly fix it and move on; that hides a real signal.
 
 ## When to stop and ask the human
 
