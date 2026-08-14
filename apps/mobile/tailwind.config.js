@@ -3,7 +3,19 @@ const { hairlineWidth } = require('nativewind/theme');
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: 'class',
-  content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}', './ui/**/*.{ts,tsx}'],
+  // Compile classes from any TS/TSX under this package so a new folder
+  // (features/, screens/, …) cannot render unstyled while typecheck stays green.
+  // node_modules / native dirs are not matched by these globs.
+  content: [
+    './app/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './ui/**/*.{ts,tsx}',
+    './lib/**/*.{ts,tsx}',
+    './features/**/*.{ts,tsx}',
+    './hooks/**/*.{ts,tsx}',
+    './screens/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
+  ],
   presets: [require('nativewind/preset')],
   theme: {
     extend: {

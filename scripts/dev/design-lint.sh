@@ -5,6 +5,9 @@
 # model can run reliably — nowhere near a substitute for real visual review,
 # but enough to keep a fixed mistake from quietly coming back.
 #
+# Scans the same apps/mobile TS/TSX tree NativeWind compiles (minus native /
+# generated dirs). A folder a model invents must not escape these checks.
+#
 # Usage:
 #   npm run design-lint
 #   bash scripts/dev/design-lint.sh
@@ -16,6 +19,15 @@ cd "$ROOT" || exit 1
 
 FAIL=0
 
+grep_mobile() {
+  grep -rn "$@" \
+    --include='*.tsx' --include='*.ts' \
+    --exclude-dir=node_modules --exclude-dir=android --exclude-dir=ios \
+    --exclude-dir=.expo --exclude-dir=__tests__ \
+    apps/mobile 2>/dev/null \
+    | grep -vE '\.test\.(ts|tsx):' || true
+}
+
 # --- 1. Raw text-[Npx] literals outside ui/ ----------------------------------
 # ui/text.tsx is the one sanctioned place to define the type scale; screens
 # should use its variants, not ad hoc arbitrary sizes. One documented
@@ -26,9 +38,8 @@ FAIL=0
 # rather than silently ignored.
 TEXT_SIZE_ALLOWLIST='apps/mobile/components/paywall.tsx:'
 TEXT_SIZE_HITS="$(
-  grep -rnE "text-\[[0-9]" \
-    --include='*.tsx' --include='*.ts' \
-    apps/mobile/app apps/mobile/components 2>/dev/null \
+  grep_mobile -E "text-\[[0-9]" \
+    | grep -v '^apps/mobile/ui/text\.tsx:' \
     | grep -v "^${TEXT_SIZE_ALLOWLIST}.*text-\[22px\]" || true
 )"
 if [[ -n "$TEXT_SIZE_HITS" ]]; then
@@ -36,21 +47,17 @@ if [[ -n "$TEXT_SIZE_HITS" ]]; then
   echo "$TEXT_SIZE_HITS" | sed 's/^/  /'
   FAIL=1
 else
-  echo "design-lint: no raw text-[Npx] literals in app/ or components/ (besides the documented paywall.tsx price exception)"
+  echo "design-lint: no raw text-[Npx] literals outside ui/text.tsx (besides the documented paywall.tsx price exception)"
 fi
 
 # --- 2. Literal bullet characters (should be an icon+text row, not "•ˑtext")--
-BULLET_HITS="$(
-  grep -rnF '•' \
-    --include='*.tsx' --include='*.ts' \
-    apps/mobile/app apps/mobile/components 2>/dev/null || true
-)"
+BULLET_HITS="$(grep_mobile -F '•')"
 if [[ -n "$BULLET_HITS" ]]; then
   echo "design-lint: literal bullet character(s) — use an icon+text row instead:"
   echo "$BULLET_HITS" | sed 's/^/  /'
   FAIL=1
 else
-  echo "design-lint: no literal bullet characters in app/ or components/"
+  echo "design-lint: no literal bullet characters in apps/mobile TS/TSX"
 fi
 
 # --- 3. Hardcoded hex colors via Tailwind arbitrary-value syntax ------------
@@ -58,33 +65,30 @@ fi
 # rendering, but a hardcoded hex bypasses the theme tokens outright and is
 # guaranteed to break in the mode it wasn't eyeballed in — this is the one
 # slice of that rubric item that's actually mechanical.
-HEX_CLASS_HITS="$(
-  grep -rnE '\[#[0-9A-Fa-f]{3,8}\]' \
-    --include='*.tsx' --include='*.ts' \
-    apps/mobile/app apps/mobile/components apps/mobile/ui 2>/dev/null || true
-)"
+HEX_CLASS_HITS="$(grep_mobile -E '\[#[0-9A-Fa-f]{3,8}\]')"
 if [[ -n "$HEX_CLASS_HITS" ]]; then
   echo "design-lint: hardcoded hex color(s) via Tailwind arbitrary value — use a theme token:"
   echo "$HEX_CLASS_HITS" | sed 's/^/  /'
   FAIL=1
 else
-  echo "design-lint: no hardcoded hex Tailwind classes in app/, components/, or ui/"
+  echo "design-lint: no hardcoded hex Tailwind classes in apps/mobile TS/TSX"
 fi
 
 # --- 3b. Hardcoded hsl()/hsla()/rgb()/rgba() literals ------------------------
 # Same rule as hex: colors belong in global.css → theme-tokens, not inline in
 # screens/components. (Hex-only grep missed BrandAtmosphere's hsla() washes.)
 FUNC_COLOR_HITS="$(
-  grep -rnE '\b(hsla?|rgba?)\s*\(' \
-    --include='*.tsx' --include='*.ts' \
-    apps/mobile/app apps/mobile/components apps/mobile/ui 2>/dev/null || true
+  grep_mobile -E '\b(hsla?|rgba?)\s*\(' \
+    | grep -v '^apps/mobile/lib/theme-tokens\.ts:' \
+    | grep -v '^apps/mobile/lib/theme\.ts:' \
+    || true
 )"
 if [[ -n "$FUNC_COLOR_HITS" ]]; then
   echo "design-lint: hardcoded hsl/hsla/rgb/rgba literal(s) — use a theme token from lib/theme-tokens.ts:"
   echo "$FUNC_COLOR_HITS" | sed 's/^/  /'
   FAIL=1
 else
-  echo "design-lint: no hardcoded hsl/hsla/rgb/rgba literals in app/, components/, or ui/"
+  echo "design-lint: no hardcoded hsl/hsla/rgb/rgba literals in apps/mobile TS/TSX"
 fi
 
 # --- 3c. Hardcoded named Tailwind palette classes ----------------------------
@@ -96,9 +100,7 @@ fi
 # explicitly rather than loosening the pattern.
 NAMED_PALETTE='white|black|slate|gray|grey|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose'
 NAMED_COLOR_HITS="$(
-  grep -rnE "\\b(bg|text|border|ring|fill|stroke|from|to|via)-(${NAMED_PALETTE})(-(100|200|300|400|500|600|700|800|900))?(/[0-9.]+)?\\b" \
-    --include='*.tsx' --include='*.ts' \
-    apps/mobile/app apps/mobile/components apps/mobile/ui 2>/dev/null \
+  grep_mobile -E "\\b(bg|text|border|ring|fill|stroke|from|to|via)-(${NAMED_PALETTE})(-(100|200|300|400|500|600|700|800|900))?(/[0-9.]+)?\\b" \
     | grep -vE ':[0-9]+:[[:space:]]*[*/]' \
     | grep -vE '^apps/mobile/ui/alert-dialog\.tsx:[0-9]+:.*bg-black/50' \
     | grep -vE '^apps/mobile/components/date-field\.tsx:[0-9]+:.*bg-black/40' \
@@ -110,24 +112,20 @@ if [[ -n "$NAMED_COLOR_HITS" ]]; then
   echo "$NAMED_COLOR_HITS" | sed 's/^/  /'
   FAIL=1
 else
-  echo "design-lint: no hardcoded named Tailwind palette classes in app/, components/, or ui/ (besides documented dismiss-scrims)"
+  echo "design-lint: no hardcoded named Tailwind palette classes (besides documented dismiss-scrims)"
 fi
 
 # --- 4. Empty catch blocks ----------------------------------------------------
 # Self-review rubric item 7 ("no unguarded JSON.parse; no unhandled promise
 # rejection; no empty catch") is mostly a judgment call, but a literal empty
 # catch block is unambiguous and mechanical.
-EMPTY_CATCH_HITS="$(
-  grep -rnE 'catch\s*(\([^)]*\))?\s*\{\s*\}' \
-    --include='*.tsx' --include='*.ts' \
-    apps/mobile/app apps/mobile/components apps/mobile/lib 2>/dev/null | grep -v '\.test\.' || true
-)"
+EMPTY_CATCH_HITS="$(grep_mobile -E 'catch\s*(\([^)]*\))?\s*\{\s*\}')"
 if [[ -n "$EMPTY_CATCH_HITS" ]]; then
   echo "design-lint: empty catch block(s) — report or explicitly no-op with a comment:"
   echo "$EMPTY_CATCH_HITS" | sed 's/^/  /'
   FAIL=1
 else
-  echo "design-lint: no empty catch blocks in app/, components/, or lib/"
+  echo "design-lint: no empty catch blocks in apps/mobile TS/TSX"
 fi
 
 # --- 5. Safe-area insets on top-level screens --------------------------------
@@ -206,6 +204,31 @@ if [[ -n "$NEW_ROUTES" ]]; then
   FAIL=1
 else
   echo "design-lint: no new route files while the screens-status sentinel is present"
+fi
+
+# --- 7. Inline style={{}} without an explicit native-required marker ---------
+# NativeWind is the styling system. Dynamic insets, pager width, and libraries
+# that do not accept className (gorhom sheets, native pickers) may keep a
+# style={{ }} object if this line or the next includes `native-required`
+# (Prettier often wraps the object onto the following line).
+INLINE_STYLE_HITS=""
+while IFS= read -r hit; do
+  [[ -z "$hit" ]] && continue
+  file="${hit%%:*}"
+  rest="${hit#*:}"
+  lineno="${rest%%:*}"
+  next=$((lineno + 1))
+  if sed -n "${lineno},${next}p" "$file" | grep -q 'native-required'; then
+    continue
+  fi
+  INLINE_STYLE_HITS+="$hit"$'\n'
+done < <(grep_mobile -E 'style=\{\{')
+if [[ -n "$INLINE_STYLE_HITS" ]]; then
+  echo "design-lint: inline style={{ }} without a native-required comment on this line or the next — use NativeWind className, or mark the exception:"
+  printf '%s' "$INLINE_STYLE_HITS" | sed 's/^/  /'
+  FAIL=1
+else
+  echo "design-lint: no unmarked inline style={{ }} in apps/mobile TS/TSX"
 fi
 
 if [[ "$FAIL" -eq 1 ]]; then

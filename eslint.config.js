@@ -74,6 +74,34 @@ const SEAM_FILES = [
   'apps/mobile/lib/sentry.ts',
 ];
 
+const SEAM_DYNAMIC_IMPORT_NAMES = [
+  'expo-sqlite',
+  'expo-sqlite/kv-store',
+  'react-native-purchases',
+  'expo-haptics',
+  'expo-notifications',
+  '@sentry/react-native',
+];
+
+const NO_RESTRICTED_SYNTAX = [
+  'error',
+  ...SEAM_DYNAMIC_IMPORT_NAMES.map((name) => ({
+    selector: `ImportExpression[source.value='${name}']`,
+    message: `Use the seam instead of import('${name}') — dynamic import() bypasses no-restricted-imports.`,
+  })),
+  {
+    selector:
+      "CallExpression[callee.name='cssInterop'][arguments.0.type='MemberExpression'][arguments.0.object.name='Animated']",
+    message:
+      'cssInterop mutates the component globally. Register a private copy — see ui/motion.tsx.',
+  },
+  {
+    selector: "CallExpression[callee.name='cssInterop'][arguments.0.name='Animated']",
+    message:
+      'cssInterop mutates the component globally. Register a private copy — see ui/motion.tsx.',
+  },
+];
+
 module.exports = defineConfig([
   expoConfig,
   eslintConfigPrettier,
@@ -99,6 +127,7 @@ module.exports = defineConfig([
       // Expo sets this to warn; require() bypasses no-restricted-imports, so a
       // seam library loaded via require() would otherwise leave lint green.
       '@typescript-eslint/no-require-imports': 'error',
+      'no-restricted-syntax': NO_RESTRICTED_SYNTAX,
     },
   },
   {
@@ -106,6 +135,7 @@ module.exports = defineConfig([
     files: SEAM_FILES,
     rules: {
       'no-restricted-imports': 'off',
+      'no-restricted-syntax': 'off',
     },
   },
   {
@@ -121,6 +151,7 @@ module.exports = defineConfig([
     files: ['apps/mobile/**/*.test.{ts,tsx}', 'apps/mobile/__tests__/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-imports': 'off',
+      'no-restricted-syntax': 'off',
       'no-console': 'off',
     },
   },
