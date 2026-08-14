@@ -62,9 +62,10 @@ edit, never regenerate from memory.
 Routine and mechanical implementation: writing the code for a decided design,
 tests, refactors, renames, running tooling, fixing issues Claude has already
 diagnosed. Write the task to `.ai/current-task.md` (see that file for the
-shape), set Owner to `cursor` and Mode to `product` or `template`, then stop.
-Do not also implement it. Mode is always explicit — never leave Cursor to
-infer whether it is building the app or developing this template.
+shape), set Owner to `cursor` and Mode to `product` or `template`, bump the
+signal, **launch the waiter** (below), then stop. Do not also implement it.
+Mode is always explicit — never leave Cursor to infer whether it is building
+the app or developing this template.
 
 Claude does not manage Cursor's model selection or its internal delegation.
 Cursor decides what it runs on. Do not put model instructions in the task.
@@ -82,19 +83,45 @@ Judgement, not ceremony.
 
 ## Noticing that Cursor is done
 
-Claude is not told when Cursor finishes; Claude finds out by looking. Before
-replying, read `.ai/mailbox-state.json` — the signal, never the mailbox, for the
-ordering reason above. If `owner` is `claude`, `status` is `ready-for-review`,
-and `seq` exceeds `.ai/.review-seen`, review it **immediately**, in that same
-reply, before answering whatever else was asked — unless the user has said
-otherwise this session. Then record that `seq` in `.ai/.review-seen`: a failed
-review leaves the mailbox at `ready-for-review`, so without the marker Claude
-would re-review it every turn.
+Claude is not told when Cursor finishes. **Do not rely on remembering to check.**
+That rule alone was the mechanism until 2026-08-14 and it failed twice in one
+session — both times the user had to say "Cursor is waiting on you." A rule with
+no trigger loses to whatever the user actually asked that turn.
 
-One small file read per turn is the whole cost. In Claude Code a `Stop` or
-`PostToolUse` hook can enforce this; hooks do **not** run in Cowork (tested
-2026-08-14), where the rule is the only mechanism and fails benignly — nothing
-happens until the user asks.
+**The waiter is the mechanism.** Immediately after bumping the signal on a
+handoff, launch `.claude/hooks/wait-for-review.sh` as a **background** command:
+
+```
+bash .claude/hooks/wait-for-review.sh 1800    # run_in_background: true
+```
+
+It sleeps, polling `.ai/mailbox-state.json` every 5s, and exits the moment
+`owner` is `claude`, `status` is `ready-for-review`, and `seq` exceeds
+`.ai/.review-seen`. A finished background task re-invokes Claude automatically —
+that exit *is* the notification. The sleeping is done by the script, not by a
+model, so idling is free. It is the mirror of `.cursor/hooks/wait-for-mail.sh`,
+which is how Cursor learns about *its* mail.
+
+It must run as a background command, not a hook. Only a harness-tracked
+background task re-invokes Claude on exit; a process spawned by a hook would see
+the mail and wake nobody.
+
+The waiter is **one-shot** — it exits when it fires, so it is already gone by
+review time and the later idle-reset bump lands in silence. One waiter per task.
+It also exits on timeout (default 1800s) with a re-arm message; if Cursor is
+still working, launch it again.
+
+**Fallback, for when the waiter is not there** — it timed out, the session
+restarted, a handoff forgot to launch it, or the harness does not support
+background tasks (Cowork: hooks are known not to run there, and the waiter is
+untested): read `.ai/mailbox-state.json` before replying — the signal, never the
+mailbox, for the ordering reason above. Same condition. One small file read.
+
+However Claude finds out, review it **immediately**, in that same reply, before
+answering whatever else was asked — unless the user has said otherwise this
+session. Then record that `seq` in `.ai/.review-seen`: a failed review leaves the
+mailbox at `ready-for-review`, so without the marker Claude would re-review it
+every turn.
 
 ## Reviewing Cursor's work
 
