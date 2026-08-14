@@ -55,10 +55,12 @@ the lander. Bundle IDs are permanent after the first store upload. Script:
 5. **Session handoff** — Keep `docs/build-status.md` current (phase, current
    task, where we left off, deviations). Read it at the start of every coding
    session.
-6. **Implement** — Switch to a cheaper model. Work the next incomplete task in
-   `docs/build-spec.md`. For each designed screen: retrieve the artifact (MCP
-   or `docs/design-exports/`) → sync tokens into `apps/mobile/global.css` /
-   `ui/` → adapt into Expo Router / NativeWind / seams. No freehand layouts.
+6. **Implement** — Planning model assigns **one mailbox task at a time**
+   (`.ai/current-task.md`). Cheaper model implements that task only. For each
+   designed screen: retrieve the artifact (MCP or `docs/design-exports/`) →
+   sync tokens into `apps/mobile/global.css` / `ui/` → adapt into Expo Router /
+   NativeWind / seams. No freehand layouts. See `AGENTS.md` → *Task loop*
+   (mailbox wins; small chat tweaks are the only idle-mailbox exception).
 7. **Data & ship** — Phase 4+ in `docs/build-status.md` (on-device logic, QA,
    polish). Fill `apps/mobile/store/metadata/` and `apps/brand/` before
    `npm run preflight`.

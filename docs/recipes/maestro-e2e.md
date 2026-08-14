@@ -19,8 +19,8 @@ when you use `npm run test:e2e` / `npm run screenshots` (those scripts `cd` to t
 | `expo-go` | `android` | `host.exp.exponent` | Same for Android Expo Go |
 
 ```bash
-npm run test:e2e -- --mode=native                 # preferred for this template
-npm run test:e2e                                    # check scripts/dev/test-e2e.sh default; pass --mode=native when unsure
+npm run test:e2e                                  # default: native (smoke needs a dev build)
+npm run test:e2e -- --mode=expo-go --flow=onboarding
 npm run test:e2e -- --platform=android --mode=native
 npm run test:e2e -- --port 8082   # match Metro port
 ```

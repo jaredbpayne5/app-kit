@@ -65,6 +65,18 @@ design beyond the PRD and the exported artifacts.
      file goes stale, the next session resumes from a false picture.
    - Do **not** add product requirements or redesign the UX.
    - Prefer existing `ui/` primitives and `lib/` seams.
+   - Write each task in mailbox shape so it can be pasted into
+     `.ai/current-task.md`: Goal, Scope, Out of scope, Acceptance criteria.
+   - **Required Phase 2 tasks** (name them explicitly):
+     1. Set `APP_CONFIG.MONETIZATION` and `STORAGE` in
+        `apps/mobile/lib/app-config.ts` from the PRD. Leave
+        `PURCHASES_MODE: 'mock'` until live keys exist.
+     2. Replace or remove demo `app/(tabs)/index.tsx` and `library.tsx` per
+        `screens-status.md`, including the Library tab in `(tabs)/_layout.tsx`.
+     3. Rewrite `apps/mobile/maestro/smoke.yaml` for the product's real tabs
+        (do not leave assertions on the demo Library CRUD).
+     4. A later prune task listing unused `ui/` / seams the PRD will never
+        use — do not delete inventory during screen work.
 
 5. **`docs/build-status.md`**
    - Remove the template sentinel.
@@ -92,6 +104,9 @@ any blockers (missing exports, PRD gaps, template-default conflicts).
    if the model added screens or features not in the PRD/exports, delete those
    parts and re-run or edit by hand.
 2. Switch Cursor to **Composer 2.5 Fast**.
-3. Say: read `docs/build-status.md`, then implement the next incomplete task
-   in `docs/build-spec.md` only.
-4. Keep updating `docs/build-status.md` as tasks complete.
+3. Planning model: copy the first incomplete build-spec task into
+   `.ai/current-task.md` (Owner `cursor`, Status `ready-for-cursor`).
+4. Implementing model: follow `AGENTS.md` → *Task loop* (mailbox, not
+   self-serve from `build-spec.md`).
+5. After review approval, assign the next task the same way.
+6. Keep updating `docs/build-status.md` as tasks complete.
