@@ -33,6 +33,12 @@ file, so a bumped `seq` is a promise that the mailbox is whole. Bumping it
 early hands Cursor a half-written task. Resetting the mailbox to idle after a
 passed review updates it too, with `seq` still incrementing.
 
+Both files are gitignored — the mailbox is a scratchpad, not a record, and its
+churn does not belong in a product clone's history. Only the blank master copy
+`.ai/current-task.template.md` is tracked. `/watch` builds the live pair from it
+in a fresh clone; if either is missing when Claude needs it, recreate it from
+the template rather than inventing a shape.
+
 ## What Claude does
 
 - Understand what the user actually wants; ask when it is genuinely ambiguous.

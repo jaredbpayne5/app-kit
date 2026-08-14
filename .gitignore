@@ -81,6 +81,9 @@ apps/web/template/og-image.png
 # Local audit backlog — not part of the template product
 REPO-EVALUATION.md
 
-# Mailbox watcher local state — per-machine, never shared
+# Mailbox — live handoff scratchpad, not a record. Only the blank master copy
+# (.ai/current-task.template.md) is tracked; `/watch` builds these from it.
+.ai/current-task.md
+.ai/mailbox-state.json
 .ai/.mailbox-seen
 .ai/.watching
