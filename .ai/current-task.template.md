@@ -33,6 +33,19 @@ _(None. Claude fills this in, then sets Owner: `cursor` / Status:
 
 **Goal:** _(one or two sentences — what should be true when this is done)_
 
+**Premises — verify these before building:**
+
+The factual claims this task rests on, each with the command that confirms it.
+**Run them first.** If any premise is false, set Status `ready-for-review` with
+what you found and **stop** — do not adapt the task around it. A false premise
+means the task is wrong, not that the implementation needs to be creative.
+
+Claude fills this in from checks already run, so this is confirmation, not
+discovery. An empty Premises block means the task was written without verifying
+anything — treat that as a defect and say so.
+
+- [ ] _(claim — e.g. "no EXIT trap exists in this script")_ — `(command)`
+
 **Scope:**
 
 - _(files or areas expected to change)_

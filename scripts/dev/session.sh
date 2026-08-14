@@ -350,7 +350,7 @@ cmd_down() {
 
   if [[ "$watch" -eq 1 ]]; then
     printf '\n%swatching %ss for respawns…%s\n' "$DIM" "$watch_secs" "$RESET"
-    local end now
+    local end
     end=$((SECONDS + watch_secs))
     while (( SECONDS < end )); do
       if anything_still_up || [[ -n "$(relaunch_pids)" ]]; then

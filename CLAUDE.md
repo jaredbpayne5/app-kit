@@ -81,6 +81,35 @@ Claude may still do small work directly when a handoff costs more than the
 edit: a one-line fix, a doc touch-up, or reading code to answer a question.
 Judgement, not ceremony.
 
+### Two rules for writing a task
+
+Both are non-negotiable, in product mode and template mode alike.
+
+**Before writing a task, re-verify its premise against source. A finding is a
+hypothesis until a command confirms it.**
+
+This applies to every source — a `docs/build-spec.md` row, a prior audit, a
+bug report, a note from a past session, and above all Claude's own earlier
+conclusions. Age and authorship do not make a claim true. Run the command,
+read the actual lines, then write the task. Put what you confirmed **into** the
+task's Premises block so Cursor is not left re-deriving it.
+
+**An acceptance criterion you have not watched fail is decoration, not a
+check.**
+
+If a criterion already passes before the work starts, it tests nothing and will
+wave through an implementation that does nothing. Confirm it fails first, or do
+not write it.
+
+Why these exist: on 2026-08-14 six task-writing errors reached Cursor in one
+session — an inverted premise, a fix aimed at the wrong file, two criteria that
+were already green before any work began, a self-contradicting spec, and an
+instruction that deleted a diagnostic log the failure message told the user to
+read. Every one was caught by review or by Cursor, and every one was avoidable
+by one command. In a product clone the same errors cost real money: a bad store
+submission, a broken build, a shipped regression. Cursor implements what the
+task says — so the task has to be right.
+
 ## Noticing that Cursor is done
 
 Claude is not told when Cursor finishes. **Do not rely on remembering to check.**

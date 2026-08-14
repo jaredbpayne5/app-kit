@@ -144,6 +144,12 @@ if [[ -f "$APP_JSON" ]]; then
   fi
 fi
 
+if grep -q 'REPLACE_WITH_COPYRIGHT_HOLDER' LICENSE 2>/dev/null; then
+  warn "LICENSE still has REPLACE_WITH_COPYRIGHT_HOLDER — re-run init-app with --copyright-holder (or edit LICENSE by hand)"
+elif [[ -f LICENSE ]]; then
+  ok "LICENSE copyright holder is stamped"
+fi
+
 if compgen -G '*service-account*.json' >/dev/null 2>&1; then
   bad 2 "service-account JSON found in repo root — remove it (use EAS credentials)"
 else

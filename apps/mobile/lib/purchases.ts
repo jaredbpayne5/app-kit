@@ -112,19 +112,23 @@ async function ensureConfigured(): Promise<PurchasesSdk> {
   return Purchases;
 }
 
+function toOfferingPackage(pkg: PurchasesPackage): OfferingPackage {
+  return {
+    identifier: pkg.identifier,
+    productId: pkg.product.identifier,
+    title: pkg.product.title,
+    description: pkg.product.description,
+    price: pkg.product.priceString,
+  };
+}
+
 function mapPackages(offerings: PurchasesOfferings): OfferingPackage[] {
   livePackageById.clear();
   const current = offerings.current;
   if (!current) return [];
   return current.availablePackages.map((pkg) => {
     livePackageById.set(pkg.identifier, pkg);
-    return {
-      identifier: pkg.identifier,
-      productId: pkg.product.identifier,
-      title: pkg.product.title,
-      description: pkg.product.description,
-      price: pkg.product.priceString,
-    };
+    return toOfferingPackage(pkg);
   });
 }
 
@@ -169,13 +173,7 @@ export async function getOfferings(): Promise<OfferingPackage[]> {
   } catch (err) {
     // Offline / store failure: return last-known packages if any, else rethrow.
     if (livePackageById.size > 0) {
-      return [...livePackageById.values()].map((pkg) => ({
-        identifier: pkg.identifier,
-        productId: pkg.product.identifier,
-        title: pkg.product.title,
-        description: pkg.product.description,
-        price: pkg.product.priceString,
-      }));
+      return [...livePackageById.values()].map(toOfferingPackage);
     }
     throw err;
   }

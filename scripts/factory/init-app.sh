@@ -355,3 +355,6 @@ Updated app identity:
 Next: npm run doctor
 Then follow docs/recipes/product-pipeline.md (PRD → design tool → specs → code).
 EOF
+if [[ -z "$COPYRIGHT_HOLDER" ]]; then
+  printf 'LICENSE still has REPLACE_WITH_COPYRIGHT_HOLDER — re-run with --copyright-holder (or edit LICENSE by hand).\n'
+fi

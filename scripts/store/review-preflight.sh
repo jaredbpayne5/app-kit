@@ -67,6 +67,7 @@ sha256_file() {
 
 # Epoch seconds. Pick the correct `stat` flavor first — do not chain
 # `stat -f … || stat -c …` (GNU `-f` is not a clean failure on Linux).
+# shellcheck disable=SC2329 # kept for the stat portability note; see REPO-EVALUATION.md §3
 mtime_file() {
   if [[ "$(uname -s)" == Darwin ]]; then
     stat -f %m "$1"
@@ -527,10 +528,14 @@ fi
 if [[ "$SKIP_HEAVY" -eq 1 ]]; then
   warn "verify_suite: skipped (--skip-heavy)"
 else
-  if npm run verify >/tmp/preflight-verify.out 2>&1; then
+  VERIFY_LOG="$(mktemp)"
+  if npm run verify >"$VERIFY_LOG" 2>&1; then
     ok "verify_suite: npm run verify green"
+    rm -f "$VERIFY_LOG"
   else
-    bad "verify_suite: npm run verify failed (see /tmp/preflight-verify.out)"
+    # Deliberately NOT removed: this log is the only record of why verify
+    # failed, and the message above tells the user to read it.
+    bad "verify_suite: npm run verify failed (see $VERIFY_LOG)"
   fi
 fi
 
