@@ -28,7 +28,7 @@ guard_path_class() {
     *.p8 | *.keystore | *.jks) printf 'deny-secret'; return ;;
   esac
   case "$rel" in
-    *service-account*.json | *service-account.json | */credentials.json | credentials.json)
+    *service-account*.json | */credentials.json | credentials.json)
       printf 'deny-secret'
       return
       ;;

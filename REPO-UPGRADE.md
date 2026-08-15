@@ -7,8 +7,8 @@ Local grades and incident notes stay in gitignored `REPO-EVALUATION.md`.
 This file is the durable “what to change” list. Template-mode mailbox
 tasks cite a section here, not `REPO-EVALUATION.md` §2.
 
-**Status:** path locked 2026-08-15. U0 leftovers + U-zero done on
-`factory-upgrade`. Next is U2.
+**Status:** path locked 2026-08-15. U0 leftovers + U-zero + U2 done on
+`factory-upgrade`. Next is merge to `main`, then U6.
 **Source:** independent evaluation, then two review passes.
 
 ---
@@ -329,7 +329,7 @@ allowlist rows that rewrite the matcher.
       mailbox template; this file on `main`
 - [x] U-zero — fail-proof tests + dead grep + deny on guard files
       (same sitting as U0 leftovers)
-- [ ] U2 — Cursor hooks, mailbox check, matcher honesty
+- [x] U2 — Cursor hooks, mailbox check, matcher honesty
 - [ ] Merge U0–U2 to `main`
 - [ ] U6 — first product clone (separate repo; not a template commit)
 - [ ] U1 — thin from clone notes; measure; cap

@@ -66,7 +66,7 @@ while [ "$waited" -lt "$MAX_WAIT_SECONDS" ]; do
   waited=$((waited + POLL_SECONDS))
 done
 
-# --- out of time: re-arm rather than dying silently ---------------------------
-# Costs one Cursor request per idle stretch. Without this the watcher would
-# quietly stop watching and the next handoff would sit unnoticed.
-emit '{"followup_message":"Mailbox watcher re-arming. No mail yet. Reply with exactly: watching. Do not read or edit any files."}'
+# --- out of time: stop without a paid re-arm ----------------------------------
+# A followup_message here costs a Cursor turn just to say "still watching."
+# The next human or agent turn starts the stop hook again if .watching exists.
+nothing

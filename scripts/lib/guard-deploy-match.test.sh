@@ -121,7 +121,7 @@ if ! command -v jq >/dev/null 2>&1; then
 else
   smoke_cmd='npm install lodash'
   cursor_out=$(jq -nc --arg c "$smoke_cmd" '{command:$c}' | bash "$ROOT/.cursor/hooks/guard-shell.sh")
-  claude_out=$(jq -nc --arg c "$smoke_cmd" '{tool_input:{command:$c}}' | bash "$ROOT/.claude/hooks/guard-deploy.sh")
+  claude_out=$(jq -nc --arg c "$smoke_cmd" '{tool_input:{command:$c}}' | bash "$ROOT/scripts/lib/guard-deploy-claude.sh")
   cursor_perm=$(echo "$cursor_out" | jq -er '.permission')
   claude_perm=$(echo "$claude_out" | jq -er '.hookSpecificOutput.permissionDecision')
   if echo "$cursor_out" | jq -e . >/dev/null && [[ "$cursor_perm" == ask ]]; then

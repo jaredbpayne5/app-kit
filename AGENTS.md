@@ -242,6 +242,8 @@ inventory (do not delete them as dead code) versus prune-on-clone.
 - Shutting down the local stack (`npm run session:down`) — Metro, sims, and
   emulators may be in use by another agent
 
+The matcher (`scripts/lib/guard-deploy-match.sh`) is a speed bump for spend, push, deps, `session:down`, and hook bypass — not a security boundary. File-write hooks cover secrets, identity files, and generated `ios/`/`android/`. The rest of this list is prose-only.
+
 ## Session teardown
 
 Do **not** invent ad-hoc kill commands. Use the existing session script

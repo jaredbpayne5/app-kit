@@ -207,6 +207,24 @@ if command -v jq >/dev/null 2>&1; then
   fi
 fi
 
+echo "=== U2 honesty / shellcheck / re-arm ==="
+if grep -q 'speed bump' scripts/lib/guard-deploy-match.sh \
+  && grep -q 'prose-only' AGENTS.md; then
+  ok "matcher header and AGENTS.md say speed bump / prose-only"
+else
+  bad "honesty lines missing from matcher header or AGENTS.md"
+fi
+if grep -q 'followup_message.*re-arming' .cursor/hooks/wait-for-mail.sh; then
+  bad "wait-for-mail.sh still sends a paid re-arm followup_message"
+else
+  ok "wait-for-mail.sh does not send a paid re-arm followup"
+fi
+if grep -q 'shellcheck-guards' package.json; then
+  ok "package.json runs shellcheck-guards in check"
+else
+  bad "shellcheck-guards is not in package.json"
+fi
+
 echo "=== mailbox JSON + Premises ==="
 # shellcheck source=scripts/lib/mailbox-check.sh
 source "$ROOT/scripts/lib/mailbox-check.sh"

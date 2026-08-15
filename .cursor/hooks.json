@@ -10,8 +10,7 @@
     ],
     "beforeShellExecution": [
       {
-        "command": "bash .cursor/hooks/guard-shell.sh",
-        "failClosed": true
+        "command": "bash .cursor/hooks/guard-shell.sh"
       },
       {
         "command": "bash .cursor/hooks/guard-identity-writes.sh"
