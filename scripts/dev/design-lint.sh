@@ -19,6 +19,14 @@ cd "$ROOT" || exit 1
 
 FAIL=0
 
+# Override for fail-proof tests. Default is the real route tree.
+APP_DIR="${DESIGN_LINT_APP_DIR:-apps/mobile/app}"
+ROUTE_FILE_COUNT="$(find "$APP_DIR" -type f -name '*.tsx' 2>/dev/null | wc -l | tr -d ' ')"
+if [[ "${ROUTE_FILE_COUNT:-0}" -eq 0 ]]; then
+  echo "design-lint: no .tsx files under $APP_DIR — scan set is empty"
+  FAIL=1
+fi
+
 grep_mobile() {
   grep -rn "$@" \
     --include='*.tsx' --include='*.ts' \
@@ -156,11 +164,13 @@ while IFS= read -r f; do
   if ! grep -q 'useSafeAreaInsets\|SafeAreaView' "$f"; then
     SAFE_AREA_MISS+="  $f"$'\n'
   fi
-done < <(find apps/mobile/app -type f -name '*.tsx' | sort)
+done < <(find "$APP_DIR" -type f -name '*.tsx' 2>/dev/null | sort)
 if [[ -n "$SAFE_AREA_MISS" ]]; then
   echo "design-lint: screen(s) with no useSafeAreaInsets/SafeAreaView reference:"
   printf '%s' "$SAFE_AREA_MISS"
   FAIL=1
+elif [[ "${ROUTE_FILE_COUNT:-0}" -eq 0 ]]; then
+  : # empty-scan failure already printed
 else
   echo "design-lint: every top-level screen references safe-area insets"
 fi
@@ -195,13 +205,15 @@ if grep -q '<!-- TEMPLATE_PLACEHOLDER -->' docs/screens-status.md 2>/dev/null; t
     if [[ "$is_baseline" -eq 0 ]]; then
       NEW_ROUTES+="  $f"$'\n'
     fi
-  done < <(find apps/mobile/app -type f -name '*.tsx' | sort)
+  done < <(find "$APP_DIR" -type f -name '*.tsx' 2>/dev/null | sort)
 fi
 if [[ -n "$NEW_ROUTES" ]]; then
   echo "design-lint: new route file(s) under apps/mobile/app/ while docs/screens-status.md still has its TEMPLATE_PLACEHOLDER sentinel:"
   printf '%s' "$NEW_ROUTES"
   echo "  Fill docs/screens-status.md (Designed = yes + artifact) and remove the sentinel before building the screen."
   FAIL=1
+elif [[ "${ROUTE_FILE_COUNT:-0}" -eq 0 ]]; then
+  : # empty-scan failure already printed
 else
   echo "design-lint: no new route files while the screens-status sentinel is present"
 fi
