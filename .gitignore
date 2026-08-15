@@ -80,6 +80,7 @@ apps/web/template/og-image.png
 
 # Local audit backlog — not part of the template product
 REPO-EVALUATION.md
+# REPO-UPGRADE.md is tracked — durable factory-change list.
 
 # Mailbox — live handoff scratchpad, not a record. Only the blank master copy
 # (.ai/current-task.template.md) is tracked; `/watch` builds these from it.
