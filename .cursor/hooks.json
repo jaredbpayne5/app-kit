@@ -12,12 +12,29 @@
       {
         "command": "bash .cursor/hooks/guard-shell.sh",
         "failClosed": true
+      },
+      {
+        "command": "bash .cursor/hooks/guard-identity-writes.sh"
       }
     ],
     "preToolUse": [
       {
+        "command": "bash .cursor/hooks/guard-secret-files.sh",
+        "matcher": "Write|StrReplace|Delete"
+      },
+      {
+        "command": "bash .cursor/hooks/guard-identity-writes.sh",
+        "matcher": "Write|StrReplace|Delete"
+      },
+      {
         "command": "bash .cursor/hooks/guard-protected-files.sh",
         "matcher": "Write|StrReplace|Delete"
+      }
+    ],
+    "beforeReadFile": [
+      {
+        "command": "bash .cursor/hooks/guard-secret-files.sh",
+        "matcher": "Read|TabRead"
       }
     ]
   }

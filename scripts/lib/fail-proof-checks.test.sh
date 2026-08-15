@@ -144,6 +144,68 @@ if command -v jq >/dev/null 2>&1; then
   fi
 fi
 
+echo "=== secret / identity path hooks ==="
+# shellcheck source=scripts/lib/guard-sensitive-paths.sh
+source "$ROOT/scripts/lib/guard-sensitive-paths.sh"
+if [[ "$(guard_path_class 'keys/AuthKey.p8')" == deny-secret ]] \
+  && [[ "$(guard_path_class 'play/service-account.json')" == deny-secret ]] \
+  && [[ "$(guard_path_class 'apps/mobile/app.json')" == ask-identity ]] \
+  && [[ "$(guard_path_class 'apps/mobile/ios/Podfile')" == ask-identity ]] \
+  && [[ "$(guard_path_class 'apps/mobile/lib/storage.ts')" == allow ]]; then
+  ok "path classifier: secret / identity / allow"
+else
+  bad "path classifier returned unexpected classes"
+fi
+
+if guard_is_init_app 'npm run init-app -- --name Foo' \
+  && ! guard_is_init_app 'echo init-app in a comment'; then
+  ok "init-app allowlist matches the script, not a mention"
+else
+  bad "init-app allowlist is wrong"
+fi
+
+if command -v jq >/dev/null 2>&1; then
+  secret_hook="$ROOT/.cursor/hooks/guard-secret-files.sh"
+  ident_hook="$ROOT/.cursor/hooks/guard-identity-writes.sh"
+  p8_out=$(jq -nc '{tool_input:{path:"keys/AuthKey.p8"}}' | bash "$secret_hook")
+  app_out=$(jq -nc '{tool_input:{path:"apps/mobile/app.json"}}' | bash "$ident_hook")
+  init_out=$(jq -nc '{command:"npm run init-app -- --name Demo"}' | bash "$ident_hook")
+  ordinary_out=$(jq -nc '{tool_input:{path:"apps/mobile/lib/storage.ts"}}' | bash "$secret_hook")
+  p8_perm=$(echo "$p8_out" | jq -r '.permission // empty')
+  app_perm=$(echo "$app_out" | jq -r '.permission // empty')
+  init_perm=$(echo "$init_out" | jq -r '.permission // empty')
+  ordinary_perm=$(echo "$ordinary_out" | jq -r '.permission // empty')
+  if [[ "$p8_perm" == deny ]]; then
+    ok "secret hook denies a .p8 path"
+  else
+    bad "secret hook got $p8_perm on .p8 (expected deny)"
+  fi
+  if [[ "$app_perm" == ask ]]; then
+    ok "identity hook asks on app.json"
+  else
+    bad "identity hook got $app_perm on app.json (expected ask)"
+  fi
+  if [[ "$init_perm" == allow ]]; then
+    ok "identity hook allows init-app"
+  else
+    bad "identity hook got $init_perm on init-app (expected allow)"
+  fi
+  if [[ "$ordinary_perm" == allow ]]; then
+    ok "secret hook allows an ordinary path"
+  else
+    bad "secret hook got $ordinary_perm on an ordinary path (expected allow)"
+  fi
+
+  claude_ident="$ROOT/scripts/lib/guard-sensitive-writes-claude.sh"
+  claude_app=$(jq -nc '{tool_input:{file_path:"apps/mobile/app.json"}}' | bash "$claude_ident")
+  claude_perm=$(echo "$claude_app" | jq -r '.hookSpecificOutput.permissionDecision // empty')
+  if [[ "$claude_perm" == ask ]]; then
+    ok "Claude identity adapter asks on app.json"
+  else
+    bad "Claude identity adapter got $claude_perm on app.json (expected ask)"
+  fi
+fi
+
 echo
 if [[ "$FAIL" -gt 0 ]]; then
   echo "fail-proof-checks: $PASS passed, $FAIL failed"
