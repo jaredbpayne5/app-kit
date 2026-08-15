@@ -304,10 +304,13 @@ considering work done. `npm run test:e2e` drives Maestro against a simulator.
 
 ## On-demand procedures
 
-Skills in `.cursor/skills/` load when relevant. Recipes in `docs/recipes/`
-are the human source — do not paste them into always-on files.
+Skills load when relevant: `.cursor/skills/` (Cursor) and `.claude/skills/`
+(Claude). Recipes in `docs/recipes/` are the human source — do not paste
+them into always-on files.
 
-- Mailbox pickup — `mailbox`
+- Mailbox pickup (Cursor) — `mailbox`
+- Write mailbox task (Claude) — `write-mailbox-task`
+- Review Cursor (Claude) — `review-cursor`
 - Compile specs (once, strong model) — `compile-specs`
 - Store gate (`npm run preflight`) — `store-preflight`
 - Maestro e2e — `maestro-e2e`

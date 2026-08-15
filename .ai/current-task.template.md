@@ -42,7 +42,9 @@ means the task is wrong, not that the implementation needs to be creative.
 
 Claude fills this in from checks already run, so this is confirmation, not
 discovery. An empty Premises block means the task was written without verifying
-anything — treat that as a defect and say so.
+anything — treat that as a defect and say so. `[x]` means Claude ran that
+command while writing; Cursor still re-runs every command. Do not premise
+the doorbell (`.ai/mailbox-state.json`).
 
 - [ ] _(claim — e.g. "no EXIT trap exists in this script")_ — `(command)`
 

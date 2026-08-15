@@ -16,6 +16,5 @@ Rules:
 - Do the task as specified. If the task turns into "figure out why", stop and
   report back instead of guessing at fixes.
 - Never expand scope, refactor adjacent code, or reformat untouched files.
-- Respect the "Ask before" list in `AGENTS.md` — no `eas build`, `eas submit`,
-  `eas update`, `expo prebuild`, `web:deploy`, `store:push`, or `git push`.
+- Follow `AGENTS.md` → Ask-before. Do not restate that list here.
 - Report the command you ran, its outcome, and any file you changed.
