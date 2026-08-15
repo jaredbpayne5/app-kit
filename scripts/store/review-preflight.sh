@@ -4,12 +4,13 @@
 #
 # Usage:
 #   npm run preflight
-#   bash scripts/store/review-preflight.sh [--phase=4|6] [--skip-heavy]
+#   bash scripts/store/review-preflight.sh [--gate=4|6] [--skip-heavy]
 #
-# --phase=4     Harden / store-readiness gate. Checks that cannot pass until
-#               later phases report DEFERRED (non-failing): live privacy URL
-#               HTTP 200, and REPLACE_WITH_EAS_PROJECT_ID / eas.json REPLACE_WITH_*.
-# --phase=6     Store-launch gate (default). Deferred checks become hard fails.
+# --gate=4      Harden / store-readiness gate. Checks that cannot pass until
+#               later in the store process report DEFERRED (non-failing): live
+#               privacy URL HTTP 200, and REPLACE_WITH_EAS_PROJECT_ID /
+#               eas.json REPLACE_WITH_*.
+# --gate=6      Store-launch gate (default). Deferred checks become hard fails.
 # --skip-heavy  Skip npm run verify. Useful for fast local iteration; store:push
 #               should always run the full gate.
 #
@@ -21,13 +22,13 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT" || exit 1
 
 SKIP_HEAVY=0
-PHASE=6
+GATE=6
 for arg in "$@"; do
   case "$arg" in
     --skip-heavy) SKIP_HEAVY=1 ;;
-    --phase=4|--phase=6) PHASE="${arg#--phase=}" ;;
-    --phase=*)
-      printf 'Invalid --phase=%s (use 4 or 6)\n' "${arg#--phase=}" >&2
+    --gate=4|--gate=6) GATE="${arg#--gate=}" ;;
+    --gate=*)
+      printf 'Invalid --gate=%s (use 4 or 6)\n' "${arg#--gate=}" >&2
       exit 2
       ;;
     -h|--help)
@@ -50,7 +51,7 @@ DEFERRED=0
 ok()     { printf '  %s✓%s %s\n' "$GREEN" "$RESET" "$*"; }
 warn()   { printf '  %s!%s %s\n' "$YELLOW" "$RESET" "$*"; }
 bad()    { printf '  %s✗%s %s\n' "$RED" "$RESET" "$*"; FAIL=1; }
-defer()  { printf '  %s○%s DEFERRED (phase %s): %s\n' "$DIM" "$RESET" "$PHASE" "$*"; DEFERRED=$((DEFERRED + 1)); }
+defer()  { printf '  %s○%s DEFERRED (gate %s): %s\n' "$DIM" "$RESET" "$GATE" "$*"; DEFERRED=$((DEFERRED + 1)); }
 
 # Committed template placeholder hashes. Update only when the template
 # intentionally ships new placeholder artwork.
@@ -116,10 +117,10 @@ print(f"{w} {h} {size}")
 PY
 }
 
-printf '%spreflight%s  %s(phase=%s)%s\n' "$BOLD" "$RESET" "$DIM" "$PHASE" "$RESET"
+printf '%spreflight%s  %s(gate=%s)%s\n' "$BOLD" "$RESET" "$DIM" "$GATE" "$RESET"
 
 # --- 1. Identity placeholders -------------------------------------------------
-# com.example.* always fails. REPLACE_WITH_EAS_PROJECT_ID is deferred at phase 4.
+# com.example.* always fails. REPLACE_WITH_EAS_PROJECT_ID is deferred at gate 4.
 # Other REPLACE_WITH_* (e.g. Sentry org) always fail.
 ID_BAD=0
 if grep -Eq 'com\.example\.' apps/mobile/app.json; then
@@ -132,7 +133,7 @@ if [[ -n "$OTHER_REPLACE" ]]; then
   ID_BAD=1
 fi
 if grep -q 'REPLACE_WITH_EAS_PROJECT_ID' apps/mobile/app.json; then
-  if [[ "$PHASE" -eq 4 ]]; then
+  if [[ "$GATE" -eq 4 ]]; then
     defer "REPLACE_WITH_EAS_PROJECT_ID still in apps/mobile/app.json (set during Store launch)"
   else
     bad "identity_placeholder: REPLACE_WITH_EAS_PROJECT_ID still in apps/mobile/app.json"
@@ -242,7 +243,7 @@ NODE
     fi
 
     if [[ "$MONETIZATION" != "free" && "$PURCHASES_MODE" == "mock" ]]; then
-      if [[ "$PHASE" == "4" ]]; then
+      if [[ "$GATE" == "4" ]]; then
         defer "purchases_mode: PURCHASES_MODE=mock (flip to live before store launch)"
       else
         bad "purchases_mode: MONETIZATION=$MONETIZATION still has PURCHASES_MODE=mock — a mock paywall must not reach TestFlight"
@@ -352,7 +353,7 @@ NODE
   fi
 fi
 
-# --- 7. Privacy URL HTTP 200 (deferred at phase 4) ----------------------------
+# --- 7. Privacy URL HTTP 200 (deferred at gate 4) ----------------------------
 PRIV_SEEN=0
 while IFS= read -r -d '' urlfile; do
   PRIV_SEEN=1
@@ -361,8 +362,8 @@ while IFS= read -r -d '' urlfile; do
     bad "privacy_url_live: $urlfile is empty or still TBD"
     continue
   fi
-  if [[ "$PHASE" -eq 4 ]]; then
-    defer "privacy_url_live: skipping HTTP 200 for $url (phase 4)"
+  if [[ "$GATE" -eq 4 ]]; then
+    defer "privacy_url_live: skipping HTTP 200 for $url (gate 4)"
     continue
   fi
   if curl -sfIL --max-time 15 "$url" >/dev/null 2>&1; then
@@ -381,7 +382,7 @@ if [[ ! -f apps/mobile/eas.json ]]; then
   bad "eas_json: apps/mobile/eas.json missing"
 else
   if grep -Eq 'REPLACE_WITH' apps/mobile/eas.json; then
-    if [[ "$PHASE" -eq 4 ]]; then
+    if [[ "$GATE" -eq 4 ]]; then
       defer "eas.json still has REPLACE_WITH_* (set during Store launch)"
     else
       bad "eas_json: apps/mobile/eas.json still has REPLACE_WITH_*"
@@ -545,7 +546,7 @@ LEGAL_PLACEHOLDER="$(
   grep -lE 'template placeholder|<!-- TBD:' apps/web/content/privacy.md apps/web/content/terms.md 2>/dev/null || true
 )"
 if [[ -n "$LEGAL_PLACEHOLDER" ]]; then
-  if [[ "$PHASE" == "4" ]]; then
+  if [[ "$GATE" == "4" ]]; then
     defer "legal_copy: privacy/terms markdown still has template placeholder text"
   else
     bad "legal_copy: replace template placeholder copy in: $LEGAL_PLACEHOLDER"
@@ -570,7 +571,7 @@ else
 fi
 
 printf '\n'
-printf 'phase=%s deferred=%s\n' "$PHASE" "$DEFERRED"
+printf 'gate=%s deferred=%s\n' "$GATE" "$DEFERRED"
 if [[ "$FAIL" -ne 0 ]]; then
   printf '%spreflight FAILED%s — fix named reasons above before store:push\n' "$BOLD" "$RESET"
   exit 1

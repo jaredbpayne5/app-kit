@@ -34,6 +34,13 @@ When sources disagree, this is the order:
 5. `docs/build-status.md` — current execution state.
 6. Existing source code — what is actually there today.
 
+After the first store ship, the running source is the living spec for
+what the app actually does. A post-ship fix that disagrees with
+`docs/build-spec.md` or `docs/build-status.md` updates those docs to
+match the code. Do not revert a correct fix to satisfy a stale
+checklist. Items 2–5 above govern *building* the first version; they
+do not outrank working code after launch.
+
 `.ai/current-task.md` is not in this hierarchy. It is agent-to-agent messaging
 about work already authorized by the build spec — never a source of
 requirements. If it conflicts with anything above, the file above wins and the
@@ -175,6 +182,7 @@ If Context7 isn’t available in the session, proceed normally.
 | Need | Use | Not |
 | --- | --- | --- |
 | Persistence | `lib/storage.ts` | `expo-sqlite` directly |
+| Secrets / tokens | `lib/secure-storage.ts` | `expo-secure-store` directly, or `lib/storage.ts` |
 | Purchases / entitlements | `lib/purchases.ts` | `react-native-purchases` directly |
 | Error reporting | `lib/report-error.ts` | `console.error`, Sentry directly |
 | Haptics | `lib/haptics.ts` | `expo-haptics` directly |

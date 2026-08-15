@@ -12,6 +12,7 @@
     "apps/mobile/lib/streak.ts",
     "apps/mobile/lib/review-prompt.ts",
     "apps/mobile/lib/local-notifications.ts",
+    "apps/mobile/lib/secure-storage.ts",
     "apps/mobile/lib/purchases.ts",
     "apps/mobile/lib/paywall-plans.ts",
     "apps/mobile/lib/paywall-plans.storekit.test.ts",

@@ -37,6 +37,11 @@ const RESTRICTED_IMPORTS = [
         message: "Use the haptics seam ('@/lib/haptics') instead.",
       },
       {
+        name: 'expo-secure-store',
+        message:
+          "Use the secure-storage seam ('@/lib/secure-storage') instead — tokens must not go in lib/storage KV.",
+      },
+      {
         name: 'expo-notifications',
         message: "Use the notifications seam ('@/lib/local-notifications') instead.",
       },
@@ -69,6 +74,7 @@ const SEAM_FILES = [
   'apps/mobile/lib/storage.ts',
   'apps/mobile/lib/purchases.ts',
   'apps/mobile/lib/haptics.ts',
+  'apps/mobile/lib/secure-storage.ts',
   'apps/mobile/lib/local-notifications.ts',
   'apps/mobile/lib/report-error.ts',
   'apps/mobile/lib/sentry.ts',
@@ -79,6 +85,7 @@ const SEAM_DYNAMIC_IMPORT_NAMES = [
   'expo-sqlite/kv-store',
   'react-native-purchases',
   'expo-haptics',
+  'expo-secure-store',
   'expo-notifications',
   '@sentry/react-native',
 ];

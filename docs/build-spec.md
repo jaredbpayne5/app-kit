@@ -11,8 +11,8 @@ visual designer. It must not add product requirements (that is the PRD) or
 redesign the experience (that is the design spec).
 
 Phase numbering matches `docs/build-status.md` (0–8). Do not introduce a
-different scheme, and do not confuse these with `npm run preflight --phase=N`
-store gates — see the *Phase vocabulary* table in `docs/build-status.md`.
+different scheme, and do not confuse these with `npm run preflight --gate=N`
+store gates — see the *Phase vs gate* table in `docs/build-status.md`.
 
 Until the sentinel above is removed, there is no build plan; agents must not
 invent one.

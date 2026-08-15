@@ -14,8 +14,8 @@ phases 0–8.
 ## Command
 
 ```bash
-npm run preflight                 # full launch gate (script --phase=6)
-npm run preflight -- --phase=4    # harden; some checks deferred
+npm run preflight                 # full launch gate (script --gate=6)
+npm run preflight -- --gate=4     # harden; some checks deferred
 ```
 
 `npm run store:push` runs the full gate, then submit. **Ask before**

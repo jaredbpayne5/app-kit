@@ -347,5 +347,11 @@ allowlist rows that rewrite the matcher.
       `expo install --check` is the gate. Broader Renovate freeze than the
       four named packages: all `expo-*` + SDK-aligned natives travel with
       `npx expo install --fix`.
-- [ ] U5 — secure-storage + living-spec + preflight “gate”
+- [x] U5 — secure-storage + living-spec + preflight “gate”.
+      Seam `apps/mobile/lib/secure-storage.ts` (lazy require, no callers).
+      ESLint restrict on `expo-secure-store` watched fail on a probe import
+      (`no-restricted-imports` → use `@/lib/secure-storage`), then probe
+      removed. Preflight flag is `--gate=4|6`; build-status 0–8 stay phase.
+      `docs/build-spec.md` + `docs/build-status.md` edits are vocabulary
+      only (phase vs gate); both `TEMPLATE_PLACEHOLDER` sentinels stayed.
 - [ ] U7 — optional unslop polish

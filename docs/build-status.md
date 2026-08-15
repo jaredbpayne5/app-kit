@@ -137,16 +137,16 @@ See `docs/recipes/app-store.md`, `play-store.md`, `store-compliance.md`.
 
 ---
 
-## Phase vocabulary (build-status vs preflight)
+## Phase vs gate (build-status vs preflight)
 
-`docs/build-status.md` phases (0–8) are the **product build** checklist.
+`docs/build-status.md` **phases** (0–8) are the **product build** checklist.
 `npm run preflight` uses a different numbering for **store gates**:
 
 | Store command | Meaning | Roughly maps to build-status |
 | --- | --- | --- |
-| `npm run preflight -- --phase=4` | Harden / store-readiness (some checks deferred) | Late Phase 6 → early Phase 7 |
-| `npm run preflight` (default) | Full launch gate (phase 6) | Phase 7 before submit |
-| `npm run store:push` | Runs full preflight (phase 6), then submit | Phase 7 |
+| `npm run preflight -- --gate=4` | Harden / store-readiness (some checks deferred) | Late Phase 6 → early Phase 7 |
+| `npm run preflight` (default) | Full launch gate (gate 6) | Phase 7 before submit |
+| `npm run store:push` | Runs full preflight (gate 6), then submit | Phase 7 |
 
 Do not confuse “Phase 4 — On-device data” in this file with
-`preflight --phase=4`.
+`preflight --gate=4`.

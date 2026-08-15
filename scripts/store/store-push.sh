@@ -20,7 +20,7 @@
 # Full live ASC/Play E2E is exercised on the first real app (not this template).
 #
 # Requires: scripts/store/review-preflight.sh exit 0 (full launch gate —
-# default preflight phase 6). Use `npm run preflight -- --phase=4` only when
+# default preflight gate 6). Use `npm run preflight -- --gate=4` only when
 # intentionally running the deferred Harden checks outside store:push.
 #
 set -euo pipefail
