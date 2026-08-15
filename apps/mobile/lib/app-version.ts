@@ -1,17 +1,24 @@
 import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 
 /** Display / marketing version from app.json `expo.version`. */
 export function getAppVersion(): string {
   return Constants.expoConfig?.version ?? '0.0.0';
 }
 
-/** Android versionCode or iOS buildNumber when available. */
+/** Android versionCode or iOS buildNumber for the running platform. */
 export function getNativeBuildNumber(): string | null {
-  const android = Constants.expoConfig?.android?.versionCode;
-  if (typeof android === 'number') return String(android);
+  if (Platform.OS === 'android') {
+    const android = Constants.expoConfig?.android?.versionCode;
+    if (typeof android === 'number') return String(android);
+    return null;
+  }
 
-  const ios = Constants.expoConfig?.ios?.buildNumber;
-  if (typeof ios === 'string' && ios.length > 0) return ios;
+  if (Platform.OS === 'ios') {
+    const ios = Constants.expoConfig?.ios?.buildNumber;
+    if (typeof ios === 'string' && ios.length > 0) return ios;
+    return null;
+  }
 
   return null;
 }
