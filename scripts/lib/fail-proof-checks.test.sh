@@ -84,7 +84,8 @@ fi
 echo "=== design-lint empty scan / planted miss ==="
 empty_dir=$(mktemp -d)
 planted_dir=$(mktemp -d)
-cleanup() { rm -rf "$empty_dir" "$planted_dir"; }
+mb_dir=$(mktemp -d)
+cleanup() { rm -rf "$empty_dir" "$planted_dir" "$mb_dir"; }
 trap cleanup EXIT
 
 empty_out=$(DESIGN_LINT_APP_DIR="$empty_dir" bash "$ROOT/scripts/dev/design-lint.sh" 2>&1) || empty_ec=$?
@@ -203,6 +204,77 @@ if command -v jq >/dev/null 2>&1; then
     ok "Claude identity adapter asks on app.json"
   else
     bad "Claude identity adapter got $claude_perm on app.json (expected ask)"
+  fi
+fi
+
+echo "=== mailbox JSON + Premises ==="
+# shellcheck source=scripts/lib/mailbox-check.sh
+source "$ROOT/scripts/lib/mailbox-check.sh"
+if mailbox_check_task "$ROOT/.ai/current-task.template.md"; then
+  ok "template mailbox (idle) passes"
+else
+  bad "template mailbox should pass"
+fi
+
+cp "$ROOT/.ai/current-task.template.md" "$mb_dir/empty-ready.md"
+# Same placeholder Premises, but claim the task is ready — must fail.
+python3 - "$mb_dir/empty-ready.md" <<'PY'
+from pathlib import Path
+import sys
+p = Path(sys.argv[1])
+text = p.read_text()
+text = text.replace("**Status:** `idle`", "**Status:** `ready-for-cursor`")
+text = text.replace("**Owner:** `none`", "**Owner:** `cursor`")
+text = text.replace("**Mode:** `none`", "**Mode:** `template`")
+p.write_text(text)
+PY
+if mailbox_check_task "$mb_dir/empty-ready.md"; then
+  bad "ready-for-cursor with placeholder Premises should fail"
+else
+  ok "ready-for-cursor with placeholder Premises fails"
+fi
+
+cp "$mb_dir/empty-ready.md" "$mb_dir/filled-ready.md"
+python3 - "$mb_dir/filled-ready.md" <<'PY'
+from pathlib import Path
+import sys
+p = Path(sys.argv[1])
+text = p.read_text()
+text = text.replace(
+    '- [ ] _(claim — e.g. "no EXIT trap exists in this script")_ — `(command)`',
+    "- [ ] guard-secrets.sh uses dash-safe grep — `(grep -n Eqe .claude/hooks/guard-secrets.sh)`",
+)
+p.write_text(text)
+PY
+if mailbox_check_task "$mb_dir/filled-ready.md"; then
+  ok "ready-for-cursor with a real Premises item passes"
+else
+  bad "ready-for-cursor with a real Premises item should pass"
+fi
+
+printf '%s\n' '{not json' >"$mb_dir/bad-state.json"
+if mailbox_check_state "$mb_dir/bad-state.json"; then
+  bad "invalid mailbox-state JSON should fail"
+else
+  ok "invalid mailbox-state JSON fails"
+fi
+
+printf '%s\n' '{"seq":1,"owner":"none","status":"idle","mode":"none","updated":"—"}' >"$mb_dir/good-state.json"
+if mailbox_check_state "$mb_dir/good-state.json"; then
+  ok "valid mailbox-state JSON passes"
+else
+  bad "valid mailbox-state JSON should pass"
+fi
+
+if command -v jq >/dev/null 2>&1; then
+  hook="$ROOT/.cursor/hooks/guard-mailbox.sh"
+  deny_body=$(cat "$mb_dir/empty-ready.md")
+  deny_out=$(jq -nc --arg c "$deny_body" '{tool_input:{path:".ai/current-task.md",contents:$c}}' | bash "$hook")
+  deny_perm=$(echo "$deny_out" | jq -r '.permission // empty')
+  if [[ "$deny_perm" == deny ]]; then
+    ok "mailbox hook denies ready-for-cursor with empty Premises"
+  else
+    bad "mailbox hook got $deny_perm (expected deny)"
   fi
 fi
 
