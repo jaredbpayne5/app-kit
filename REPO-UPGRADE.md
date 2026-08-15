@@ -233,7 +233,8 @@ Stay on `factory-upgrade`. Clone U6 from this branch, not from `main`.
 ### U3 — Skills
 
 - **What:** `.cursor/skills/`: `mailbox`, `compile-specs`,
-  `store-preflight`, `maestro-e2e`. Recipes stay the human source.
+  `pull-design`, `store-preflight`, `maestro-e2e`. Recipes stay the
+  human source.
   Fix `PURCHASES_MODE` in `docs/recipes/compile-specs.md` (it is a
   standalone export, not an `APP_CONFIG` key).
 - **Why:** Rules = constraints. Skills = procedures, loaded when relevant.
@@ -293,7 +294,7 @@ Stay on `factory-upgrade`. Clone U6 from this branch, not from `main`.
 | Claude/Cursor deny on guard files | Agents cannot edit the net |
 | Cursor `beforeReadFile` / `preToolUse` | Secret / identity pauses |
 | Mailbox JSON + Premises check | Stop-the-line, machine-enforced |
-| `.cursor/skills/` (four names above) | On-demand procedures |
+| `.cursor/skills/` (names above) | On-demand procedures |
 | Context-budget script (U1, after measure) | Repo always-on size cap |
 | Glob-scoped instruction-hygiene `.mdc` | Only when editing those files |
 | `lint-staged` | Fast pre-commit |
@@ -336,8 +337,9 @@ allowlist rows that rewrite the matcher.
 - [ ] U6 — first product clone (separate repo; not a template commit)
 - [ ] U1 — thin from clone notes; measure; cap
 - [x] U3 — skills (`.cursor/skills/` mailbox, compile-specs,
-      store-preflight, maestro-e2e; `PURCHASES_MODE` standalone in
-      `docs/recipes/compile-specs.md`; pointers in `AGENTS.md` + waiter)
+      pull-design, store-preflight, maestro-e2e; `PURCHASES_MODE`
+      standalone in `docs/recipes/compile-specs.md`; pointers in
+      `AGENTS.md` + waiter)
 - [x] U4 — lint-staged, Renovate, knip:clone, CI expo-sdk-check +
       audit report; Expo 56 patches aligned via `expo install --fix`.
       Pre-commit is lint-staged + secrets only — fail-proof / design-lint
