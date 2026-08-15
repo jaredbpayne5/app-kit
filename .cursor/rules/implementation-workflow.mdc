@@ -37,8 +37,8 @@ and "what's in the mailbox?" all mean this file — read it and act on its
    - **template** — leave `docs/build-status.md` and every
      `<!-- TEMPLATE_PLACEHOLDER -->` doc untouched unless the task explicitly
      changes the template's documentation structure. Update
-     `REPO-EVALUATION.md` instead, moving the item from §2/§3 to §1 only once
-     the proof that file requires has actually been established.
+     `REPO-UPGRADE.md` instead, ticking the Progress item only once the
+     proof that file requires has actually been established.
 7. Fill the Implementation report, set Owner `claude`, Status
    `ready-for-review`. Report deviations and blockers honestly; Claude reads
    the diff, so an omission surfaces as a discrepancy.

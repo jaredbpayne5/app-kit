@@ -166,7 +166,7 @@ Cursor's report is a claim, not evidence. Review the implementation itself:
    reported result.
 5. Product mode: confirm `docs/build-status.md` was updated. Template mode:
    confirm the opposite — that no `docs/` placeholder was disturbed — and that
-   any `REPO-EVALUATION.md` item moved to §1 carries its proof.
+   any `REPO-UPGRADE.md` item moved to Progress carries its proof.
 
 Green checks are necessary, not sufficient. This toolchain's blind spot is
 runtime behaviour — typecheck, lint, and a full passing test suite once cleared

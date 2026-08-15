@@ -7,8 +7,8 @@ Local grades and incident notes stay in gitignored `REPO-EVALUATION.md`.
 This file is the durable “what to change” list. Template-mode mailbox
 tasks cite a section here, not `REPO-EVALUATION.md` §2.
 
-**Status:** path locked 2026-08-15 (Grok + Opus cross-review). Work is not
-started until the sitting that does U0 leftovers + U-zero.
+**Status:** path locked 2026-08-15. U0 leftovers + U-zero in progress on
+`factory-upgrade`.
 **Source:** independent evaluation, then two review passes.
 
 ---
@@ -325,7 +325,7 @@ allowlist rows that rewrite the matcher.
 ## Progress
 
 - [x] Path locked in this file (2026-08-15)
-- [ ] U0 leftovers — pointers in CLAUDE.md / implementation-workflow /
+- [x] U0 leftovers — pointers in CLAUDE.md / implementation-workflow /
       mailbox template; this file on `main`
 - [ ] U-zero — fail-proof tests + dead grep + deny on guard files
       (same sitting as U0 leftovers)
