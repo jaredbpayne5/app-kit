@@ -14,7 +14,11 @@
 # Exits 0 in three cases, each with a different message on stdout:
 #   * new mail      -> Cursor finished; review it now.
 #   * timed out     -> nothing yet; re-arm if the task is still out.
-#   * cannot read   -> state file missing/malformed, or jq absent.
+#   * cannot read   -> state file missing, or malformed (when jq is present).
+#
+# Dependency-free: no jq, no node. The state file is read with the same sed
+# field() helper as wait-for-mail.sh. jq is used only for an optional
+# validity check when it is on PATH.
 #
 # "New mail" means .ai/mailbox-state.json carries a `seq` higher than the one
 # recorded in .ai/.review-seen, AND owner is `claude`, AND status is
@@ -34,11 +38,16 @@ SEEN="$ROOT/.ai/.review-seen"
 POLL_SECONDS=5
 MAX_WAIT_SECONDS="${1:-1800}"
 
-if ! command -v jq >/dev/null 2>&1; then
-  printf 'wait-for-review: jq not installed — cannot read the mailbox signal.\n'
-  printf 'Install it (brew install jq), then check .ai/mailbox-state.json by hand.\n'
-  exit 0
-fi
+# --- read a field out of the state file ---------------------------------------
+# Deliberately dependency-free: no jq, no node. The state file is written by
+# Claude in a fixed flat shape, one key per line.
+field() {
+  [ -f "$STATE" ] || return 1
+  sed -n "s/.*\"$1\"[[:space:]]*:[[:space:]]*\"\{0,1\}\([^\",}]*\)\"\{0,1\}.*/\1/p" "$STATE" \
+    | head -n 1 | tr -d '[:space:]'
+}
+
+seen_seq() { [ -f "$SEEN" ] && tr -cd '0-9' <"$SEEN" || printf '0'; }
 
 start=$SECONDS
 while :; do
@@ -49,18 +58,20 @@ while :; do
   fi
 
   # A half-written or malformed signal is not a reason to wedge — report and let
-  # Claude look. jq exits non-zero on invalid JSON.
-  if ! state_json="$(jq -c '.' "$STATE" 2>/dev/null)"; then
-    printf 'wait-for-review: %s is not valid JSON. Inspect it by hand.\n' "$STATE"
-    exit 0
+  # Claude look. jq exits non-zero on invalid JSON. Without jq, skip this check:
+  # a malformed file fails the readiness predicate and we keep polling.
+  if command -v jq >/dev/null 2>&1; then
+    if ! jq -c '.' "$STATE" >/dev/null 2>&1; then
+      printf 'wait-for-review: %s is not valid JSON. Inspect it by hand.\n' "$STATE"
+      exit 0
+    fi
   fi
 
-  seq_now="$(printf '%s' "$state_json" | jq -r '.seq // 0')"
-  owner="$(printf '%s' "$state_json" | jq -r '.owner // "none"')"
-  status="$(printf '%s' "$state_json" | jq -r '.status // "idle"')"
-
-  seen=0
-  [ -f "$SEEN" ] && seen="$(tr -dc '0-9' < "$SEEN")" && [ -n "$seen" ] || seen=0
+  seq_now="$(field seq || printf '')"
+  owner="$(field owner || printf '')"
+  status="$(field status || printf '')"
+  seen="$(seen_seq)"
+  : "${seq_now:=0}" "${seen:=0}"
 
   if [ "$owner" = "claude" ] && [ "$status" = "ready-for-review" ] &&
     [ "$seq_now" -gt "$seen" ]; then
