@@ -7,6 +7,12 @@
         "timeout": 3600,
         "loop_limit": null
       }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": "bash .cursor/hooks/guard-shell.sh",
+        "failClosed": true
+      }
     ]
   }
 }
