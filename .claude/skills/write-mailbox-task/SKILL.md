@@ -28,15 +28,18 @@ placeholder. Fill the body first. Set the header last.
 
 1. Copy the template — never retype the whole file. Bypass any `cp` alias:
    `/bin/cp .ai/current-task.template.md .ai/current-task.md`
-   Then edit only the header fields and the Task section. Leave Owner
-   `none` / Status `idle` until step 5.
+   Then edit the Task section only. Leave the header at Owner `none` /
+   Status `idle` / Mode `none` until step 5.
 2. Write Source, Goal, Scope, Out of scope, Notes.
 3. **Premises:** a finding is a hypothesis until a command confirms it.
    Run the command, read the lines, put what Cursor will observe **at
    pickup** into Premises. Age and authorship do not make a claim true.
-   - Do **not** premise the doorbell (`.ai/mailbox-state.json`). You bump
-     it after writing; that command can only show the new value. The
-     doorbell is the signal, not evidence about the repo.
+   The cited command must still be able to confirm the claim when Cursor
+   runs it. Do not premise anything your own next step, or time passing,
+   will change — the doorbell (you bump it after writing), "check
+   currently passes" if more work may land, timestamps. The doorbell is
+   the signal, not evidence about the repo; never cite
+   `.ai/mailbox-state.json` as a premise.
    - Mark each verified item `[x]`. That means Claude ran the command
      while writing. Cursor still re-runs every command (confirmation).
      An empty or leftover `[ ] _(claim…)_` placeholder is a defect.

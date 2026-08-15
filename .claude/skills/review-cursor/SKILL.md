@@ -42,7 +42,8 @@ clearing are one action.
 The implementation is wrong (or incomplete) relative to a sound task. Say
 what is wrong and why. Bring the corrected task to the user for approval
 **before** writing it to the mailbox. Do not re-assign on your own. Do
-not quietly fix it and move on.
+not quietly fix it and move on. A reissue is a new handoff: new waiter
+after the new bump.
 
 ## Rejected-on-premise
 
