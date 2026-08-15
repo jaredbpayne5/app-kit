@@ -99,6 +99,11 @@ if have jq; then
 else
   bad 1 "jq missing — required for Claude hooks, screenshots, deploy scripts (brew install jq)"
 fi
+if have gitleaks; then
+  ok "gitleaks ($(gitleaks version 2>/dev/null | head -1 || echo installed))"
+else
+  warn "gitleaks missing — pre-commit falls back to a weaker grep (brew install gitleaks)"
+fi
 if have python3; then
   ok "python3 ($(python3 --version 2>/dev/null | awk '{print $2}'))"
 else

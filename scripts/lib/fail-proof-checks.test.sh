@@ -104,6 +104,46 @@ else
   bad "planted screen should fail section 5 (exit=$planted_ec)"
 fi
 
+echo "=== guard-file deny is configured ==="
+if grep -q 'Edit(./.claude/hooks/\*\*)' .claude/settings.json \
+  && grep -q 'Edit(./.githooks/\*\*)' .claude/settings.json \
+  && grep -q 'Edit(./eslint.config.js)' .claude/settings.json \
+  && grep -q 'Edit(./.github/workflows/ci.yml)' .claude/settings.json; then
+  ok "Claude permissions.deny lists the four guard paths"
+else
+  bad "Claude permissions.deny is missing a guard path"
+fi
+
+if grep -q 'guard-protected-files.sh' .cursor/hooks.json; then
+  ok "Cursor hooks.json registers guard-protected-files.sh"
+else
+  bad "Cursor hooks.json does not register guard-protected-files.sh"
+fi
+
+if grep -q 'gitleaks' scripts/dev/doctor.sh; then
+  ok "doctor.sh mentions gitleaks"
+else
+  bad "doctor.sh does not mention gitleaks"
+fi
+
+if command -v jq >/dev/null 2>&1; then
+  cursor_hook="$ROOT/.cursor/hooks/guard-protected-files.sh"
+  deny_out=$(jq -nc '{tool_input:{path:".claude/hooks/guard-secrets.sh"}}' | bash "$cursor_hook")
+  allow_out=$(jq -nc '{tool_input:{path:"apps/mobile/lib/storage.ts"}}' | bash "$cursor_hook")
+  deny_perm=$(echo "$deny_out" | jq -r '.permission // empty')
+  allow_perm=$(echo "$allow_out" | jq -r '.permission // empty')
+  if [[ "$deny_perm" == deny ]]; then
+    ok "Cursor protected-files hook denies a guard path"
+  else
+    bad "Cursor protected-files hook got $deny_perm on a guard path (expected deny)"
+  fi
+  if [[ "$allow_perm" == allow ]]; then
+    ok "Cursor protected-files hook allows an ordinary path"
+  else
+    bad "Cursor protected-files hook got $allow_perm on an ordinary path (expected allow)"
+  fi
+fi
+
 echo
 if [[ "$FAIL" -gt 0 ]]; then
   echo "fail-proof-checks: $PASS passed, $FAIL failed"

@@ -1,4 +1,12 @@
 {
+  "permissions": {
+    "deny": [
+      "Edit(./.claude/hooks/**)",
+      "Edit(./.githooks/**)",
+      "Edit(./eslint.config.js)",
+      "Edit(./.github/workflows/ci.yml)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {

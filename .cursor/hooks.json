@@ -13,6 +13,12 @@
         "command": "bash .cursor/hooks/guard-shell.sh",
         "failClosed": true
       }
+    ],
+    "preToolUse": [
+      {
+        "command": "bash .cursor/hooks/guard-protected-files.sh",
+        "matcher": "Write|StrReplace|Delete"
+      }
     ]
   }
 }
