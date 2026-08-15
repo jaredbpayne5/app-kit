@@ -8,10 +8,10 @@ This file is the durable “what to change” list. Template-mode mailbox
 tasks cite a section here, not `REPO-EVALUATION.md` §2.
 
 **Status:** path locked 2026-08-15; stay-on-branch 2026-08-15. U0 leftovers
-+ U-zero + U2 + U3 done on `factory-upgrade`. U6 and U1 wait for a real
-app. Stay on that branch until this file is complete and verified. One
-merge to `main` at the end. U6 clones from `factory-upgrade`, not from
-`main`.
++ U-zero + U2 + U3 + U4 done on `factory-upgrade`. U6 and U1 wait for a
+real app. Stay on that branch until this file is complete and verified.
+One merge to `main` at the end. U6 clones from `factory-upgrade`, not
+from `main`.
 **Source:** independent evaluation, then two review passes.
 
 ---
@@ -107,18 +107,17 @@ get dramatically faster at shipping a screen. Mailbox round-trips stay.
 ```
 U0 leftovers + U-zero   one sitting on factory-upgrade
 U2                      Cursor hooks, mailbox check, matcher honesty
+U3                      Skills — pulled forward 2026-08-15 (no app yet)
+U4                      lint-staged, Renovate, knip, CI — same sitting
 U6                      first product clone from factory-upgrade (not main)
 U1                      thin from those notes; measure; cap
-U3                      Skills
-U4                      lint-staged, Renovate, expo-doctor, audit
 U5                      secure-storage, living-spec, preflight “gate”
 U7                      optional /unslop on leftover docs (on demand)
 Merge to main           once, after the list above is done and verified
 ```
 
-Do not delay U-zero/U2 until you have an app idea. Do delay U1 until you
-have used the factory once. Stay on `factory-upgrade` until this file is
-complete; do not merge U0–U2 early.
+U6 and U1 still wait for a real app. U3/U4 do not. Stay on
+`factory-upgrade` until this file is complete; do not merge early.
 
 Cloning today’s constitution is **not** expensive to undo. Instruction
 files are not welded to screens. After U1, copy the thinner files into
@@ -339,6 +338,14 @@ allowlist rows that rewrite the matcher.
 - [x] U3 — skills (`.cursor/skills/` mailbox, compile-specs,
       store-preflight, maestro-e2e; `PURCHASES_MODE` standalone in
       `docs/recipes/compile-specs.md`; pointers in `AGENTS.md` + waiter)
-- [ ] U4 — lint-staged, Renovate, expo-doctor, audit
+- [x] U4 — lint-staged, Renovate, knip:clone, CI expo-sdk-check +
+      audit report; Expo 56 patches aligned via `expo install --fix`.
+      Pre-commit is lint-staged + secrets only — fail-proof / design-lint
+      / mailbox-check live in CI and `npm run verify`, not at commit
+      (deliberate; full check tempted `--no-verify`). `expo-doctor` is a
+      report on SDK 56 (Hermes V1 check fails; advertised fix is SDK 57).
+      `expo install --check` is the gate. Broader Renovate freeze than the
+      four named packages: all `expo-*` + SDK-aligned natives travel with
+      `npx expo install --fix`.
 - [ ] U5 — secure-storage + living-spec + preflight “gate”
 - [ ] U7 — optional unslop polish

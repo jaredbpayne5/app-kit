@@ -1,0 +1,33 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "labels": ["dependencies"],
+  "packageRules": [
+    {
+      "description": "Expo-managed set — move only via npx expo install --fix",
+      "matchPackageNames": ["expo", "react", "react-dom", "react-native"],
+      "enabled": false
+    },
+    {
+      "description": "SDK-aligned packages that travel with the Expo set",
+      "matchPackageNames": [
+        "/^expo-/",
+        "jest-expo",
+        "eslint-config-expo",
+        "react-native-web",
+        "react-native-worklets",
+        "react-native-reanimated",
+        "react-native-gesture-handler",
+        "react-native-screens",
+        "react-native-safe-area-context",
+        "react-native-svg",
+        "@react-native/jest-preset",
+        "@react-native-community/datetimepicker",
+        "@react-native-picker/picker",
+        "@shopify/flash-list",
+        "react-test-renderer"
+      ],
+      "enabled": false
+    }
+  ]
+}

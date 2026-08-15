@@ -196,7 +196,15 @@ Maestro drives the real app like a user. It is not in CI because GitHub's Linux
 runners can't boot an iOS Simulator.
 
 **CI known limitation:** GitHub Actions runs format, lint, typecheck, unit
-tests, contrast/design lint, and a JS bundle export (`smoke:export`). It
-never compiles the native iOS or Android project. Before trusting a merge that
-adds a config plugin or native dependency, run
+tests, contrast/design lint, a JS bundle export (`smoke:export`), Expo SDK
+drift (`expo install --check` is the gate; `expo-doctor` is a report on
+SDK 56), and `npm audit` as a report (not a gate). It never compiles the
+native iOS or Android project.
+Before trusting a merge that adds a config plugin or native dependency, run
 `npm run dev:build:ios` and/or `npm run dev:build:android` locally.
+
+Pre-commit runs **lint-staged** on touched files (plus a secret scan), not
+the full `check`+`test` suite — that stays in CI and `npm run verify`.
+`npm run knip:clone` finds unused code after `docs/PRD.md` is filled; do not
+run it on the blank template. Expo / React / React Native updates go through
+`npx expo install --fix`, not Renovate.

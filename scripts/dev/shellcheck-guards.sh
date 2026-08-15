@@ -32,6 +32,10 @@ files=(
   .claude/hooks/guard-sensitive-writes.sh
   .claude/hooks/wait-for-review.sh
   .githooks/pre-commit
+  scripts/dev/knip-clone.sh
+  scripts/ci/expo-sdk-check.sh
+  scripts/ci/audit-report.sh
+  scripts/lib/u4-fail-proof.sh
 )
 
 echo "shellcheck-guards: checking ${#files[@]} files"

@@ -18,6 +18,8 @@ jobs:
 
       - run: sudo apt-get update && sudo apt-get install -y shellcheck
       - run: npm ci
+      - run: bash scripts/ci/expo-sdk-check.sh
+      - run: bash scripts/ci/audit-report.sh
       - run: npm run check
       - run: npm test
       - run: npm run smoke:init

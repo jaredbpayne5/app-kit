@@ -1,25 +1,16 @@
 #!/bin/sh
 #
-# Pre-commit: full npm run check + tests + basic secret scan.
+# Pre-commit: lint-staged on touched files + secret scan.
 # Wired via package.json "prepare" → git config core.hooksPath .githooks
 
 set -e
 
-echo "pre-commit: running npm run check..."
+echo "pre-commit: running lint-staged..."
 
-if ! npm run --silent check; then
+if ! npx lint-staged; then
   echo
-  echo "✗ npm run check failed."
-  echo "  Formatting:  npm run format"
-  echo "  Lint/types/theme/contrast/design-lint: see output above."
-  exit 1
-fi
-
-echo "pre-commit: running npm test..."
-
-if ! npm run --silent test; then
-  echo
-  echo "✗ Tests failed. Fix them, then re-commit."
+  echo "✗ lint-staged failed on a staged file."
+  echo "  Fix the reported file, or: npm run format"
   exit 1
 fi
 
