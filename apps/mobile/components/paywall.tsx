@@ -10,9 +10,9 @@ import {
   type ResolvedPlan,
 } from '@/lib/paywall-plans';
 import { getOfferings, purchase, restore } from '@/lib/purchases';
+import { openInAppBrowser } from '@/lib/open-browser';
 import { PRIVACY_URL, TERMS_URL } from '@/lib/product';
 import { reportError } from '@/lib/report-error';
-import * as WebBrowser from 'expo-web-browser';
 import { RefreshCw, Sparkles } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
@@ -185,7 +185,10 @@ function PaywallPaid({ onPurchased }: PaywallProps) {
           accessibilityRole="link"
           accessibilityLabel="Privacy Policy"
           onPress={() => {
-            void WebBrowser.openBrowserAsync(PRIVACY_URL);
+            void openInAppBrowser(PRIVACY_URL, {
+              label: 'Privacy Policy',
+              scope: 'paywall.openInAppBrowser',
+            });
           }}>
           <Text variant="small" className="text-muted-foreground underline">
             Privacy Policy
@@ -196,7 +199,10 @@ function PaywallPaid({ onPurchased }: PaywallProps) {
           accessibilityRole="link"
           accessibilityLabel="Terms of Use"
           onPress={() => {
-            void WebBrowser.openBrowserAsync(TERMS_URL);
+            void openInAppBrowser(TERMS_URL, {
+              label: 'Terms of Use',
+              scope: 'paywall.openInAppBrowser',
+            });
           }}>
           <Text variant="small" className="text-muted-foreground underline">
             Terms of Use

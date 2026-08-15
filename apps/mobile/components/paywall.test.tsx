@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-require-imports -- Jest mock factories need require() */
 import { Paywall } from '@/components/paywall';
 import { restore } from '@/lib/purchases';
+import { reportError } from '@/lib/report-error';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import * as WebBrowser from 'expo-web-browser';
 
 jest.mock('lucide-react-native', () => {
   const React = require('react');
@@ -61,12 +63,17 @@ jest.mock('expo-web-browser', () => ({
   openBrowserAsync: jest.fn(),
 }));
 
+jest.mock('@/lib/report-error', () => ({
+  reportError: jest.fn(),
+}));
+
 describe('Paywall', () => {
   afterEach(() => {
     global.__paywallTestConfig.APP_CONFIG = {
       STORAGE: 'kv',
       MONETIZATION: 'free',
     };
+    (reportError as jest.Mock).mockClear();
   });
 
   it('renders nothing when MONETIZATION is free', () => {
@@ -134,5 +141,42 @@ describe('Paywall', () => {
     (restore as jest.Mock).mockResolvedValueOnce({ ok: true, restored: false });
     await pressRestore();
     await waitFor(() => expect(screen.getByText('No purchases to restore.')).toBeTruthy());
+  });
+
+  async function showPaidPaywall() {
+    global.__paywallTestConfig.APP_CONFIG = {
+      STORAGE: 'kv',
+      MONETIZATION: 'subscription',
+    };
+    render(<Paywall />);
+    await waitFor(() => expect(screen.getByTestId('paywall')).toBeTruthy());
+  }
+
+  it('reports when the privacy link fails to open', async () => {
+    (WebBrowser.openBrowserAsync as jest.Mock).mockRejectedValueOnce(new Error('offline'));
+    await showPaidPaywall();
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('paywall-link-privacy'));
+    });
+    await waitFor(() =>
+      expect(reportError).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ scope: 'paywall.openInAppBrowser', label: 'Privacy Policy' })
+      )
+    );
+  });
+
+  it('reports when the terms link fails to open', async () => {
+    (WebBrowser.openBrowserAsync as jest.Mock).mockRejectedValueOnce(new Error('offline'));
+    await showPaidPaywall();
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('paywall-link-terms'));
+    });
+    await waitFor(() =>
+      expect(reportError).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ scope: 'paywall.openInAppBrowser', label: 'Terms of Use' })
+      )
+    );
   });
 });

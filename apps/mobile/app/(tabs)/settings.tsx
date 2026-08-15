@@ -3,22 +3,13 @@ import { Paywall } from '@/components/paywall';
 import { APP_CONFIG } from '@/lib/app-config';
 import { getAppDisplayName, getAppVersion, getNativeBuildNumber } from '@/lib/app-version';
 import { resetOnboardingSeen } from '@/lib/onboarding';
+import { openInAppBrowser } from '@/lib/open-browser';
 import { PRIVACY_URL, TERMS_URL } from '@/lib/product';
 import { useEntitlement } from '@/lib/purchases';
 import { reportError } from '@/lib/report-error';
 import { Text } from '@/ui/text';
-import * as WebBrowser from 'expo-web-browser';
 import { Alert, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-async function openInAppBrowser(url: string, label: string): Promise<void> {
-  try {
-    await WebBrowser.openBrowserAsync(url);
-  } catch (error) {
-    reportError(error, { scope: 'settings.openInAppBrowser', label, url });
-    Alert.alert(`Couldn’t open ${label}`, 'Please try again.');
-  }
-}
 
 async function resetOnboarding(): Promise<void> {
   try {
@@ -61,7 +52,10 @@ export default function SettingsScreen() {
           testID="link-privacy"
           accessibilityLabel="Privacy Policy"
           onPress={() => {
-            void openInAppBrowser(PRIVACY_URL, 'Privacy Policy');
+            void openInAppBrowser(PRIVACY_URL, {
+              label: 'Privacy Policy',
+              scope: 'settings.openInAppBrowser',
+            });
           }}
         />
         <GroupedRow
@@ -71,7 +65,10 @@ export default function SettingsScreen() {
           testID="link-terms"
           accessibilityLabel="Terms of Use"
           onPress={() => {
-            void openInAppBrowser(TERMS_URL, 'Terms of Use');
+            void openInAppBrowser(TERMS_URL, {
+              label: 'Terms of Use',
+              scope: 'settings.openInAppBrowser',
+            });
           }}
         />
       </GroupedSection>
