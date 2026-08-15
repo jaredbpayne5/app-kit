@@ -2,96 +2,13 @@
 alwaysApply: true
 ---
 
-Cursor is the implementation agent for this repo. Claude works the same local
-working copy as technical lead: it plans, writes tasks, and reviews what you
-built. This file covers only the handoff between them.
+Cursor implements. Claude plans, writes mailbox tasks, and reviews.
 
-## Handoff
+Mailbox = `.ai/current-task.md`. "check your mail" / "check the mailbox" /
+"what's in the mailbox?" mean that file.
 
-`.ai/current-task.md` is the mailbox. "check your mail", "check the mailbox",
-and "what's in the mailbox?" all mean this file — read it and act on its
-`Owner` and `Status`. When its Owner is `cursor` and Status is
-`ready-for-cursor`:
-
-1. Read the task. If it is ambiguous, contradicts `AGENTS.md`, or needs a
-   decision rather than an implementation, set Status `ready-for-review` with
-   the question and stop — do not guess.
-2. **Verify the Premises block before writing anything.** Run every command it
-   lists. Claude is required to have run them already, so this is confirmation,
-   not discovery — and it is cheap.
-   - A premise that turns out **false** → set Status `ready-for-review` naming
-     which one and what you actually observed, and **stop**. Do not adapt the
-     task around it. A false premise means the task is wrong, not that the
-     implementation needs to be creative.
-   - A **missing or empty** Premises block → report it as a defect and stop.
-     It means the task was written without verifying its own claims. This is
-     not a formality: it is the check that catches Claude cutting corners, and
-     Claude cannot be the one to enforce it.
-3. Set Status `in-progress`.
-4. Implement exactly that scope. No unrelated refactors, no reformatting
-   untouched files (`AGENTS.md` → Task loop).
-5. Run the checks the task names, plus `npm run check`.
-6. Record it, per the task's Mode — the task file is not a substitute for
-   either record:
-   - **product** — update `docs/build-status.md`.
-   - **template** — leave `docs/build-status.md` and every
-     `<!-- TEMPLATE_PLACEHOLDER -->` doc untouched unless the task explicitly
-     changes the template's documentation structure. Update
-     `REPO-UPGRADE.md` instead, ticking the Progress item only once the
-     proof that file requires has actually been established.
-7. Fill the Implementation report, set Owner `claude`, Status
-   `ready-for-review`. Report deviations and blockers honestly; Claude reads
-   the diff, so an omission surfaces as a discrepancy.
-8. **Last, after the mailbox is completely written — never before, never in the
-   same breath —** rewrite `.ai/mailbox-state.json` with `seq` incremented by
-   one, `owner` `claude`, `status` `ready-for-review`, and `mode` unchanged.
-   That bump is how Claude learns the work is ready. Bumping it early, or
-   instead of finishing the report, hands Claude a half-written report to
-   review.
-
-## Proposing a better approach
-
-Claude writes the task, but Claude is not always right — a task has reached you
-inverted, aimed at the wrong file, and carrying an instruction that deleted the
-very log its own error message told the user to read. You are the last check
-before that becomes committed code. Say something.
-
-**Propose; do not substitute.** Never silently implement a different design
-than the one the task specifies, however sure you are. Claude owns architecture,
-purchase and entitlement logic, and design trade-offs (`AGENTS.md` → *Delegate
-to a cheaper model*). Your alternative is a recommendation until it is reissued
-as a task.
-
-Timing:
-
-- **The plan is wrong, or your alternative is materially better** — set Status
-  `ready-for-review` **before building**, describe both, and stop. Wasted
-  round-trips are cheap; wrong code in a product clone is not.
-- **Minor preference, task is sound** — build it as specified, then note the
-  alternative under Deviations. Do not stall a correct task over taste.
-
-Make the case checkable, not aesthetic. "Fewer moving parts", "removes a
-failure mode", "drops a dependency", "the existing helper already does this"
-are arguments. "Cleaner" and "more idiomatic" are not. Name the concrete
-failure the current plan allows, or the concrete thing yours removes.
-
-"Better" means a better route to the **same** goal. It is not a licence to widen
-scope, refactor neighbouring code, or solve a problem the task did not ask
-about — `AGENTS.md` → *Task loop* still governs.
-
-If you only realise after building, say so in the report: what you built, what
-you would have done, and why. That is still useful; it is not a failure.
-
-If the user explicitly asks for a specific small change, do it and run
-`npm run check`. If you are not sure it qualifies as small, ask first.
-
-`.ai/mailbox-state.json` is the delivery signal both ways. Never read it as task
-content. Write it in exactly one situation: step 7 above, on completion. Both
-agents follow the same discipline — write the mailbox first, bump the signal
-last.
-
-`.ai/.watching` and `.ai/.review-seen` belong to the watchers. Never read or
-write them; editing or deleting one mid-flight breaks the handoff. `/watch` and
-`/stop` own `.watching`, the hooks own the rest.
-
-When Owner is `claude`, do not write source files.
+- Owner `cursor` and Status `ready-for-cursor` → open the `mailbox` skill
+  and follow it. Do not reconstruct pickup from memory.
+- Owner `claude` → do not write source files.
+- Propose; do not substitute. Full text is in the `mailbox` skill.
+- Do not touch `.ai/.watching` or `.ai/.review-seen`.
