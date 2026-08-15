@@ -336,13 +336,19 @@ for (const k of ["privacyUrl", "termsUrl", "contactEmail"]) {
     console.log(`FAIL:${k} has example.com or TBD`);
   }
 }
+// Placeholder must stay in sync with apps/product.json and
+// scripts/factory/init-app.sh — three languages, no shared constant.
+const TAGLINE_PLACEHOLDER = "A short pitch for the marketing lander.";
+if (String(p.tagline || "") === TAGLINE_PLACEHOLDER) {
+  console.log("FAIL:tagline is still the template placeholder");
+}
 for (const k of ["iosUrl", "androidUrl"]) {
   if (String(p[k] || "") === "#") console.log(`WARN:${k} is still "#"`);
 }
 NODE
   )
   if [[ "$PRODUCT_RC" -eq 0 ]]; then
-    ok "product_json: privacyUrl/termsUrl/contactEmail look real"
+    ok "product_json: privacyUrl/termsUrl/contactEmail/tagline look real"
   fi
 fi
 

@@ -251,7 +251,10 @@ if (productPath && fs.existsSync(productPath)) {
   product.privacyUrl = privacyUrl;
   product.termsUrl = termsUrl;
   // Keep iosUrl/androidUrl as "#" until store listings are live (preflight warns only).
-  if (!product.tagline) {
+  // Placeholder must stay in sync with apps/product.json and
+  // scripts/store/review-preflight.sh — three languages, no shared constant.
+  const TAGLINE_PLACEHOLDER = 'A short pitch for the marketing lander.';
+  if (!product.tagline || product.tagline === TAGLINE_PLACEHOLDER) {
     product.tagline = `${name} — on-device tools that stay on your phone.`;
   }
   fs.writeFileSync(productPath, JSON.stringify(product, null, 2) + '\n');
