@@ -107,10 +107,15 @@ fi
 
 echo "=== guard-file deny is configured ==="
 if grep -q 'Edit(./.claude/hooks/\*\*)' .claude/settings.json \
+  && grep -q 'Write(./.claude/hooks/\*\*)' .claude/settings.json \
+  && grep -q 'Edit(./.cursor/hooks/\*\*)' .claude/settings.json \
+  && grep -q 'Edit(./scripts/lib/guard-\*\.sh)' .claude/settings.json \
+  && grep -q 'Edit(./scripts/lib/mailbox-check.sh)' .claude/settings.json \
+  && grep -q 'Edit(./scripts/lib/fail-proof-checks.test.sh)' .claude/settings.json \
   && grep -q 'Edit(./.githooks/\*\*)' .claude/settings.json \
   && grep -q 'Edit(./eslint.config.js)' .claude/settings.json \
   && grep -q 'Edit(./.github/workflows/ci.yml)' .claude/settings.json; then
-  ok "Claude permissions.deny lists the four guard paths"
+  ok "Claude permissions.deny lists the guard paths (Edit and Write)"
 else
   bad "Claude permissions.deny is missing a guard path"
 fi
@@ -130,18 +135,109 @@ fi
 if command -v jq >/dev/null 2>&1; then
   cursor_hook="$ROOT/.cursor/hooks/guard-protected-files.sh"
   deny_out=$(jq -nc '{tool_input:{path:".claude/hooks/guard-secrets.sh"}}' | bash "$cursor_hook")
+  cursor_net_out=$(jq -nc '{tool_input:{path:".cursor/hooks/guard-secret-files.sh"}}' | bash "$cursor_hook")
+  lib_net_out=$(jq -nc '{tool_input:{path:"scripts/lib/guard-sensitive-paths.sh"}}' | bash "$cursor_hook")
   allow_out=$(jq -nc '{tool_input:{path:"apps/mobile/lib/storage.ts"}}' | bash "$cursor_hook")
   deny_perm=$(echo "$deny_out" | jq -r '.permission // empty')
+  cursor_net_perm=$(echo "$cursor_net_out" | jq -r '.permission // empty')
+  lib_net_perm=$(echo "$lib_net_out" | jq -r '.permission // empty')
   allow_perm=$(echo "$allow_out" | jq -r '.permission // empty')
   if [[ "$deny_perm" == deny ]]; then
     ok "Cursor protected-files hook denies a guard path"
   else
     bad "Cursor protected-files hook got $deny_perm on a guard path (expected deny)"
   fi
+  if [[ "$cursor_net_perm" == deny && "$lib_net_perm" == deny ]]; then
+    ok "Cursor protected-files hook denies the new Cursor/lib net"
+  else
+    bad "Cursor protected-files hook got cursor=$cursor_net_perm lib=$lib_net_perm (expected deny)"
+  fi
   if [[ "$allow_perm" == allow ]]; then
     ok "Cursor protected-files hook allows an ordinary path"
   else
     bad "Cursor protected-files hook got $allow_perm on an ordinary path (expected allow)"
+  fi
+  test_net_out=$(jq -nc '{tool_input:{path:"scripts/lib/fail-proof-checks.test.sh"}}' | bash "$cursor_hook")
+  test_net_perm=$(echo "$test_net_out" | jq -r '.permission // empty')
+  if [[ "$test_net_perm" == deny ]]; then
+    ok "Cursor protected-files hook denies the fail-proof test"
+  else
+    bad "Cursor protected-files hook got $test_net_perm on fail-proof-checks.test.sh (expected deny)"
+  fi
+fi
+
+echo "=== shellcheck covers the dead-grep files and cannot skip on CI ==="
+for f in .claude/hooks/guard-secrets.sh .githooks/pre-commit; do
+  if grep -qF "$f" scripts/dev/shellcheck-guards.sh; then
+    ok "shellcheck-guards lists $f"
+  else
+    bad "shellcheck-guards does not list $f"
+  fi
+done
+if grep -q 'not installed on CI' scripts/dev/shellcheck-guards.sh; then
+  bad "shellcheck-guards still skips when CI=true"
+else
+  ok "shellcheck-guards has no CI skip"
+fi
+if command -v shellcheck >/dev/null 2>&1; then
+  planted_sh=$(mktemp)
+  printf '%s\n' '#!/bin/sh' 'if then fi' >"$planted_sh"
+  if shellcheck -S warning "$planted_sh" >/dev/null 2>&1; then
+    bad "planted invalid script should fail shellcheck"
+  else
+    ok "planted invalid script fails shellcheck"
+  fi
+  rm -f "$planted_sh"
+  fake_bin=$(mktemp -d)
+  hide_out=$(CI=true PATH="$fake_bin" /bin/bash "$ROOT/scripts/dev/shellcheck-guards.sh" 2>&1) || hide_ec=$?
+  hide_ec=${hide_ec:-0}
+  rm -rf "$fake_bin"
+  if [[ "$hide_ec" -ne 0 ]] && echo "$hide_out" | grep -q 'not on PATH'; then
+    ok "missing shellcheck fails under CI=true"
+  else
+    bad "missing shellcheck under CI=true should fail (exit=$hide_ec)"
+  fi
+fi
+
+echo "=== common shell write shapes to guard files are denied (speed bump) ==="
+if command -v jq >/dev/null 2>&1; then
+  # shellcheck source=scripts/lib/guard-sensitive-paths.sh
+  source "$ROOT/scripts/lib/guard-sensitive-paths.sh"
+  if guard_command_writes_protected 'cat /dev/null > .claude/hooks/guard-secrets.sh' \
+    && guard_command_writes_protected 'rm .cursor/hooks/guard-secret-files.sh' \
+    && guard_command_writes_protected 'echo exit 0 > scripts/lib/guard-deploy-match.sh' \
+    && ! guard_command_writes_protected 'echo hello' \
+    && ! guard_command_writes_protected 'npm run check'; then
+    ok "shell-write classifier: redirect/rm of guards vs ordinary"
+  else
+    bad "shell-write classifier returned unexpected results"
+  fi
+  shell_hook="$ROOT/.cursor/hooks/guard-shell.sh"
+  sh_deny=$(jq -nc '{command:"cat /dev/null > .claude/hooks/guard-secrets.sh"}' | bash "$shell_hook")
+  sh_rm=$(jq -nc '{command:"rm .cursor/hooks/guard-secret-files.sh"}' | bash "$shell_hook")
+  sh_allow=$(jq -nc '{command:"echo hello"}' | bash "$shell_hook")
+  sh_deny_perm=$(echo "$sh_deny" | jq -r '.permission // empty')
+  sh_rm_perm=$(echo "$sh_rm" | jq -r '.permission // empty')
+  sh_allow_perm=$(echo "$sh_allow" | jq -r '.permission // empty')
+  if [[ "$sh_deny_perm" == deny && "$sh_rm_perm" == deny ]]; then
+    ok "Cursor shell hook denies redirect/rm of a guard file"
+  else
+    bad "Cursor shell hook got redirect=$sh_deny_perm rm=$sh_rm_perm (expected deny)"
+  fi
+  if [[ "$sh_allow_perm" == allow ]]; then
+    ok "Cursor shell hook allows an ordinary command"
+  else
+    bad "Cursor shell hook got $sh_allow_perm on echo hello (expected allow)"
+  fi
+  claude_writes="$ROOT/scripts/lib/guard-sensitive-writes-claude.sh"
+  claude_write=$(jq -nc '{tool_input:{file_path:".claude/hooks/guard-secrets.sh",content:"exit 0"}}' | bash "$claude_writes")
+  claude_bash=$(jq -nc '{tool_input:{command:"echo exit 0 > scripts/lib/guard-deploy-match.sh"}}' | bash "$claude_writes")
+  claude_write_perm=$(echo "$claude_write" | jq -r '.hookSpecificOutput.permissionDecision // empty')
+  claude_bash_perm=$(echo "$claude_bash" | jq -r '.hookSpecificOutput.permissionDecision // empty')
+  if [[ "$claude_write_perm" == deny && "$claude_bash_perm" == deny ]]; then
+    ok "Claude identity adapter denies Write/Bash to a guard file"
+  else
+    bad "Claude identity adapter got write=$claude_write_perm bash=$claude_bash_perm (expected deny)"
   fi
 fi
 
@@ -293,6 +389,51 @@ if command -v jq >/dev/null 2>&1; then
     ok "mailbox hook denies ready-for-cursor with empty Premises"
   else
     bad "mailbox hook got $deny_perm (expected deny)"
+  fi
+
+  # StrReplace of a report line must validate the patched file, not the fragment.
+  mkdir -p "$mb_dir/.ai"
+  cp "$mb_dir/filled-ready.md" "$mb_dir/.ai/current-task.md"
+  python3 - "$mb_dir/.ai/current-task.md" <<'PY'
+from pathlib import Path
+import sys
+p = Path(sys.argv[1])
+text = p.read_text()
+text = text.replace("**Status:** `ready-for-cursor`", "**Status:** `in-progress`")
+p.write_text(text)
+PY
+  old='**Changed:** _(files + what changed in each)_'
+  new='**Changed:** mailbox hook reconstructs StrReplace'
+  frag_out=$(jq -nc --arg p "$mb_dir/.ai/current-task.md" --arg o "$old" --arg n "$new" \
+    '{tool_input:{path:$p,old_string:$o,new_string:$n}}' | bash "$hook")
+  frag_perm=$(echo "$frag_out" | jq -r '.permission // empty')
+  if [[ "$frag_perm" == allow ]]; then
+    ok "mailbox hook allows StrReplace of a report line on a valid task"
+  else
+    bad "mailbox hook got $frag_perm on a report StrReplace (expected allow)"
+  fi
+
+  # Same path: flipping to ready-for-cursor while Premises is still the placeholder.
+  mkdir -p "$mb_dir/empty/.ai"
+  cp "$ROOT/.ai/current-task.template.md" "$mb_dir/empty/.ai/current-task.md"
+  python3 - "$mb_dir/empty/.ai/current-task.md" <<'PY'
+from pathlib import Path
+import sys
+p = Path(sys.argv[1])
+text = p.read_text()
+text = text.replace("**Owner:** `none`", "**Owner:** `cursor`")
+text = text.replace("**Mode:** `none`", "**Mode:** `template`")
+p.write_text(text)
+PY
+  bad_old='**Status:** `idle`'
+  bad_new='**Status:** `ready-for-cursor`'
+  flip_out=$(jq -nc --arg p "$mb_dir/empty/.ai/current-task.md" --arg o "$bad_old" --arg n "$bad_new" \
+    '{tool_input:{path:$p,old_string:$o,new_string:$n}}' | bash "$hook")
+  flip_perm=$(echo "$flip_out" | jq -r '.permission // empty')
+  if [[ "$flip_perm" == deny ]]; then
+    ok "mailbox hook denies StrReplace that makes ready-for-cursor with empty Premises"
+  else
+    bad "mailbox hook got $flip_perm on empty-Premises status flip (expected deny)"
   fi
 fi
 

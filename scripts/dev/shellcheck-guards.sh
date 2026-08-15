@@ -1,22 +1,19 @@
 #!/usr/bin/env bash
-# Run shellcheck on guard / hook scripts. Missing binary: fail locally,
-# warn-and-pass on CI (ci.yml is agent-denied, so we cannot apt-get it there).
+# Run shellcheck on guard / hook scripts. Missing binary: fail, including on
+# CI. The workflow installs shellcheck before npm run check.
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT" || exit 1
 
 if ! command -v shellcheck >/dev/null 2>&1; then
-  if [[ "${CI:-}" == true ]]; then
-    echo "shellcheck-guards: shellcheck not installed on CI — skipped"
-    exit 0
-  fi
-  echo "shellcheck-guards: shellcheck is not on PATH. Install it (brew install shellcheck) so npm run check can prove the guards parse."
+  echo "shellcheck-guards: shellcheck is not on PATH. Install it (brew install shellcheck, or apt-get install shellcheck on CI) so npm run check can prove the guards parse."
   exit 1
 fi
 
 files=(
   scripts/lib/guard-deploy-match.sh
+  scripts/lib/guard-deploy-match.test.sh
   scripts/lib/guard-sensitive-paths.sh
   scripts/lib/guard-sensitive-writes-claude.sh
   scripts/lib/mailbox-check.sh
@@ -30,6 +27,11 @@ files=(
   .cursor/hooks/guard-identity-writes.sh
   .cursor/hooks/guard-mailbox.sh
   .cursor/hooks/wait-for-mail.sh
+  .claude/hooks/guard-secrets.sh
+  .claude/hooks/guard-deploy.sh
+  .claude/hooks/guard-sensitive-writes.sh
+  .claude/hooks/wait-for-review.sh
+  .githooks/pre-commit
 )
 
 echo "shellcheck-guards: checking ${#files[@]} files"

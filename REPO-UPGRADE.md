@@ -7,8 +7,10 @@ Local grades and incident notes stay in gitignored `REPO-EVALUATION.md`.
 This file is the durable “what to change” list. Template-mode mailbox
 tasks cite a section here, not `REPO-EVALUATION.md` §2.
 
-**Status:** path locked 2026-08-15. U0 leftovers + U-zero + U2 done on
-`factory-upgrade`. Next is merge to `main`, then U6.
+**Status:** path locked 2026-08-15; stay-on-branch 2026-08-15. U0 leftovers
++ U-zero + U2 done on `factory-upgrade`. Stay on that branch until this
+file is complete and verified. One merge to `main` at the end. U6 clones
+from `factory-upgrade`, not from `main`.
 **Source:** independent evaluation, then two review passes.
 
 ---
@@ -104,18 +106,18 @@ get dramatically faster at shipping a screen. Mailbox round-trips stay.
 ```
 U0 leftovers + U-zero   one sitting on factory-upgrade
 U2                      Cursor hooks, mailbox check, matcher honesty
-Merge U0–U2 to main     so the first clone inherits working guards
-U6                      first product clone; note which rules fired
+U6                      first product clone from factory-upgrade (not main)
 U1                      thin from those notes; measure; cap
 U3                      Skills
 U4                      lint-staged, Renovate, expo-doctor, audit
 U5                      secure-storage, living-spec, preflight “gate”
 U7                      optional /unslop on leftover docs (on demand)
+Merge to main           once, after the list above is done and verified
 ```
 
 Do not delay U-zero/U2 until you have an app idea. Do delay U1 until you
-have used the factory once. If a product is months away, merge U0–U2 and
-wait.
+have used the factory once. Stay on `factory-upgrade` until this file is
+complete; do not merge U0–U2 early.
 
 Cloning today’s constitution is **not** expensive to undo. Instruction
 files are not welded to screens. After U1, copy the thinner files into
@@ -195,12 +197,12 @@ Same sitting as U0 leftovers. A guard that has never fired is not backlog.
 - **Benefits:** Broken-guard-worse-than-no-guard is closed on both agents.
 - **Risks:** Deny-on-`app.json` fights `init-app` unless allowlisted.
 
-Then **merge U0–U2 to main** before cloning.
+Stay on `factory-upgrade`. Clone U6 from this branch, not from `main`.
 
 ### U6 — First product clone (evidence, not a template commit)
 
 - **What:** PRD → Moonchild → compile-specs → mailbox → `verify` →
-  `preflight` on one real app, cloned from post-U2 `main`. Write down
+  `preflight` on one real app, cloned from post-U2 `factory-upgrade`. Write down
   which always-on rules actually fired.
 - **Why:** This factory has never produced a product. Every claim about
   which rules earn their keep is inference. U1 without that is guessing.
@@ -330,7 +332,7 @@ allowlist rows that rewrite the matcher.
 - [x] U-zero — fail-proof tests + dead grep + deny on guard files
       (same sitting as U0 leftovers)
 - [x] U2 — Cursor hooks, mailbox check, matcher honesty
-- [ ] Merge U0–U2 to `main`
+- [ ] Merge `factory-upgrade` to `main` (once, after this list is verified)
 - [ ] U6 — first product clone (separate repo; not a template commit)
 - [ ] U1 — thin from clone notes; measure; cap
 - [ ] U3 — skills

@@ -10,8 +10,8 @@
 #   * No `.ai/.watching` file  -> exit immediately, do nothing. Cursor behaves
 #     normally. This is the on/off switch and the emergency stop.
 #   * Watching, no new mail    -> sleep and re-check until mail lands or the
-#     hook's time budget runs low, then hand Cursor a re-arm message so the
-#     loop survives.
+#     hook's time budget runs low, then exit without a paid re-arm. The next
+#     human or agent turn starts the stop hook again if .watching exists.
 #   * Watching, new mail       -> hand Cursor the task via followup_message.
 #
 # "New mail" means .ai/mailbox-state.json has owner `cursor` AND status

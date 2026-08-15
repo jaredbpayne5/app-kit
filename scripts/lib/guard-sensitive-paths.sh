@@ -7,10 +7,11 @@
 #   source "$ROOT/scripts/lib/guard-sensitive-paths.sh"
 #   guard_rel_path "$path" "$ROOT"          # prints repo-relative path
 #   guard_path_class "$rel"                 # deny-secret | ask-identity | allow
+#   guard_is_protected "$rel"               # 0 if agents must not edit this file
 #   guard_is_init_app "$command"            # 0 if this is init-app
 #   guard_command_class "$command"          # deny-secret | ask-identity | allow
 #
-# Returns via stdout (classifiers) or exit status (init-app).
+# Returns via stdout (classifiers) or exit status (init-app / protected).
 
 guard_rel_path() {
   local path="$1"
@@ -52,6 +53,41 @@ guard_path_class() {
       ;;
   esac
   printf 'allow'
+}
+
+# Factory net: hooks, shared matchers, mailbox check, eslint, githooks, CI.
+# Keep in sync with .claude/settings.json permissions.deny.
+guard_is_protected() {
+  local rel="$1"
+  case "$rel" in
+    .claude/hooks/* | */.claude/hooks/*) return 0 ;;
+    .claude/settings.json | */.claude/settings.json) return 0 ;;
+    .cursor/hooks/* | */.cursor/hooks/*) return 0 ;;
+    .cursor/hooks.json | */.cursor/hooks.json) return 0 ;;
+    .githooks/* | */.githooks/*) return 0 ;;
+    eslint.config.js | */eslint.config.js) return 0 ;;
+    .github/workflows/ci.yml | */.github/workflows/ci.yml) return 0 ;;
+    scripts/lib/guard-*.sh | */scripts/lib/guard-*.sh) return 0 ;;
+    scripts/lib/mailbox-check.sh | */scripts/lib/mailbox-check.sh) return 0 ;;
+    scripts/lib/mailbox-check-claude.sh | */scripts/lib/mailbox-check-claude.sh) return 0 ;;
+    scripts/lib/fail-proof-checks.test.sh | */scripts/lib/fail-proof-checks.test.sh) return 0 ;;
+  esac
+  return 1
+}
+
+# Speed bump for common write shapes (rm, redirect, tee, cp, mv) onto a
+# protected path — not a security boundary. Does not cover sed, python,
+# chmod, or every bash -c wrapper.
+guard_command_writes_protected() {
+  local command="$1"
+  local pat='(\.claude/hooks/|\.claude/settings\.json|\.cursor/hooks|\.githooks/|eslint\.config\.js|\.github/workflows/ci\.yml|scripts/lib/guard-|scripts/lib/mailbox-check|scripts/lib/fail-proof-checks\.test\.sh)'
+  if echo "$command" | grep -Eqe "\\brm\\b[^;&|]*${pat}"; then
+    return 0
+  fi
+  if echo "$command" | grep -Eqe "(>|>>|[[:space:]]tee[[:space:]]|\\b(cp|mv)\\b)[^;&|]*${pat}"; then
+    return 0
+  fi
+  return 1
 }
 
 guard_is_init_app() {

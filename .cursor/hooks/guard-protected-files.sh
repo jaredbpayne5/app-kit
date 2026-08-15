@@ -23,23 +23,14 @@ if [[ -z "$path" ]]; then
 fi
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-rel="$path"
-rel="${rel#file://}"
-if [[ "$rel" == "$ROOT/"* ]]; then
-  rel="${rel#"$ROOT"/}"
-fi
+# shellcheck source=scripts/lib/guard-sensitive-paths.sh
+source "$ROOT/scripts/lib/guard-sensitive-paths.sh"
 
-protected=0
-case "$rel" in
-  .claude/hooks/* | */.claude/hooks/*) protected=1 ;;
-  .githooks/* | */.githooks/*) protected=1 ;;
-  eslint.config.js | */eslint.config.js) protected=1 ;;
-  .github/workflows/ci.yml | */.github/workflows/ci.yml) protected=1 ;;
-esac
+rel="$(guard_rel_path "$path" "$ROOT")"
 
-if [[ "$protected" -eq 1 ]]; then
+if guard_is_protected "$rel"; then
   cat <<'JSON'
-{"permission":"deny","user_message":"This file is a factory guard (hooks, eslint, githooks, or CI). Editing it is denied so an agent cannot rewrite the safety net. Change it yourself in the editor if you really mean to.","agent_message":"Write denied: guard files are protected. Ask the human to edit them."}
+{"permission":"deny","user_message":"This file is a factory guard (hooks, matchers, mailbox check, eslint, githooks, or CI). Editing it is denied so an agent cannot rewrite the safety net. Change it yourself in the editor if you really mean to.","agent_message":"Write denied: guard files are protected. Ask the human to edit them."}
 JSON
   exit 0
 fi

@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Cursor preToolUse: reject a mailbox write that is invalid JSON / illegal
 # owner-status-mode, or ready-for-cursor with an empty Premises block.
-# jq missing: allow (not secret detection).
+# StrReplace/Edit is applied to the on-disk file before checking — new_string
+# alone is not the whole mailbox. jq missing: allow (not secret detection).
 set -euo pipefail
 
 if ! command -v jq >/dev/null 2>&1; then
@@ -17,12 +18,10 @@ path=$(echo "$input" | jq -r '
   // .path
   // empty
 ')
-content=$(echo "$input" | jq -r '
-  .tool_input.contents
-  // .tool_input.content
-  // .tool_input.new_string
-  // empty
-')
+contents=$(echo "$input" | jq -r '.tool_input.contents // .tool_input.content // empty')
+old_string=$(echo "$input" | jq -r '.tool_input.old_string // empty')
+new_string=$(echo "$input" | jq -r '.tool_input.new_string // empty')
+replace_all=$(echo "$input" | jq -r '.tool_input.replace_all // "false"')
 
 if [[ -z "$path" ]]; then
   echo '{"permission":"allow"}'
@@ -39,19 +38,20 @@ if [[ "$rel" == "$ROOT/"* ]]; then
   rel="${rel#"$ROOT"/}"
 fi
 
+on_disk="$path"
+on_disk="${on_disk#file://}"
+if [[ "$on_disk" != /* ]]; then
+  on_disk="$ROOT/$rel"
+fi
+
 check_file=""
 cleanup() { [[ -n "${check_file:-}" && -f "$check_file" ]] && rm -f "$check_file"; }
 trap cleanup EXIT
 
 case "$rel" in
   .ai/mailbox-state.json | */.ai/mailbox-state.json)
-    if [[ -n "$content" ]]; then
-      check_file=$(mktemp)
-      printf '%s\n' "$content" >"$check_file"
-    elif [[ -f "$path" ]]; then
-      check_file="$path"
-      trap - EXIT
-    else
+    check_file=$(mktemp)
+    if ! mailbox_prepare_candidate "$check_file" "$on_disk" "$contents" "$old_string" "$new_string" "$replace_all"; then
       echo '{"permission":"allow"}'
       exit 0
     fi
@@ -63,13 +63,8 @@ JSON
     fi
     ;;
   .ai/current-task.md | */.ai/current-task.md)
-    if [[ -n "$content" ]]; then
-      check_file=$(mktemp)
-      printf '%s\n' "$content" >"$check_file"
-    elif [[ -f "$path" ]]; then
-      check_file="$path"
-      trap - EXIT
-    else
+    check_file=$(mktemp)
+    if ! mailbox_prepare_candidate "$check_file" "$on_disk" "$contents" "$old_string" "$new_string" "$replace_all"; then
       echo '{"permission":"allow"}'
       exit 0
     fi

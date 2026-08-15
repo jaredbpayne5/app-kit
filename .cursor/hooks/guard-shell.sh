@@ -20,6 +20,15 @@ fi
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 # shellcheck source=scripts/lib/guard-deploy-match.sh
 source "$ROOT/scripts/lib/guard-deploy-match.sh"
+# shellcheck source=scripts/lib/guard-sensitive-paths.sh
+source "$ROOT/scripts/lib/guard-sensitive-paths.sh"
+
+if guard_command_writes_protected "$command"; then
+  cat <<'JSON'
+{"permission":"deny","user_message":"This command would rewrite a factory guard (hooks, matchers, mailbox check, eslint, githooks, or CI). Denied so an agent cannot hollow out the safety net. Change it yourself in the editor if you really mean to.","agent_message":"Shell denied: command writes to a protected guard file."}
+JSON
+  exit 0
+fi
 
 if guard_should_ask "$command"; then
   cat <<'JSON'
