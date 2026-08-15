@@ -12,6 +12,7 @@
  *   customerInfo.entitlements.active; error.userCancelled
  */
 import { APP_CONFIG, MOCK_ENTITLED, PURCHASES_MODE } from '@/lib/app-config';
+import { reportError } from '@/lib/report-error';
 import { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 
@@ -28,7 +29,7 @@ export type OfferingPackage = {
 export type PurchaseResult =
   { ok: true; productId: string } | { ok: false; error: string; cancelled?: boolean };
 
-export type RestoreResult = { restored: boolean };
+export type RestoreResult = { ok: true; restored: boolean } | { ok: false; error: string };
 
 type PurchasesSdk = typeof import('react-native-purchases').default;
 
@@ -188,17 +189,21 @@ export async function purchase(packageIdentifier: string): Promise<PurchaseResul
     return { ok: true, productId: packageIdentifier };
   }
 
-  const Purchases = await ensureConfigured();
-  let pkg = livePackageById.get(packageIdentifier);
-  if (!pkg) {
-    await getOfferings();
-    pkg = livePackageById.get(packageIdentifier);
-  }
-  if (!pkg) {
-    return { ok: false, error: `Unknown package: ${packageIdentifier}` };
-  }
-
+  // ensureConfigured() throws by design when the RevenueCat key is missing or
+  // still REPLACE_WITH_ (resolveApiKey). It must sit INSIDE the try: PurchaseResult
+  // is a total type, so rejecting past it would break every caller that trusts
+  // the signature, not just the paywall (which happens to try/catch already).
   try {
+    const Purchases = await ensureConfigured();
+    let pkg = livePackageById.get(packageIdentifier);
+    if (!pkg) {
+      await getOfferings();
+      pkg = livePackageById.get(packageIdentifier);
+    }
+    if (!pkg) {
+      return { ok: false, error: `Unknown package: ${packageIdentifier}` };
+    }
+
     const result = await Purchases.purchasePackage(pkg);
     cachedCustomerInfo = result.customerInfo;
     return { ok: true, productId: result.productIdentifier };
@@ -212,12 +217,19 @@ export async function purchase(packageIdentifier: string): Promise<PurchaseResul
 }
 
 export async function restore(): Promise<RestoreResult> {
-  if (!isPaid()) return { restored: false };
-  if (!isLive()) return { restored: currentMockEntitled() };
-  const Purchases = await ensureConfigured();
-  cachedCustomerInfo = await Purchases.restorePurchases();
-  const active = cachedCustomerInfo.entitlements.active;
-  return { restored: Object.keys(active).length > 0 };
+  if (!isPaid()) return { ok: true, restored: false };
+  if (!isLive()) return { ok: true, restored: currentMockEntitled() };
+
+  try {
+    const Purchases = await ensureConfigured();
+    cachedCustomerInfo = await Purchases.restorePurchases();
+    const active = cachedCustomerInfo.entitlements.active;
+    return { ok: true, restored: Object.keys(active).length > 0 };
+  } catch (err) {
+    reportError(err, { scope: 'purchases.restore' });
+    const message = err instanceof Error ? err.message : 'Restore failed';
+    return { ok: false, error: message };
+  }
 }
 
 /**

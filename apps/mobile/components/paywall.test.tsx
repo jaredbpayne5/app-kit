@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-require-imports -- Jest mock factories need require() */
 import { Paywall } from '@/components/paywall';
-import { render, screen, waitFor } from '@testing-library/react-native';
+import { restore } from '@/lib/purchases';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 
 jest.mock('lucide-react-native', () => {
   const React = require('react');
@@ -53,7 +54,7 @@ jest.mock('@/lib/purchases', () => ({
     },
   ]),
   purchase: jest.fn(),
-  restore: jest.fn(async () => ({ restored: false })),
+  restore: jest.fn(async () => ({ ok: true, restored: false })),
 }));
 
 jest.mock('expo-web-browser', () => ({
@@ -91,5 +92,47 @@ describe('Paywall', () => {
     expect(screen.getByLabelText('Restore purchases')).toBeTruthy();
     expect(screen.getByTestId('paywall-link-privacy')).toBeTruthy();
     expect(screen.getByTestId('paywall-link-terms')).toBeTruthy();
+  });
+
+  async function pressRestore() {
+    global.__paywallTestConfig.APP_CONFIG = {
+      STORAGE: 'kv',
+      MONETIZATION: 'subscription',
+    };
+    render(<Paywall />);
+    await waitFor(() => expect(screen.getByLabelText('Restore purchases')).toBeTruthy());
+    await act(async () => {
+      fireEvent.press(screen.getByLabelText('Restore purchases'));
+    });
+  }
+
+  it('shows the restore() error text when restore() returns ok:false', async () => {
+    (restore as jest.Mock).mockResolvedValueOnce({
+      ok: false,
+      error:
+        'Missing EXPO_PUBLIC_REVENUECAT_API_KEY (or platform-specific keys). Copy .env.example → .env.local.',
+    });
+    await pressRestore();
+    await waitFor(() =>
+      expect(screen.getByText(/Missing EXPO_PUBLIC_REVENUECAT_API_KEY/)).toBeTruthy()
+    );
+  });
+
+  it('shows Restore failed when restore() returns ok:false with an empty error', async () => {
+    (restore as jest.Mock).mockResolvedValueOnce({ ok: false, error: '' });
+    await pressRestore();
+    await waitFor(() => expect(screen.getByText('Restore failed')).toBeTruthy());
+  });
+
+  it('shows Restore complete when restore() returns entitlements', async () => {
+    (restore as jest.Mock).mockResolvedValueOnce({ ok: true, restored: true });
+    await pressRestore();
+    await waitFor(() => expect(screen.getByText('Restore complete.')).toBeTruthy());
+  });
+
+  it('shows No purchases to restore when restore() succeeds with nothing', async () => {
+    (restore as jest.Mock).mockResolvedValueOnce({ ok: true, restored: false });
+    await pressRestore();
+    await waitFor(() => expect(screen.getByText('No purchases to restore.')).toBeTruthy());
   });
 });

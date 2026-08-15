@@ -84,6 +84,10 @@ function PaywallPaid({ onPurchased }: PaywallProps) {
     setMessage(null);
     try {
       const result = await restore();
+      if (!result.ok) {
+        setMessage(result.error || 'Restore failed');
+        return;
+      }
       setMessage(result.restored ? 'Restore complete.' : 'No purchases to restore.');
     } catch (err) {
       reportError(err, { screen: 'paywall', action: 'restore' });
