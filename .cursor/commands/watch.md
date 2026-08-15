@@ -28,7 +28,7 @@ Once you stop, the `stop` hook (`.cursor/hooks/wait-for-mail.sh`) takes over and
 waits for Claude to hand over a task. Waiting is done by a sleeping shell
 script, so it costs nothing until real mail arrives.
 
-When mail lands you will be handed the task automatically. Carry it out as
-written, honouring `AGENTS.md` and the Mode set in the mailbox, then fill in the
-Implementation report, set Owner to `claude` and Status to `ready-for-review`,
-and stop.
+When mail lands you will be handed the task automatically. Follow
+`.cursor/skills/mailbox/SKILL.md`, then carry it out as written, honouring
+`AGENTS.md` and the Mode set in the mailbox. Fill in the Implementation
+report, set Owner to `claude` and Status to `ready-for-review`, and stop.

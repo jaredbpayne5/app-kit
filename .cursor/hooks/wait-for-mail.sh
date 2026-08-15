@@ -59,7 +59,7 @@ while [ "$waited" -lt "$MAX_WAIT_SECONDS" ]; do
 
   if [ "$owner" = "cursor" ] \
     && [ "$status" = "ready-for-cursor" ]; then
-    emit '{"followup_message":"New mail. Read .ai/current-task.md and carry out the task exactly as written, honouring AGENTS.md and the Mode set in the mailbox. When done, fill in the Implementation report, set Owner to `claude` and Status to `ready-for-review`, and stop."}'
+    emit '{"followup_message":"New mail. Read .cursor/skills/mailbox/SKILL.md, then .ai/current-task.md and carry out the task exactly as written, honouring AGENTS.md and the Mode set in the mailbox. When done, fill in the Implementation report, set Owner to `claude` and Status to `ready-for-review`, and stop."}'
   fi
 
   sleep "$POLL_SECONDS"

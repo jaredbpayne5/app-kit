@@ -294,6 +294,16 @@ Run `npm run check` after edits (format, lint, typecheck, contrast, design
 lint). Run `npm test` for logic changes. Run `npm run verify` before
 considering work done. `npm run test:e2e` drives Maestro against a simulator.
 
+## On-demand procedures
+
+Skills in `.cursor/skills/` load when relevant. Recipes in `docs/recipes/`
+are the human source — do not paste them into always-on files.
+
+- Mailbox pickup — `mailbox`
+- Compile specs (once, strong model) — `compile-specs`
+- Store gate (`npm run preflight`) — `store-preflight`
+- Maestro e2e — `maestro-e2e`
+
 ## Delegate to a cheaper model
 
 Default: hand mechanical work to a cheaper subagent — builds, tests, decided

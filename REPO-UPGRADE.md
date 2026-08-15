@@ -8,9 +8,10 @@ This file is the durable “what to change” list. Template-mode mailbox
 tasks cite a section here, not `REPO-EVALUATION.md` §2.
 
 **Status:** path locked 2026-08-15; stay-on-branch 2026-08-15. U0 leftovers
-+ U-zero + U2 done on `factory-upgrade`. Stay on that branch until this
-file is complete and verified. One merge to `main` at the end. U6 clones
-from `factory-upgrade`, not from `main`.
++ U-zero + U2 + U3 done on `factory-upgrade`. U6 and U1 wait for a real
+app. Stay on that branch until this file is complete and verified. One
+merge to `main` at the end. U6 clones from `factory-upgrade`, not from
+`main`.
 **Source:** independent evaluation, then two review passes.
 
 ---
@@ -335,7 +336,9 @@ allowlist rows that rewrite the matcher.
 - [ ] Merge `factory-upgrade` to `main` (once, after this list is verified)
 - [ ] U6 — first product clone (separate repo; not a template commit)
 - [ ] U1 — thin from clone notes; measure; cap
-- [ ] U3 — skills
+- [x] U3 — skills (`.cursor/skills/` mailbox, compile-specs,
+      store-preflight, maestro-e2e; `PURCHASES_MODE` standalone in
+      `docs/recipes/compile-specs.md`; pointers in `AGENTS.md` + waiter)
 - [ ] U4 — lint-staged, Renovate, expo-doctor, audit
 - [ ] U5 — secure-storage + living-spec + preflight “gate”
 - [ ] U7 — optional unslop polish

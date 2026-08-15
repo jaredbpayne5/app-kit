@@ -68,9 +68,10 @@ design beyond the PRD and the exported artifacts.
    - Write each task in mailbox shape so it can be pasted into
      `.ai/current-task.md`: Goal, Scope, Out of scope, Acceptance criteria.
    - **Required Phase 2 tasks** (name them explicitly):
-     1. Set `APP_CONFIG.MONETIZATION` and `STORAGE` in
-        `apps/mobile/lib/app-config.ts` from the PRD. Leave
-        `PURCHASES_MODE: 'mock'` until live keys exist.
+     1. Set `APP_CONFIG.MONETIZATION` and `APP_CONFIG.STORAGE` in
+        `apps/mobile/lib/app-config.ts` from the PRD. Leave the standalone
+        `PURCHASES_MODE` export as `'mock'` until live keys exist
+        (`PURCHASES_MODE` is not an `APP_CONFIG` key).
      2. Replace or remove demo `app/(tabs)/index.tsx` and `library.tsx` per
         `screens-status.md`, including the Library tab in `(tabs)/_layout.tsx`.
      3. Rewrite `apps/mobile/maestro/smoke.yaml` for the product's real tabs
