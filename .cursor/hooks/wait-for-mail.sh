@@ -14,16 +14,16 @@
 #     loop survives.
 #   * Watching, new mail       -> hand Cursor the task via followup_message.
 #
-# "New mail" means .ai/mailbox-state.json carries a `seq` higher than the one
-# recorded in .ai/.mailbox-seen, AND owner is `cursor`, AND status is
-# `ready-for-cursor`. Claude writes mailbox-state.json last, atomically, so a
-# bumped seq guarantees .ai/current-task.md is complete.
+# "New mail" means .ai/mailbox-state.json has owner `cursor` AND status
+# `ready-for-cursor`. The watcher re-delivers for as long as that remains
+# true. Re-delivery is safe because implementation-workflow.mdc step 3
+# requires Cursor to set status `in-progress` on pickup, so a retry can
+# only happen while the task was never started.
 
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 STATE="$ROOT/.ai/mailbox-state.json"
-SEEN="$ROOT/.ai/.mailbox-seen"
 WATCHING="$ROOT/.ai/.watching"
 
 POLL_SECONDS=5
@@ -48,26 +48,17 @@ field() {
     | head -n 1 | tr -d '[:space:]'
 }
 
-seen_seq() { [ -f "$SEEN" ] && tr -cd '0-9' <"$SEEN" || printf '0'; }
-
 # --- wait for the state file to say there is work -----------------------------
 waited=0
 while [ "$waited" -lt "$MAX_WAIT_SECONDS" ]; do
   # Switched off mid-wait: stand down without touching anything.
   [ -f "$WATCHING" ] || nothing
 
-  seq="$(field seq || printf '')"
   owner="$(field owner || printf '')"
   status="$(field status || printf '')"
-  seen="$(seen_seq)"
-  : "${seq:=0}" "${seen:=0}"
 
-  if [ "$seq" -gt "$seen" ] 2>/dev/null \
-    && [ "$owner" = "cursor" ] \
+  if [ "$owner" = "cursor" ] \
     && [ "$status" = "ready-for-cursor" ]; then
-    # Record it before handing it over, so a crash mid-task cannot cause the
-    # same task to be picked up twice.
-    printf '%s\n' "$seq" >"$SEEN"
     emit '{"followup_message":"New mail. Read .ai/current-task.md and carry out the task exactly as written, honouring AGENTS.md and the Mode set in the mailbox. When done, fill in the Implementation report, set Owner to `claude` and Status to `ready-for-review`, and stop."}'
   fi
 

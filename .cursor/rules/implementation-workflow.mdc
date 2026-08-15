@@ -90,8 +90,8 @@ content. Write it in exactly one situation: step 7 above, on completion. Both
 agents follow the same discipline — write the mailbox first, bump the signal
 last.
 
-`.ai/.watching`, `.ai/.mailbox-seen`, and `.ai/.review-seen` belong to the
-watchers. Never read or write them; editing or deleting one mid-flight breaks the
-handoff. `/watch` and `/stop` own `.watching`, the hooks own the rest.
+`.ai/.watching` and `.ai/.review-seen` belong to the watchers. Never read or
+write them; editing or deleting one mid-flight breaks the handoff. `/watch` and
+`/stop` own `.watching`, the hooks own the rest.
 
 When Owner is `claude`, do not write source files.

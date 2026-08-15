@@ -85,6 +85,5 @@ REPO-EVALUATION.md
 # (.ai/current-task.template.md) is tracked; `/watch` builds these from it.
 .ai/current-task.md
 .ai/mailbox-state.json
-.ai/.mailbox-seen
 .ai/.review-seen
 .ai/.watching
