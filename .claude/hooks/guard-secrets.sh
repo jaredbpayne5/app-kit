@@ -27,7 +27,7 @@ if [[ "$base" == .env.* && "$base" == *.local ]]; then
 fi
 
 # Private keys / AWS-style / GitHub PATs — hard deny outside env files
-if echo "$content" | grep -Eq '-----BEGIN [A-Z ]*PRIVATE KEY-----|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{22,}'; then
+if echo "$content" | grep -Eqe '-----BEGIN [A-Z ]*PRIVATE KEY-----|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{22,}'; then
   cat <<'JSON'
 {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "A private key or cloud credential pattern was detected outside an env file. Blocked to avoid leaking a real secret."}}
 JSON

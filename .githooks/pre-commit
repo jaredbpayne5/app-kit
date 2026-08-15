@@ -38,7 +38,7 @@ else
       ":(exclude).claude/hooks/*" \
       | grep "^+" | grep -v "^+++" || true
   )
-  if printf "%s\n" "$staged_added" | grep -Eq "AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{22,}|-----BEGIN [A-Z ]*PRIVATE KEY-----"; then
+  if printf "%s\n" "$staged_added" | grep -Eqe "AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{22,}|-----BEGIN [A-Z ]*PRIVATE KEY-----"; then
     echo
     echo "✗ A staged change looks like it contains a secret."
     echo "  Remove it and rotate the key if it was real. Install gitleaks for better coverage."
