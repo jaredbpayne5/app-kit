@@ -81,9 +81,9 @@ read_app_config() {
   node <<'NODE'
 const fs = require("fs");
 const s = fs.readFileSync("apps/mobile/lib/app-config.ts", "utf8");
-const storage = /STORAGE:\s*['"]([^'"]+)['"]/.exec(s);
-const mon = /MONETIZATION:\s*['"]([^'"]+)['"]/.exec(s);
-const mode = /PURCHASES_MODE:\s*['"]([^'"]+)['"]/.exec(s);
+const storage = /STORAGE\s*[:=]\s*['"]([^'"]+)['"]/.exec(s);
+const mon = /MONETIZATION\s*[:=]\s*['"]([^'"]+)['"]/.exec(s);
+const mode = /PURCHASES_MODE\s*[:=]\s*['"]([^'"]+)['"]/.exec(s);
 if (!storage || !mon || !mode) {
   console.error("could not parse app-config");
   process.exit(1);
@@ -190,16 +190,39 @@ if [[ "$FAIL" -eq "$LIMIT_FAIL_BEFORE" ]]; then
 fi
 
 # --- 4. App config + data-practices purchases / RevenueCat --------------------
-CFG="$(read_app_config)" || { bad "app_config: could not parse apps/mobile/lib/app-config.ts"; CFG=$'\t\t\t'; }
-# STORAGE also present in CFG (field 1); the purchases gate uses MONETIZATION only.
-MONETIZATION="$(printf '%s' "$CFG" | cut -f2)"
-PURCHASES_MODE="$(printf '%s' "$CFG" | cut -f3)"
+CFG_OK=1
+CFG="$(read_app_config)" || { bad "app_config: could not parse apps/mobile/lib/app-config.ts"; CFG_OK=0; }
+STORAGE=""
+MONETIZATION=""
+PURCHASES_MODE=""
+if [[ "$CFG_OK" -eq 1 ]]; then
+  STORAGE="$(printf '%s' "$CFG" | cut -f1)"
+  MONETIZATION="$(printf '%s' "$CFG" | cut -f2)"
+  PURCHASES_MODE="$(printf '%s' "$CFG" | cut -f3)"
+  if [[ -z "$STORAGE" ]]; then
+    bad "app_config: STORAGE is empty in apps/mobile/lib/app-config.ts"
+    CFG_OK=0
+  fi
+  if [[ -z "$MONETIZATION" ]]; then
+    bad "app_config: MONETIZATION is empty in apps/mobile/lib/app-config.ts"
+    CFG_OK=0
+  fi
+  if [[ -z "$PURCHASES_MODE" ]]; then
+    bad "app_config: PURCHASES_MODE is empty in apps/mobile/lib/app-config.ts"
+    CFG_OK=0
+  fi
+fi
+if [[ "$CFG_OK" -eq 0 ]]; then
+  bad "purchases_declared: skipped — app-config could not be parsed"
+  bad "purchases_mode: skipped — app-config could not be parsed"
+fi
 
 if [[ ! -f apps/mobile/store/data-practices.json ]]; then
   bad "data_practices: apps/mobile/store/data-practices.json missing"
 else
-  PURCHASES_OK="$(
-    MONETIZATION="$MONETIZATION" node <<'NODE'
+  if [[ "$CFG_OK" -eq 1 ]]; then
+    PURCHASES_OK="$(
+      MONETIZATION="$MONETIZATION" node <<'NODE'
 const fs = require("fs");
 const p = JSON.parse(fs.readFileSync("apps/mobile/store/data-practices.json", "utf8"));
 const mon = process.env.MONETIZATION;
@@ -211,21 +234,22 @@ if (mon && mon !== "free") {
 }
 process.stdout.write("ok");
 NODE
-  )"
-  if [[ "$PURCHASES_OK" != "ok" ]]; then
-    bad "purchases_declared: MONETIZATION=$MONETIZATION but data-practices.json must have collects_purchases: true and data_shared_with_third_parties: true (RevenueCat receives purchase history + app-user id)"
-  else
-    ok "purchases_declared: MONETIZATION=$MONETIZATION matches data-practices purchases/sharing flags"
-  fi
-
-  if [[ "$MONETIZATION" != "free" && "$PURCHASES_MODE" == "mock" ]]; then
-    if [[ "$PHASE" == "4" ]]; then
-      defer "purchases_mode: PURCHASES_MODE=mock (flip to live before store launch)"
+    )"
+    if [[ "$PURCHASES_OK" != "ok" ]]; then
+      bad "purchases_declared: MONETIZATION=$MONETIZATION but data-practices.json must have collects_purchases: true and data_shared_with_third_parties: true (RevenueCat receives purchase history + app-user id)"
     else
-      bad "purchases_mode: MONETIZATION=$MONETIZATION still has PURCHASES_MODE=mock — a mock paywall must not reach TestFlight"
+      ok "purchases_declared: MONETIZATION=$MONETIZATION matches data-practices purchases/sharing flags"
     fi
-  else
-    ok "purchases_mode: PURCHASES_MODE=$PURCHASES_MODE"
+
+    if [[ "$MONETIZATION" != "free" && "$PURCHASES_MODE" == "mock" ]]; then
+      if [[ "$PHASE" == "4" ]]; then
+        defer "purchases_mode: PURCHASES_MODE=mock (flip to live before store launch)"
+      else
+        bad "purchases_mode: MONETIZATION=$MONETIZATION still has PURCHASES_MODE=mock — a mock paywall must not reach TestFlight"
+      fi
+    else
+      ok "purchases_mode: PURCHASES_MODE=$PURCHASES_MODE"
+    fi
   fi
 
   CONTACT_OK="$(
