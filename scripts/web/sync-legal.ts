@@ -5,9 +5,11 @@
  * No dependency — keep this file small and idempotent (R6).
  * Legal is hosted-only (no in-app legal-content.ts).
  *
- * Usage: npm run sync:legal
+ * Usage:
+ *   npm run sync:legal
+ *   npm run sync:legal -- --check
  */
-import { cpSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 /** Override for fixture smokes (`FACTORY_ROOT=/tmp/...`). Default: repo root. */
@@ -140,35 +142,59 @@ function escapeAttr(s: string): string {
   return escapeHtml(s).replace(/"/g, '&quot;');
 }
 
-function writeHtmlPage(title: string, contentHtml: string, outRel: string) {
+function renderHtmlPage(title: string, contentHtml: string): string {
   const templatePath = path.join(ROOT, 'apps/web/template/legal.template.html');
   const template = readFileSync(templatePath, 'utf8');
   if (!template.includes('{{TITLE}}') || !template.includes('{{CONTENT}}')) {
     throw new Error('legal.template.html missing {{TITLE}} or {{CONTENT}}');
   }
-  const html = template
-    .replaceAll('{{TITLE}}', escapeHtml(title))
-    .replaceAll('{{CONTENT}}', contentHtml);
-  const outPath = path.join(ROOT, outRel);
-  mkdirSync(path.dirname(outPath), { recursive: true });
-  writeFileSync(outPath, html, 'utf8');
-  console.log(`wrote ${path.relative(ROOT, outPath)}`);
+  return template.replaceAll('{{TITLE}}', escapeHtml(title)).replaceAll('{{CONTENT}}', contentHtml);
+}
+
+function intendedOutputs(): { rel: string; contents: Buffer }[] {
+  const files: { rel: string; contents: Buffer }[] = [];
+  for (const doc of DOCS) {
+    const md = readFileSync(path.join(ROOT, doc.src), 'utf8');
+    const html = renderHtmlPage(doc.title, blocksToHtml(parseMarkdown(md)));
+    files.push({ rel: doc.htmlOut, contents: Buffer.from(html, 'utf8') });
+  }
+  // Legal pages link style.css; keep a copy next to apps/web/{privacy,terms}.html.
+  files.push({
+    rel: 'apps/web/style.css',
+    contents: readFileSync(path.join(ROOT, 'apps/web/template/style.css')),
+  });
+  return files;
 }
 
 function main() {
-  for (const doc of DOCS) {
-    const md = readFileSync(path.join(ROOT, doc.src), 'utf8');
-    const blocks = parseMarkdown(md);
-    const html = blocksToHtml(blocks);
-    writeHtmlPage(doc.title, html, doc.htmlOut);
+  const checkOnly = process.argv.includes('--check');
+  const files = intendedOutputs();
+
+  if (checkOnly) {
+    const stale: string[] = [];
+    for (const { rel, contents } of files) {
+      const dest = path.join(ROOT, rel);
+      const current = existsSync(dest) ? readFileSync(dest) : null;
+      if (!current || !current.equals(contents)) stale.push(rel);
+    }
+    if (stale.length === 0) {
+      console.log('sync:legal: privacy.html, terms.html, and style.css are up to date');
+      return;
+    }
+    console.error(
+      'sync:legal: FAILED — generated files are stale:\n' +
+        stale.map((f) => `  ${f}`).join('\n') +
+        '\n\nRun `npm run sync:legal` and commit the result.'
+    );
+    process.exit(1);
   }
 
-  // Legal pages link style.css; keep a copy next to apps/web/{privacy,terms}.html.
-  const styleSrc = path.join(ROOT, 'apps/web/template/style.css');
-  const styleDest = path.join(ROOT, 'apps/web/style.css');
-  cpSync(styleSrc, styleDest);
-  console.log('wrote apps/web/style.css');
-
+  for (const { rel, contents } of files) {
+    const outPath = path.join(ROOT, rel);
+    mkdirSync(path.dirname(outPath), { recursive: true });
+    writeFileSync(outPath, contents);
+    console.log(`wrote ${path.relative(ROOT, outPath)}`);
+  }
   console.log('sync:legal complete');
 }
 
