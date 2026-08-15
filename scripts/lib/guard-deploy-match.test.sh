@@ -100,10 +100,16 @@ ask	npx eas build --platform ios
 ask	eas submit --platform android
 ask	npx expo prebuild
 ask	git push origin main
+ask	git  push origin main
+ask	npx eas-cli build --platform ios
+ask	npm run session:down
+ask	git config core.hooksPath /dev/null
+ask	rm .githooks/pre-commit
 ask	npm run web:deploy
 ask	npm run store:push
 ask	bundle exec fastlane deliver
 allow	echo git push origin main
+allow	echo npm run session:down
 allow	git commit -m wip
 allow	git status
 allow	npm run check
