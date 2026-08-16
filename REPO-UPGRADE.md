@@ -8,10 +8,10 @@ This file is the durable “what to change” list. Template-mode mailbox
 tasks cite a section here, not `REPO-EVALUATION.md` §2.
 
 **Status:** path locked 2026-08-15; stay-on-branch 2026-08-15. U0 leftovers
-+ U-zero + U2 + U3 + U4 done on `factory-upgrade`. U6 and U1 wait for a
-real app. Stay on that branch until this file is complete and verified.
-One merge to `main` at the end. U6 clones from `factory-upgrade`, not
-from `main`.
++ U-zero + U2 + U3 + U4 + U5 + U1a done on `factory-upgrade`. U6 and U1b
+wait for a real app. Stay on that branch until this file is complete and
+verified. One merge to `main` at the end. U6 clones from
+`factory-upgrade`, not from `main`.
 **Source:** independent evaluation, then two review passes.
 
 ---
@@ -28,8 +28,9 @@ from `main`.
   an aligned agent’s mistakes, **not** a security boundary.
 - **Mailbox** — `.ai/current-task.md` (the task) plus
   `.ai/mailbox-state.json` (the doorbell). Do not change that file format.
-- **U0–U5** are template edits. **U6** is a real product clone (evidence).
-  **U7** is optional doc polish.
+- **U0–U5** are template edits. **U1a** is the always-on dedup (done).
+  **U6** is a real product clone (evidence). **U1b** thins product rules
+  from those notes. **U7** is optional doc polish.
 
 Do **not** implement this as one task. Instruction-file edits fail in bunches.
 Exception: U0 leftovers and U-zero are **one sitting**.
@@ -63,7 +64,8 @@ New checks follow the same rule.
 - Fix checks that cannot fail. Protect guard files from agent edits.
 - Make Cursor’s secret/identity pauses real. Be honest about the matcher.
 - Require a mailbox JSON + Premises check.
-- Clone one real app **before** thinning always-on text.
+- U1a (mailbox/review out of always-on) is done. Clone one real app
+  **before** thinning `AGENTS.md` product/design text (that is U1b).
 - Then thin from clone notes; cap **bytes/tokens** of repo always-on
   files from that measurement (not a 200–250 line guess).
 - Skills, Renovate, `knip:clone`, secure-storage seam, living-spec line.
@@ -87,15 +89,18 @@ New checks follow the same rule.
 
 ## Expected outcome
 
-Repo always-on today is about **5–6k tokens** (Claude ~6.3k with imported
-`AGENTS.md`; Cursor ~5.2k without always-loading `CLAUDE.md`). User-level
-Cursor rules are extra and live outside this repo.
+Repo always-on after U1a is about **4k tokens** (Claude ~4.1k with imported
+`AGENTS.md`; Cursor ~4.0k without always-loading `CLAUDE.md`). Rough
+tokens = bytes ÷ 4. User-level Cursor rules are extra and live outside
+this repo.
 
-U1’s saving is whatever the first clone shows was unused — likely a few
-thousand tokens, not a promised −60–75%. Set the cap **after** the thin.
+U1a already moved mailbox/review procedure into skills. U1b’s saving is
+whatever the first clone shows was unused — not a promised percentage.
+Set the cap **after** that thin (U1b), not now.
 
-On disk the template gets slightly bigger (skills, tests, Renovate,
-`knip`). The agent’s head gets smaller only after U1.
+On disk the template is slightly bigger (skills, tests, Renovate,
+`knip`). The agent’s head is already smaller after U1a; U1b may shrink
+`AGENTS.md` further from clone notes.
 
 The factory gets **safer first**, then **cheaper to operate**. It does not
 get dramatically faster at shipping a screen. Mailbox round-trips stay.
@@ -109,18 +114,20 @@ U0 leftovers + U-zero   one sitting on factory-upgrade
 U2                      Cursor hooks, mailbox check, matcher honesty
 U3                      Skills — pulled forward 2026-08-15 (no app yet)
 U4                      lint-staged, Renovate, knip, CI — same sitting
+U1a                     always-on dedup + re-measure (done; not behind U6)
 U6                      first product clone from factory-upgrade (not main)
-U1                      thin from those notes; measure; cap
+U1b                     thin product rules from those notes; measure; cap
 U5                      secure-storage, living-spec, preflight “gate”
 U7                      optional /unslop on leftover docs (on demand)
 Merge to main           once, after the list above is done and verified
 ```
 
-U6 and U1 still wait for a real app. U3/U4 do not. Stay on
-`factory-upgrade` until this file is complete; do not merge early.
+U6 and U1b still wait for a real app. U1a does not — it is done on this
+branch. U3/U4 do not. Stay on `factory-upgrade` until this file is
+complete; do not merge early.
 
 Cloning today’s constitution is **not** expensive to undo. Instruction
-files are not welded to screens. After U1, copy the thinner files into
+files are not welded to screens. After U1b, copy the thinner files into
 the product in one commit. Extra tokens for one app are cheaper to undo
 than a paragraph you cut and later need.
 
@@ -205,28 +212,82 @@ Stay on `factory-upgrade`. Clone U6 from this branch, not from `main`.
   `preflight` on one real app, cloned from post-U2 `factory-upgrade`. Write down
   which always-on rules actually fired.
 - **Why:** This factory has never produced a product. Every claim about
-  which rules earn their keep is inference. U1 without that is guessing.
+  which rules earn their keep is inference. U1b without that is guessing.
 - **How:** Separate repo or folder. Do not thin the template first.
-- **Benefits:** A list of hit vs never-hit rules. That list is U1’s input.
+- **Benefits:** A list of hit vs never-hit rules. That list is U1b’s input.
 - **Risks:** Temporary extra always-on tokens during the first build.
   Not lock-in.
 
-### U1 — Context budget (after U6 notes)
+### U1a — Always-on dedup (done 2026-08-15)
 
-- **What:** Move unused procedure out of always-on files. Keep what the
-  clone actually hit. Cap repo always-on **bytes/tokens** from the
-  post-thin measurement. Glob-scoped hygiene rule.
+- **What:** Move mailbox write/review procedure out of always-on files.
+  Stub Cursor’s implementation-workflow. Point `runner.md` at
+  `AGENTS.md` Ask-before instead of restating it. Re-measure. Glob-scope
+  the user Maestro hygiene rule (machine, not this repo).
+- **Why:** Several files restated `AGENTS.md`. Cursor loaded Claude’s
+  review protocol every turn. That is procedure, not a constraint.
+- **How:** Skills (`mailbox`, `write-mailbox-task`, `review-cursor`,
+  `pull-design`). Do not thin `AGENTS.md` product/design rules. Do not
+  change hooks, `eslint.config.js`, or the mailbox file format.
+- **Done when:** before/after counts exist in this file; one mailbox
+  write + Cursor pickup + review already proved (Phases 2–3).
+- **Benefits:** Fewer always-on tokens on every turn.
+- **Risks:** Over-thinning product rules — that is U1b, not this.
+
+Skills and `docs/recipes/` are not always-on.
+
+#### Before / after
+
+Phase 0 baseline was line counts only. After is `wc -l` / `wc -c` on
+2026-08-15. Rough tokens = bytes ÷ 4.
+
+| Path | Who | Before (lines) | After (lines) | After bytes | After tokens | Always-on after? |
+| --- | --- | ---: | ---: | ---: | ---: | --- |
+| `AGENTS.md` | both | 334 | 304 | 14646 | ~3662 | yes |
+| `CLAUDE.md` | Claude | 194 | 43 | 1732 | ~433 | yes (Claude) |
+| `.cursor/rules/implementation-workflow.mdc` | Cursor | 97 | 14 | 514 | ~129 | yes (Cursor) |
+| `.cursor/rules/cursor-sandbox.mdc` | Cursor | 21 | 21 | 739 | ~185 | yes (Cursor) |
+| `.claude/agents/runner.md` | Claude runner | restated Ask-before | 20 | 1032 | ~258 | when runner is used |
+| `~/.cursor/rules/maestro-e2e-hygiene.mdc` | Cursor (user) | 39 (always-on) | 40 | 1332 | ~333 | no — glob-scoped |
+| `~/.cursor/rules/delegate-to-cheaper-model.mdc` | Cursor (user) | 40 | 40 | 1793 | ~448 | yes (machine) |
+| `~/.cursor/rules/beginner-step-by-step.mdc` | Cursor (user) | (not in Phase 0 list) | 27 | 1243 | ~311 | yes (machine) |
+
+Repo always-on after U1a: Cursor `AGENTS.md` + implementation-workflow +
+sandbox = 15899 bytes ≈ **4.0k** tokens. Claude `AGENTS.md` +
+`CLAUDE.md` = 16378 bytes ≈ **4.1k** tokens.
+
+User always-on (outside repo; count `beginner-step-by-step` once):
+delegate + beginner = 3036 bytes ≈ **0.8k** tokens. A second identical
+copy lives at `~/Development/.cursor/rules/beginner-step-by-step.mdc`
+(27 / 1243). Maestro hygiene is glob-scoped (`alwaysApply: false`;
+globs `**/*maestro*,**/test-e2e.sh`) and is not in that total.
+
+No token cap yet. That is U1b after a real app.
+
+#### Repeat map
+
+| Path | Who loads it | Disposition |
+| --- | --- | --- |
+| `AGENTS.md` | both, every turn | keep (product/design authority; U1b may thin after U6) |
+| `CLAUDE.md` | Claude only | keep (role split; points at skills) |
+| `.cursor/rules/implementation-workflow.mdc` | Cursor, every turn | pointer / stub → `mailbox` skill |
+| `.cursor/rules/cursor-sandbox.mdc` | Cursor, every turn | keep |
+| `.claude/agents/runner.md` | Claude, when runner is used | pointer → `AGENTS.md` Ask-before |
+| `.cursor/skills/` + `.claude/skills/` | on demand | skill |
+| `docs/recipes/` | human / skill pointer | not always-on |
+| `~/.cursor/rules/maestro-e2e-hygiene.mdc` | Cursor, Maestro / e2e files | keep, glob-scoped |
+| `~/.cursor/rules/delegate-to-cheaper-model.mdc` | Cursor, every turn | keep (machine, not repo) |
+| `~/.cursor/rules/beginner-step-by-step.mdc` | Cursor, every turn | keep (machine, not repo) |
+
+### U1b — Product-rule thin (after U6 notes)
+
+- **What:** Move unused *product* procedure out of always-on files.
+  Keep what the clone actually hit. Cap repo always-on **bytes/tokens**
+  from the post-thin measurement.
 - **Why:** Extra rules compete with the open file. Cap lines reward long
-  lines. A cap set before measuring fights itself (`AGENTS.md` is already
-  314 lines).
-- **How:** Dedup map first (several files restate `AGENTS.md`;
-  `.claude/agents/runner.md` drops Ask-before items). Move text into
-  Skills / `CLAUDE.md` only. Shrink
-  `implementation-workflow.mdc` to a short stub. Do not load full Claude
-  review protocol on every Cursor turn. Prove one mailbox handoff after
-  the thin. While `AGENTS.md` is open: one line so **source code is not
-  ranked below `docs/build-status.md`** after ship. User-level rules
-  stay a separate budget in `~/.cursor/rules`.
+  lines. A cap set before measuring fights itself.
+- **How:** Thin from U6 hit vs never-hit notes. Do not guess. User-level
+  rules stay a separate budget in `~/.cursor/rules`.
 - **Benefits:** Cheaper turns; clones inherit a thinner constitution.
 - **Risks:** Over-thinning. Mitigate with the clone notes, not a guess.
 
@@ -271,12 +332,13 @@ Stay on `factory-upgrade`. Clone U6 from this branch, not from `main`.
   `docs/CAPABILITIES.md` as inventory.
 - **Risks:** A seam with no callers looks unused. That is acceptable.
 
-### U7 — Optional unslop (after U1, not instead)
+### U7 — Optional unslop (after U1b, not instead)
 
 - **What:** One on-demand `/unslop` pass on leftover README / recipes.
   Skip hooks and the mailbox template unless you read every line.
-- **Why:** Style is not volume. U1 decides what is always-on. Unslop
-  decides how leftover sentences sound.
+- **Why:** Style is not volume. U1a already moved procedure out of
+  always-on. U1b decides which product rules stay. Unslop decides how
+  leftover sentences sound.
 - **How:** Do **not** install as always-apply. Do not “add soul” on
   agent contracts.
 - **Risks:** A whole-repo rewrite of `AGENTS.md` can drop a load-bearing
@@ -295,7 +357,7 @@ Stay on `factory-upgrade`. Clone U6 from this branch, not from `main`.
 | Cursor `beforeReadFile` / `preToolUse` | Secret / identity pauses |
 | Mailbox JSON + Premises check | Stop-the-line, machine-enforced |
 | `.cursor/skills/` (names above) | On-demand procedures |
-| Context-budget script (U1, after measure) | Repo always-on size cap |
+| Context-budget script (U1b, after measure) | Repo always-on size cap |
 | Glob-scoped instruction-hygiene `.mdc` | Only when editing those files |
 | `lint-staged` | Fast pre-commit |
 | Renovate + Expo freeze | SDK drift |
@@ -335,7 +397,10 @@ allowlist rows that rewrite the matcher.
 - [x] U2 — Cursor hooks, mailbox check, matcher honesty
 - [ ] Merge `factory-upgrade` to `main` (once, after this list is verified)
 - [ ] U6 — first product clone (separate repo; not a template commit)
-- [ ] U1 — thin from clone notes; measure; cap
+- [x] U1a — always-on dedup + re-measure (mailbox/review in skills;
+      implementation-workflow stub; runner Ask-before pointer;
+      user Maestro hygiene glob-scoped). Before/after in this file.
+- [ ] U1b — thin product rules from U6 clone notes; measure; cap
 - [x] U3 — skills (`.cursor/skills/` mailbox, compile-specs,
       pull-design, store-preflight, maestro-e2e; `PURCHASES_MODE`
       standalone in `docs/recipes/compile-specs.md`; pointers in
