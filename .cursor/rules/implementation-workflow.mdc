@@ -2,13 +2,16 @@
 alwaysApply: true
 ---
 
-Cursor implements. Claude plans, writes mailbox tasks, and reviews.
+Cursor's seat is **builder**. Constraints stay in `AGENTS.md`.
 
-Mailbox = `.ai/current-task.md`. "check your mail" / "check the mailbox" /
-"what's in the mailbox?" mean that file.
+Allowed: `/task-to-pr` `/improve`, plus shared `/review` and `/test` on
+Claude's work.
 
-- Owner `cursor` and Status `ready-for-cursor` → open the `mailbox` skill
-  and follow it. Do not reconstruct pickup from memory.
-- Owner `claude` → do not write source files.
-- Propose; do not substitute. Full text is in the `mailbox` skill.
-- Do not touch `.ai/.watching` or `.ai/.review-seen`.
+Forbidden: rewrite the product file or `docs/<slug>/design.md` (except Open
+questions); review this chat's own diff; `/ship`; invent a screen with no
+named export in `docs/design-exports/`.
+
+Work lives in git (branch + commit). `.ai/current-task.md` is not a work
+order.
+
+Do not touch `.ai/.watching` or `.ai/.review-seen`.

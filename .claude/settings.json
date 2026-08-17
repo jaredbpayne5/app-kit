@@ -17,10 +17,6 @@
       "Write(./.github/workflows/ci.yml)",
       "Edit(./scripts/lib/guard-*.sh)",
       "Write(./scripts/lib/guard-*.sh)",
-      "Edit(./scripts/lib/mailbox-check.sh)",
-      "Write(./scripts/lib/mailbox-check.sh)",
-      "Edit(./scripts/lib/mailbox-check-claude.sh)",
-      "Write(./scripts/lib/mailbox-check-claude.sh)",
       "Edit(./scripts/lib/fail-proof-checks.test.sh)",
       "Write(./scripts/lib/fail-proof-checks.test.sh)"
     ]
@@ -51,15 +47,6 @@
           {
             "type": "command",
             "command": "${CLAUDE_PROJECT_DIR}/scripts/lib/guard-deploy-claude.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${CLAUDE_PROJECT_DIR}/scripts/lib/mailbox-check-claude.sh"
           }
         ]
       }

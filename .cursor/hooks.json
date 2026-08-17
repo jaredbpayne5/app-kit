@@ -28,10 +28,6 @@
       {
         "command": "bash .cursor/hooks/guard-protected-files.sh",
         "matcher": "Write|StrReplace|Delete"
-      },
-      {
-        "command": "bash .cursor/hooks/guard-mailbox.sh",
-        "matcher": "Write|StrReplace|Delete"
       }
     ],
     "beforeReadFile": [

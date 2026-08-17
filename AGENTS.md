@@ -3,8 +3,9 @@
 Shared rules for every agent in this repo. Cursor reads this file natively;
 `CLAUDE.md` imports it.
 
-Agent roles and the handoff between them live in `CLAUDE.md` and
-`.cursor/rules/` — never overriding this file, and never restating it.
+A **role** is the hat for the whole chat. `/` means run that **skill** (a
+playbook). Seats are fixed: Claude is thinker, Cursor is builder. Both may
+`/review` and `/test` the other's work. The agent picks the next allowed skill.
 
 ## What this is
 
@@ -20,100 +21,78 @@ Google Play, and a marketing lander. Cloned per app.
 RevenueCat. If a feature needs accounts or server-side sync, stop and discuss
 it rather than adding a backend.
 
-## Authority hierarchy
+## Roles
+
+| Role | Seat | Allowed skills | Forbidden |
+| --- | --- | --- | --- |
+| **thinker** | Claude Code | `/product` `/design` `/design-review` `/plan` `/harden` `/as-built` | App code. `/task-to-pr`. `/improve`. Submit, pay, publish. |
+| **builder** | Cursor | `/task-to-pr` `/improve` | Rewrite the product file or `docs/<slug>/design.md` (except Open questions). `/ship`. Invent a screen with no named export. |
+| **shipper** | Matt opens this on purpose | `/ship` only | Feature work. Redesigning the product. Auto-start from the pager. |
+
+**Shared** (either seat): `/review` `/test`. Use them on the *other* agent's
+work. A chat must not review or rubber-stamp what it just wrote. The pager
+never starts shipper.
+
+## Authority
 
 When sources disagree, this is the order:
 
-1. **This file** — repo invariants: no backend, the `lib/` seams, the "Ask
-   before" list, security. These outrank the product spec. A PRD that needs
+1. **This file** — no backend, the `lib/` seams, the "Ask before" list,
+   security, roles. These outrank the product. A product file that needs
    accounts or server-side sync means *stop and discuss*, not implement.
-2. `docs/PRD.md` — what the product must do, and why.
-3. `docs/design-spec.md` plus the design artifact it points at — the approved
-   UX/UI.
-4. `docs/build-spec.md` — how it gets built: phases, tasks, acceptance criteria.
-5. `docs/build-status.md` — current execution state.
-6. Existing source code — what is actually there today.
+2. `docs/PRD.md` — what the product must do, and why. Filled by `/product`.
+3. A named export in `docs/design-exports/` — the approved UX/UI.
+4. `docs/<slug>/design.md` — how we build it (storage, purchases, failures).
+   Written by `/design`.
+5. Existing source code — what is actually there today.
 
-After the first store ship, the running source is the living spec for
-what the app actually does. A post-ship fix that disagrees with
-`docs/build-spec.md` or `docs/build-status.md` updates those docs to
-match the code. Do not revert a correct fix to satisfy a stale
-checklist. Items 2–5 above govern *building* the first version; they
-do not outrank working code after launch.
-
-`.ai/current-task.md` is not in this hierarchy. It is agent-to-agent messaging
-about work already authorized by the build spec — never a source of
-requirements. If it conflicts with anything above, the file above wins and the
-task file is wrong.
+The **letter** (the work) lives in git: branch + commit. That is the product
+file, `design.md`, the task, and the code. `.ai/current-task.md` is not a
+source of requirements.
 
 Never silently override a higher authority. If the conflict is material, stop
-and report it. If it is a minor implementation detail, make the smallest change
-that preserves the higher-level requirement and record it under **Deviations**
-in `docs/build-status.md`.
+and report it. If it is a minor implementation detail, make the smallest
+change that preserves the higher-level requirement.
 
-## Product & design reference
+After the first store ship, the running source is the living spec for what
+the app actually does. Do not revert a correct fix to satisfy a stale doc.
 
-Build order for a product clone: finish `docs/PRD.md` (the only repo file
-given to the design tool), generate the design system and flows in the design
-tool, export artifacts into `docs/design-exports/`, then one strong-model pass
-using the master prompt in `docs/recipes/compile-specs.md` fills
-`docs/design-spec.md` + `docs/moonchild.md` + `docs/screens-status.md` +
-`docs/build-spec.md` and initializes `docs/build-status.md`. Implement from
-the build spec. Full loop: `docs/recipes/product-pipeline.md`.
+If `docs/PRD.md` still contains `<!-- TEMPLATE_PLACEHOLDER -->`, stop. Do not
+invent an MVP, design system, screen list, or build plan.
+
+## First-app path
+
+1. Thinker `/product` until the product file is filled. Pager idle.
+2. Matt takes that file to a UI/UX tool. Drops exports in
+   `docs/design-exports/`.
+3. New thinker chat → `/design` (how we build it). Cites export frames.
+   No app code.
+4. New thinker chat → `/design-review` then `/plan`. If solid, commit task 1.
+5. Builder `/task-to-pr` + `/test`. One task. Named frame. Commit.
+6. The other seat `/review` (and `/test` if needed) on
+   `git diff main...branch`. Approve → next task. Revise → builder. Deny →
+   stop.
+7. After the last feature: thinker `/harden`. Then Matt opens shipper →
+   `/ship`.
 
 There is **no** `docs/design-brief.md`. Kickoff prompts for the design tool
-stay outside the repo (chat paste only).
+stay outside the repo (chat paste only). Moonchild is optional. Exports in
+`docs/design-exports/` are first-class.
 
-- `docs/PRD.md` — authoritative for *what* to build. If a request goes beyond
-  it, flag rather than expanding scope.
-- `docs/design-spec.md` — the approved UX/UI as prose. Compiled **once** by a
-  strong model from the PRD + committed (or MCP-pullable) design artifacts —
-  a faithful transcription, not a redesign. Authoritative for design intent,
-  states, and accessibility. After it exists, agents must not invent or extend
-  it; if something needed is missing, stop and tell the user.
-- `docs/moonchild.md` — the design tool of record for this clone, project ids,
-  and/or paths to committed exports. Unfilled means no design source is linked.
-- `docs/screens-status.md` — design inventory for this product. Treat
-  **Designed** = `yes` as fact. Do not infer design readiness from memory or a
-  vague MCP reply alone.
-- `docs/build-spec.md` — phases, tasks, and acceptance criteria. Compiled once
-  from the PRD + design spec + repo. Authoritative for *how* it gets built.
-- `docs/build-status.md` — phase checklist and session handoff. Read it at
-  the start of every session before doing anything else. Update Current
-  status and Where we left off before ending a session, or whenever a phase
-  (or meaningful chunk) is completed.
+## Design system & screens
 
-If any of these files still contains `<!-- TEMPLATE_PLACEHOLDER -->`, stop
-and tell the user. Do not invent an MVP, design system, screen list, or build
-plan.
+An external design tool owns the structured design system (color roles, type
+scale, spacing) and screen/flow layouts. The PRD is the only repo file given
+to that tool. Repo token files (`apps/mobile/global.css`, `ui/`) are the
+downstream sync for NativeWind — see Stack below.
 
-Two carve-outs, both narrow:
+A frame beats prose. `design.md` is not a substitute for the export.
 
-1. The one-time strong-model **compile** pass that creates `design-spec.md` /
-   `build-spec.md` / inventory docs from PRD + exports may clear those
-   placeholders as it writes them.
-2. Reading and ticking the **Phase 0–1 checklist** in `docs/build-status.md`
-   while its own sentinel is still present is allowed — that is the bootstrap
-   path described under Task loop below, not a licence to invent content.
-
-What stays forbidden in both cases: inventing product scope, screens, design
-tokens, or a build plan that the PRD and design exports do not support.
-
-## Design system & design tool
-
-An external design tool — recorded in `docs/moonchild.md` — owns the
-**structured** design system (color roles, type scale, spacing) and
-screen/flow layouts. The PRD is the only repo input to that tool. Repo token
-files (`apps/mobile/global.css`, `ui/`) are the downstream sync of that system
-for NativeWind — see Stack below.
-
-`docs/design-spec.md` is the design *authority* in prose. It is not a
-substitute for the artifact: prose is lossy next to a frame.
-
-No new screen layout without the `pull-design` skill. If the pull fails,
-stop — do not invent a layout. Non-UI work (storage, purchases, copy) and
-edits to already-built screens that only use already-synced tokens are
-allowed without a new pull — still no new freehand layouts or new screens.
+No new screen layout without the `pull-design` skill and a named export in
+`docs/design-exports/`. If the pull fails, stop — do not invent a layout.
+Non-UI work (storage, purchases, copy) and edits to already-built screens
+that only use already-synced tokens are allowed without a new pull — still
+no new freehand layouts or new screens.
 
 ## Stack
 
@@ -229,38 +208,18 @@ npm run session:down -- --watch   # same + re-kill for ~20s if agents relaunch
 npm run session:status            # what's still running
 ```
 
-## Task loop
+## How to work
 
-At session start, read `docs/build-status.md` before anything else.
-
-Then:
-
-1. A mailbox task (`.ai/current-task.md`) is the unit of work. Implement **that
-   task only** — never also pull the next `docs/build-spec.md` row, and a small
-   change requested in chat is not a build-spec row. Pickup, reporting, and
-   signalling mechanics belong to each agent: `CLAUDE.md`, `.cursor/rules/`.
-2. Run the checks the task names (see Verify below). Compiling is not passing.
-3. Product mode: update `docs/build-status.md` on completion.
-4. Do not start the next build-spec task until the current mailbox task is
-   approved.
-
-Before `docs/build-spec.md` exists (Phase 0–1 — compiling specs from PRD +
-design exports), work from `docs/build-status.md`’s phase checklist instead.
-That is the one case where a missing build spec is not a stop.
-
-Work on this template repo itself — hardening the scaffolding rather than
-building a product in a clone — is not product work, and this loop does not
-apply to it. Its backlog lives outside `docs/`. Do not fill in placeholders,
-and do not record template work in `docs/build-status.md`; those files ship
-blank to every clone. The sentinel rule above still stands for product work.
+One skill outcome at a time. Do not also start the next task. A small change
+requested in chat is not a planned task.
 
 No unrelated refactors mid-task, and no reformatting untouched files. Reuse
 existing `ui/` primitives, `lib/` seams, components, and dependencies before
 adding anything new. Do not ask the user for information already in the repo.
 
 On completion, report what changed, what was verified, any deviations, and
-the next task. If blocked, name the specific blocker and the decision or
-information needed to clear it.
+the next allowed skill. If blocked, name the specific blocker and the
+decision or information needed to clear it.
 
 ## Verify
 
@@ -270,16 +229,17 @@ considering work done. `npm run test:e2e` drives Maestro against a simulator.
 
 ## On-demand procedures
 
-Skills load when relevant: `.cursor/skills/` (Cursor) and `.claude/skills/`
-(Claude). Recipes in `docs/recipes/` are the human source — do not paste
-them into always-on files.
+Skills load when relevant. Recipes in `docs/recipes/` are the human source —
+do not paste them into always-on files.
 
-- Mailbox pickup (Cursor) — `mailbox`
-- Write mailbox task (Claude) — `write-mailbox-task`
-- Review Cursor (Claude) — `review-cursor`
-- Compile specs (once, strong model) — `compile-specs`
-- Pull a screen artifact (Cursor) — `pull-design`
-- Store gate (`npm run preflight`) — `store-preflight`
+Thinker and builder playbooks are the role allow-list above. Until those
+shared files exist, do not invent a missing skill and do not fall back to
+mailbox pickup.
+
+Still on disk and still valid:
+
+- Pull a screen artifact (builder) — `pull-design`
+- Store gate (`npm run preflight`) — `store-preflight` (until `/ship` exists)
 - Maestro e2e — `maestro-e2e`
 
 ## Delegate to a cheaper model
@@ -301,4 +261,5 @@ trade-off. Escalate back to the stronger model mid-task when:
 - requirements conflict, or a higher authority contradicts a lower one
 - an architecture decision has to be made rather than followed
 - debugging is genuinely difficult
-- implementation reveals a real problem in the PRD, design spec, or build spec
+- implementation reveals a real problem in the product file, a named export,
+  or `design.md`

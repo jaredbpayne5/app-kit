@@ -7,8 +7,8 @@ The factory upgrade shipped to `main` on 2026-08-15 (fast-forward from
 `factory-upgrade`, tip `6697ff5`). U0, U-zero, U2, U3, U4, U5, and U1a
 are done. Do not redo them.
 
-Local grades stay in gitignored `REPO-EVALUATION.md`. Template-mode
-mailbox tasks cite a section here.
+Local grades stay in gitignored `REPO-EVALUATION.md`. The reshape in
+`RESHAPE.md` replaces mailbox as the handoff.
 
 **Status:** on `main`. Remaining work waits for a real app (U6), then a
 product-rule thin (U1b). U7 is optional.
@@ -19,8 +19,6 @@ product-rule thin (U1b). U7 is optional.
 
 - **Always-on** — instructions an AI loads on every turn. Tokens here
   compete with the file it should be editing.
-- **Mailbox** — `.ai/current-task.md` plus `.ai/mailbox-state.json`.
-  Do not change that file format.
 
 Do **not** implement the leftovers as one task.
 
@@ -31,7 +29,8 @@ Do **not** implement the leftovers as one task.
 These constraints still apply to leftover work:
 
 - Thin `AGENTS.md` product/design rules before a first clone (U6).
-- Change the mailbox file format.
+  Reshape Pass 2 already removed the six-doc chain and mailbox loop;
+  U1b is a later measurement pass, not a license to put those back.
 - Install full pstack, or unslop as always-on.
 - Put Maestro in default CI.
 - Add a second ticket system (Taskmaster, Beads, Spec Kit, Conductor).
@@ -122,7 +121,7 @@ delegate + beginner ≈ **0.8k**. A second identical copy lives at
 | --- | --- | --- |
 | `AGENTS.md` | both, every turn | keep until U1b notes say otherwise |
 | `CLAUDE.md` | Claude only | keep (role split; points at skills) |
-| `.cursor/rules/implementation-workflow.mdc` | Cursor, every turn | pointer → `mailbox` skill |
+| `.cursor/rules/implementation-workflow.mdc` | Cursor, every turn | builder allow-list (Pass 2) |
 | `.cursor/rules/cursor-sandbox.mdc` | Cursor, every turn | keep |
 | `.claude/agents/runner.md` | Claude, when runner is used | pointer → `AGENTS.md` Ask-before |
 | `.cursor/skills/` + `.claude/skills/` | on demand | skill |

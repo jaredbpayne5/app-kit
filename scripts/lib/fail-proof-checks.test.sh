@@ -84,8 +84,7 @@ fi
 echo "=== design-lint empty scan / planted miss ==="
 empty_dir=$(mktemp -d)
 planted_dir=$(mktemp -d)
-mb_dir=$(mktemp -d)
-cleanup() { rm -rf "$empty_dir" "$planted_dir" "$mb_dir"; }
+cleanup() { rm -rf "$empty_dir" "$planted_dir"; }
 trap cleanup EXIT
 
 empty_out=$(DESIGN_LINT_APP_DIR="$empty_dir" bash "$ROOT/scripts/dev/design-lint.sh" 2>&1) || empty_ec=$?
@@ -110,7 +109,6 @@ if grep -q 'Edit(./.claude/hooks/\*\*)' .claude/settings.json \
   && grep -q 'Write(./.claude/hooks/\*\*)' .claude/settings.json \
   && grep -q 'Edit(./.cursor/hooks/\*\*)' .claude/settings.json \
   && grep -q 'Edit(./scripts/lib/guard-\*\.sh)' .claude/settings.json \
-  && grep -q 'Edit(./scripts/lib/mailbox-check.sh)' .claude/settings.json \
   && grep -q 'Edit(./scripts/lib/fail-proof-checks.test.sh)' .claude/settings.json \
   && grep -q 'Edit(./.githooks/\*\*)' .claude/settings.json \
   && grep -q 'Edit(./eslint.config.js)' .claude/settings.json \
@@ -319,122 +317,6 @@ if grep -q 'shellcheck-guards' package.json; then
   ok "package.json runs shellcheck-guards in check"
 else
   bad "shellcheck-guards is not in package.json"
-fi
-
-echo "=== mailbox JSON + Premises ==="
-# shellcheck source=scripts/lib/mailbox-check.sh
-source "$ROOT/scripts/lib/mailbox-check.sh"
-if mailbox_check_task "$ROOT/.ai/current-task.template.md"; then
-  ok "template mailbox (idle) passes"
-else
-  bad "template mailbox should pass"
-fi
-
-cp "$ROOT/.ai/current-task.template.md" "$mb_dir/empty-ready.md"
-# Same placeholder Premises, but claim the task is ready — must fail.
-python3 - "$mb_dir/empty-ready.md" <<'PY'
-from pathlib import Path
-import sys
-p = Path(sys.argv[1])
-text = p.read_text()
-text = text.replace("**Status:** `idle`", "**Status:** `ready-for-cursor`")
-text = text.replace("**Owner:** `none`", "**Owner:** `cursor`")
-text = text.replace("**Mode:** `none`", "**Mode:** `template`")
-p.write_text(text)
-PY
-if mailbox_check_task "$mb_dir/empty-ready.md"; then
-  bad "ready-for-cursor with placeholder Premises should fail"
-else
-  ok "ready-for-cursor with placeholder Premises fails"
-fi
-
-cp "$mb_dir/empty-ready.md" "$mb_dir/filled-ready.md"
-python3 - "$mb_dir/filled-ready.md" <<'PY'
-from pathlib import Path
-import sys
-p = Path(sys.argv[1])
-text = p.read_text()
-text = text.replace(
-    '- [ ] _(claim — e.g. "no EXIT trap exists in this script")_ — `(command)`',
-    "- [ ] guard-secrets.sh uses dash-safe grep — `(grep -n Eqe .claude/hooks/guard-secrets.sh)`",
-)
-p.write_text(text)
-PY
-if mailbox_check_task "$mb_dir/filled-ready.md"; then
-  ok "ready-for-cursor with a real Premises item passes"
-else
-  bad "ready-for-cursor with a real Premises item should pass"
-fi
-
-printf '%s\n' '{not json' >"$mb_dir/bad-state.json"
-if mailbox_check_state "$mb_dir/bad-state.json"; then
-  bad "invalid mailbox-state JSON should fail"
-else
-  ok "invalid mailbox-state JSON fails"
-fi
-
-printf '%s\n' '{"seq":1,"owner":"none","status":"idle","mode":"none","updated":"—"}' >"$mb_dir/good-state.json"
-if mailbox_check_state "$mb_dir/good-state.json"; then
-  ok "valid mailbox-state JSON passes"
-else
-  bad "valid mailbox-state JSON should pass"
-fi
-
-if command -v jq >/dev/null 2>&1; then
-  hook="$ROOT/.cursor/hooks/guard-mailbox.sh"
-  deny_body=$(cat "$mb_dir/empty-ready.md")
-  deny_out=$(jq -nc --arg c "$deny_body" '{tool_input:{path:".ai/current-task.md",contents:$c}}' | bash "$hook")
-  deny_perm=$(echo "$deny_out" | jq -r '.permission // empty')
-  if [[ "$deny_perm" == deny ]]; then
-    ok "mailbox hook denies ready-for-cursor with empty Premises"
-  else
-    bad "mailbox hook got $deny_perm (expected deny)"
-  fi
-
-  # StrReplace of a report line must validate the patched file, not the fragment.
-  mkdir -p "$mb_dir/.ai"
-  cp "$mb_dir/filled-ready.md" "$mb_dir/.ai/current-task.md"
-  python3 - "$mb_dir/.ai/current-task.md" <<'PY'
-from pathlib import Path
-import sys
-p = Path(sys.argv[1])
-text = p.read_text()
-text = text.replace("**Status:** `ready-for-cursor`", "**Status:** `in-progress`")
-p.write_text(text)
-PY
-  old='**Changed:** _(files + what changed in each)_'
-  new='**Changed:** mailbox hook reconstructs StrReplace'
-  frag_out=$(jq -nc --arg p "$mb_dir/.ai/current-task.md" --arg o "$old" --arg n "$new" \
-    '{tool_input:{path:$p,old_string:$o,new_string:$n}}' | bash "$hook")
-  frag_perm=$(echo "$frag_out" | jq -r '.permission // empty')
-  if [[ "$frag_perm" == allow ]]; then
-    ok "mailbox hook allows StrReplace of a report line on a valid task"
-  else
-    bad "mailbox hook got $frag_perm on a report StrReplace (expected allow)"
-  fi
-
-  # Same path: flipping to ready-for-cursor while Premises is still the placeholder.
-  mkdir -p "$mb_dir/empty/.ai"
-  cp "$ROOT/.ai/current-task.template.md" "$mb_dir/empty/.ai/current-task.md"
-  python3 - "$mb_dir/empty/.ai/current-task.md" <<'PY'
-from pathlib import Path
-import sys
-p = Path(sys.argv[1])
-text = p.read_text()
-text = text.replace("**Owner:** `none`", "**Owner:** `cursor`")
-text = text.replace("**Mode:** `none`", "**Mode:** `template`")
-p.write_text(text)
-PY
-  bad_old='**Status:** `idle`'
-  bad_new='**Status:** `ready-for-cursor`'
-  flip_out=$(jq -nc --arg p "$mb_dir/empty/.ai/current-task.md" --arg o "$bad_old" --arg n "$bad_new" \
-    '{tool_input:{path:$p,old_string:$o,new_string:$n}}' | bash "$hook")
-  flip_perm=$(echo "$flip_out" | jq -r '.permission // empty')
-  if [[ "$flip_perm" == deny ]]; then
-    ok "mailbox hook denies StrReplace that makes ready-for-cursor with empty Premises"
-  else
-    bad "mailbox hook got $flip_perm on empty-Premises status flip (expected deny)"
-  fi
 fi
 
 echo

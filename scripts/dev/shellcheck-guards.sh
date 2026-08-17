@@ -16,8 +16,6 @@ files=(
   scripts/lib/guard-deploy-match.test.sh
   scripts/lib/guard-sensitive-paths.sh
   scripts/lib/guard-sensitive-writes-claude.sh
-  scripts/lib/mailbox-check.sh
-  scripts/lib/mailbox-check-claude.sh
   scripts/lib/guard-deploy-claude.sh
   scripts/lib/fail-proof-checks.test.sh
   scripts/dev/shellcheck-guards.sh
@@ -25,7 +23,6 @@ files=(
   .cursor/hooks/guard-protected-files.sh
   .cursor/hooks/guard-secret-files.sh
   .cursor/hooks/guard-identity-writes.sh
-  .cursor/hooks/guard-mailbox.sh
   .cursor/hooks/wait-for-mail.sh
   .claude/hooks/guard-secrets.sh
   .claude/hooks/guard-deploy.sh

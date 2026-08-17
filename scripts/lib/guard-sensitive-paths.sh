@@ -55,7 +55,7 @@ guard_path_class() {
   printf 'allow'
 }
 
-# Factory net: hooks, shared matchers, mailbox check, eslint, githooks, CI.
+# Factory net: hooks, shared matchers, eslint, githooks, CI.
 # Keep in sync with .claude/settings.json permissions.deny.
 guard_is_protected() {
   local rel="$1"
@@ -68,8 +68,6 @@ guard_is_protected() {
     eslint.config.js | */eslint.config.js) return 0 ;;
     .github/workflows/ci.yml | */.github/workflows/ci.yml) return 0 ;;
     scripts/lib/guard-*.sh | */scripts/lib/guard-*.sh) return 0 ;;
-    scripts/lib/mailbox-check.sh | */scripts/lib/mailbox-check.sh) return 0 ;;
-    scripts/lib/mailbox-check-claude.sh | */scripts/lib/mailbox-check-claude.sh) return 0 ;;
     scripts/lib/fail-proof-checks.test.sh | */scripts/lib/fail-proof-checks.test.sh) return 0 ;;
   esac
   return 1
@@ -80,7 +78,7 @@ guard_is_protected() {
 # chmod, or every bash -c wrapper.
 guard_command_writes_protected() {
   local command="$1"
-  local pat='(\.claude/hooks/|\.claude/settings\.json|\.cursor/hooks|\.githooks/|eslint\.config\.js|\.github/workflows/ci\.yml|scripts/lib/guard-|scripts/lib/mailbox-check|scripts/lib/fail-proof-checks\.test\.sh)'
+  local pat='(\.claude/hooks/|\.claude/settings\.json|\.cursor/hooks|\.githooks/|eslint\.config\.js|\.github/workflows/ci\.yml|scripts/lib/guard-|scripts/lib/fail-proof-checks\.test\.sh)'
   if echo "$command" | grep -Eqe "\\brm\\b[^;&|]*${pat}"; then
     return 0
   fi
