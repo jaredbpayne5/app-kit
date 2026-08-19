@@ -175,11 +175,11 @@ else
   echo "design-lint: every top-level screen references safe-area insets"
 fi
 
-# --- 6. New routes while the design inventory is still a placeholder ---------
-# Catches *new route files* under apps/mobile/app/ while screens-status.md
-# still carries its sentinel. Does not catch a freehand redesign of an
-# existing screen. The template ships the sentinel plus the 8 routes below;
-# fail only when a file appears that is not in this list. Update the list if
+# --- 6. New routes while the product is still a placeholder ------------------
+# Catches *new route files* under apps/mobile/app/ while docs/PRD.md still
+# carries its sentinel. Does not catch a freehand redesign of an existing
+# screen. The template ships the sentinel plus the 8 routes below; fail
+# only when a file appears that is not in this list. Update the list if
 # the template itself gains a route, or this check fires on the template.
 TEMPLATE_ROUTE_BASELINE=(
   'apps/mobile/app/_layout.tsx'
@@ -192,7 +192,7 @@ TEMPLATE_ROUTE_BASELINE=(
   'apps/mobile/app/(tabs)/settings.tsx'
 )
 NEW_ROUTES=""
-if grep -q '<!-- TEMPLATE_PLACEHOLDER -->' docs/screens-status.md 2>/dev/null; then
+if grep -q '<!-- TEMPLATE_PLACEHOLDER -->' docs/PRD.md 2>/dev/null; then
   while IFS= read -r f; do
     [[ -f "$f" ]] || continue
     is_baseline=0
@@ -208,14 +208,14 @@ if grep -q '<!-- TEMPLATE_PLACEHOLDER -->' docs/screens-status.md 2>/dev/null; t
   done < <(find "$APP_DIR" -type f -name '*.tsx' 2>/dev/null | sort)
 fi
 if [[ -n "$NEW_ROUTES" ]]; then
-  echo "design-lint: new route file(s) under apps/mobile/app/ while docs/screens-status.md still has its TEMPLATE_PLACEHOLDER sentinel:"
+  echo "design-lint: new route file(s) under apps/mobile/app/ while docs/PRD.md still has its TEMPLATE_PLACEHOLDER sentinel:"
   printf '%s' "$NEW_ROUTES"
-  echo "  Fill docs/screens-status.md (Designed = yes + artifact) and remove the sentinel before building the screen."
+  echo "  Fill docs/PRD.md and add a named export in docs/design-exports/ before building the screen."
   FAIL=1
 elif [[ "${ROUTE_FILE_COUNT:-0}" -eq 0 ]]; then
   : # empty-scan failure already printed
 else
-  echo "design-lint: no new route files while the screens-status sentinel is present"
+  echo "design-lint: no new route files while the PRD sentinel is present"
 fi
 
 # --- 7. Inline style={{}} without an explicit native-required marker ---------

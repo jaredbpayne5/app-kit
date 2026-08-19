@@ -162,6 +162,5 @@ dark-mode tokens — it checks both themes.
 
 ## Related
 
-- Product pipeline: `docs/recipes/product-pipeline.md`
 - Brand assets / icon generation: `docs/recipes/brand-assets.md`
-- Agent rules (Moonchild SSOT): `AGENTS.md`
+- Agent rules: `AGENTS.md`

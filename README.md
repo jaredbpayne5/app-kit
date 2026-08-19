@@ -14,15 +14,17 @@ Play, and a marketing lander. No backend, no accounts, no server bill.
 ## Requirements
 
 - **Node ≥ 24** — matches `.nvmrc` and `package.json` `engines` (`>=24.0.0`).
-- **`jq`** — `brew install jq`. All three `.claude/hooks` scripts fail closed
-  without it, which makes Claude Code non-functional in this repo.
+- **`jq`** — `brew install jq`. Claude and Cursor guard hooks fail closed
+  without it.
 
 ## Starting a new app
 
+v1 is one complete app: one PRD, one design, one critic, one plan, then
+jobs. Matt is the doorbell. Paste one line into the right app.
+
 1. Copy this repo to a new folder and `npm install`.
-2. Set identity with one command (keeps the four surfaces in sync — see
-   `docs/recipes/product-pipeline.md`). Copy `.env.example` to `.env.local`
-   first if you have not already:
+2. Set identity with one command (keeps the four surfaces in sync). Copy
+   `.env.example` to `.env.local` first if you have not already:
 
    ```bash
    npm run init-app -- --name "My App" --slug my-app --package com.yourname.myapp
@@ -34,14 +36,16 @@ Play, and a marketing lander. No backend, no accounts, no server bill.
    Bundle identifiers are permanent once you upload to a store.
 
 3. `npm run doctor` to check your toolchain.
-4. Follow the product pipeline (`docs/recipes/product-pipeline.md`):
-   1. `init-app` (identity)
-   2. Write `docs/PRD.md` (strong model)
-   3. Generate UI in Moonchild from the PRD; drop exports in `docs/design-exports/`
-   4. Compile specs (`docs/recipes/compile-specs.md` master prompt)
-   5. Human skim: delete anything the compile pass invented
-   6. Strong model assigns one mailbox task; Composer implements; strong model reviews
-   7. Repeat until the build spec is done, then `npm run verify` and `npm run preflight`
+4. Build the product (one PRD, one design, one critic, one plan, then jobs):
+   1. Claude: `/product` — fills `docs/PRD.md`
+   2. Matt: drop screen pictures in `docs/design-exports/`
+   3. Claude, new chat: `/design` — writes `docs/design.md`
+   4. Cursor, new chat: `/critic` — writes `docs/critic.md`
+   5. On FAIL: new Claude chat fixes the design; Cursor critic again
+   6. After PASS and Matt agrees: Claude, new chat: `/plan` — writes `docs/plan.md`
+   7. Cursor: `/code next job` (`code → test → improve → test`)
+   8. Claude, new chat: `/review job N` — checks the box on PASS
+   9. Repeat 7–8 until the plan is done, then `npm run verify` and `npm run preflight`
 5. `npm run dev` and press `i` for the iOS Simulator or `a` for Android.
    Prefer a development build (`npm run dev:build:ios` /
    `dev:build:android`) once you add native modules.

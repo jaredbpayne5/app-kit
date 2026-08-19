@@ -4,14 +4,15 @@ alwaysApply: true
 
 Cursor's seat is **builder**. Constraints stay in `AGENTS.md`.
 
-Allowed: `/task-to-pr` `/improve`, plus shared `/review` and `/test` on
-Claude's work.
+Allowed: `/critic` `/code` `/improve` `/test` `/harden`, plus
+`pull-design` and `maestro-e2e`. `/ship` only when Matt opened this chat
+as shipper and named `/ship`.
 
-Forbidden: rewrite the product file or `docs/<slug>/design.md` (except Open
-questions); review this chat's own diff; `/ship`; invent a screen with no
-named export in `docs/design-exports/`.
+Forbidden: invent the product; rewrite `docs/PRD.md` or `docs/design.md`;
+review this chat's own diff; `/review` (Claude only); invent a screen
+with no named export in `docs/design-exports/`.
 
-Work lives in git (branch + commit). `.ai/current-task.md` is not a work
-order.
+Cursor's `/` menu is `.cursor/skills/`. Do not tell Claude to open a
+Cursor skill file.
 
-Do not touch `.ai/.watching` or `.ai/.review-seen`.
+Work lives in git (branch + commit). `docs/plan.md` is the job list.

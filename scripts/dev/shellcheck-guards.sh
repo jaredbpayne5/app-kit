@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Run shellcheck on guard / hook scripts. Missing binary: fail, including on
 # CI. The workflow installs shellcheck before npm run check.
+#
+# Glob hook and guard directories. Do not list individual hook files by
+# hand — a deleted waiter must not stay on a list and keep check green.
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -11,29 +14,19 @@ if ! command -v shellcheck >/dev/null 2>&1; then
   exit 1
 fi
 
+shopt -s nullglob
 files=(
-  scripts/lib/guard-deploy-match.sh
-  scripts/lib/guard-deploy-match.test.sh
-  scripts/lib/guard-sensitive-paths.sh
-  scripts/lib/guard-sensitive-writes-claude.sh
-  scripts/lib/guard-deploy-claude.sh
-  scripts/lib/fail-proof-checks.test.sh
-  scripts/dev/shellcheck-guards.sh
-  .cursor/hooks/guard-shell.sh
-  .cursor/hooks/guard-protected-files.sh
-  .cursor/hooks/guard-secret-files.sh
-  .cursor/hooks/guard-identity-writes.sh
-  .cursor/hooks/wait-for-mail.sh
-  .claude/hooks/guard-secrets.sh
-  .claude/hooks/guard-deploy.sh
-  .claude/hooks/guard-sensitive-writes.sh
-  .claude/hooks/wait-for-review.sh
-  .githooks/pre-commit
-  scripts/dev/knip-clone.sh
-  scripts/ci/expo-sdk-check.sh
-  scripts/ci/audit-report.sh
-  scripts/lib/u4-fail-proof.sh
+  .cursor/hooks/*.sh
+  .claude/hooks/*.sh
+  .githooks/*
+  scripts/lib/*.sh
+  scripts/ci/*.sh
 )
+
+if [[ ${#files[@]} -eq 0 ]]; then
+  echo "shellcheck-guards: glob set is empty"
+  exit 1
+fi
 
 echo "shellcheck-guards: checking ${#files[@]} files"
 if ! shellcheck -S warning "${files[@]}"; then

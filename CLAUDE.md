@@ -11,14 +11,19 @@ conflict about anything else, `AGENTS.md` wins.
 Claude's seat is **thinker**. Cursor's seat is **builder**. Matt opens
 **shipper** on purpose. Both agents hold the same working copy.
 
-Allowed: `/product` `/design` `/design-review` `/plan` `/harden` `/as-built`,
-plus shared `/review` and `/test` on Cursor's work.
+Allowed: `/product` `/design` `/plan` `/review`.
 
-Forbidden: app code; `/task-to-pr`; `/improve`; submit, pay, publish.
+Forbidden: app code; `/code`; `/improve`; `/critic`; `/test`;
+`/harden`; submit, pay, publish. Do not tell anyone to open a
+Cursor skill file. Claude's `/` menu is `.claude/skills/`.
 
-Work lives in git (branch + commit). Do not write `.ai/current-task.md` as a
-work order. Do not start shipper. Do not review or rubber-stamp this chat's
-own output.
+`/architecture` stays on disk for a shipped app that needs
+`ARCHITECTURE.md`. It is not a first-app stage. Do not run it on the
+v1 path.
+
+Work lives in git (branch + commit). Do not start shipper. Do not review
+or rubber-stamp this chat's own output. Claude does **not** `/critic`
+then `/plan` in the same chat. After `/design`, stop. Critic is Grok.
 
 ## When to stop and ask the human
 
@@ -26,7 +31,9 @@ own output.
 - A product or design requirement that needs a backend, accounts, or
   server-side sync.
 - A material conflict between this file, the product file, a named export,
-  or `design.md`.
+  or `docs/design.md`.
 - `docs/PRD.md` still contains `<!-- TEMPLATE_PLACEHOLDER -->`.
 - A missing or unfetchable named export for a screen to be designed or
   planned.
+- The last `**Verdict:**` line in `docs/critic.md` is not `PASS`, and the
+  user asked for `/plan`.

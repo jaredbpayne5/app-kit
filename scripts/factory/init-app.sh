@@ -356,7 +356,9 @@ Updated app identity:
   terms:      $TERMS_URL
 
 Next: npm run doctor
-Then follow docs/recipes/product-pipeline.md (PRD → design tool → specs → code).
+Then: Claude /product (docs/PRD.md) → pictures in docs/design-exports/ →
+Claude /design (docs/design.md) → Cursor /critic (docs/critic.md) →
+Claude /plan (docs/plan.md) → jobs.
 EOF
 if [[ -z "$COPYRIGHT_HOLDER" ]]; then
   printf 'LICENSE still has REPLACE_WITH_COPYRIGHT_HOLDER — re-run with --copyright-holder (or edit LICENSE by hand).\n'

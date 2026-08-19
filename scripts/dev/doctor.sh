@@ -162,30 +162,15 @@ else
 fi
 
 printf '\n%sproduct docs%s\n' "$BOLD" "$RESET"
-PRODUCT_DOCS=(
-  docs/PRD.md
-  docs/design-spec.md
-  docs/screens-status.md
-  docs/build-spec.md
-  docs/build-status.md
-  docs/moonchild.md
-)
-product_docs_missing=0
-product_docs_placeholder=0
-for doc in "${PRODUCT_DOCS[@]}"; do
-  if [[ ! -f "$doc" ]]; then
-    bad 2 "product doc missing: $doc"
-    product_docs_missing=1
-  elif grep -q 'TEMPLATE_PLACEHOLDER' "$doc" 2>/dev/null; then
-    warn "$doc still has TEMPLATE_PLACEHOLDER — fill before building product UI"
-    product_docs_placeholder=1
-  fi
-done
-if [[ "$product_docs_missing" -eq 0 && "$product_docs_placeholder" -eq 0 ]]; then
-  ok "product docs present and placeholders cleared"
-elif [[ "$product_docs_missing" -eq 0 ]]; then
-  ok "product docs present (placeholders still template defaults — expected on a fresh clone)"
+if [[ ! -f docs/PRD.md ]]; then
+  bad 2 "product doc missing: docs/PRD.md"
+elif grep -q 'TEMPLATE_PLACEHOLDER' docs/PRD.md 2>/dev/null; then
+  warn "docs/PRD.md still has TEMPLATE_PLACEHOLDER — Claude /product before building UI"
+  ok "docs/PRD.md present (sentinel still template default — expected on a fresh clone)"
+else
+  ok "docs/PRD.md present and sentinel cleared"
 fi
+printf '  %sNext: Claude /product → pictures in docs/design-exports/ → Claude /design → Cursor /critic → Claude /plan → jobs.%s\n' "$DIM" "$RESET"
 
 printf '\n%slocal runtime%s\n' "$BOLD" "$RESET"
 ok "backend: none (local-first — no Docker / hosted BaaS checks)"

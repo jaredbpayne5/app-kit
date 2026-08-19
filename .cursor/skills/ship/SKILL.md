@@ -1,25 +1,22 @@
 ---
-name: store-preflight
-description: >-
-  Runs the store-readiness gate (npm run preflight) and the store recipes
-  before submit. Use when preparing App Store or Play submission, running
-  preflight, store:push, or filling store metadata / compliance.
+name: ship
+description: "Shipper playbook. Runs the store-readiness gate and store recipes before submit. Use when Matt opened this chat as shipper, or named /ship. Covers preflight, store metadata, compliance, and Ask-before spend commands."
+disable-model-invocation: true
 ---
 
-# Store preflight
+# Ship
 
-Store-readiness gate. Not the same numbering as `docs/build-status.md`
-phases 0–8.
+Matt opened this chat as shipper, or named `/ship`. Do not do feature work.
+Do not redesign the product. Helpers do not start this skill.
 
-## Command
+## Store gate
 
 ```bash
 npm run preflight                 # full launch gate (script --gate=6)
 npm run preflight -- --gate=4     # harden; some checks deferred
 ```
 
-`npm run store:push` runs the full gate, then submit. **Ask before**
-`store:push`, `eas build`, `eas submit`, `web:deploy`.
+`npm run store:push` runs the full gate, then submit.
 
 ## Do this
 
@@ -28,6 +25,16 @@ npm run preflight -- --gate=4     # harden; some checks deferred
 3. After editing `apps/mobile/store/data-practices.json`, run
    `npm run gen-compliance`.
 4. Run `npm run preflight`. Fix every named failure. Do not skip the gate.
+5. Stop at every Ask-before command and wait for Matt.
+
+## Ask before
+
+These cost money or are hard to undo. Do not run them unless Matt said so
+in this chat:
+
+- `eas build`, `eas submit`, `eas update`, `npx expo prebuild`
+- `web:deploy`, `store:push`, `domain-attach`
+- `git push`
 
 ## Recipes (authoritative)
 

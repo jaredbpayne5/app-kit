@@ -13,8 +13,9 @@ is removed, agents must not invent an MVP or product scope.
   separate design-brief file. Kickoff prompts for the design tool stay
   **outside the repo** (chat paste only).
 - The only repo file you give the design tool is this PRD.
-- Implementation planning belongs in `docs/build-spec.md` after design exports
-  exist. Visual authority after design is `docs/design-spec.md` + artifacts.
+- After exports land in `docs/design-exports/`, Claude writes `docs/design.md`.
+  Cursor writes `docs/critic.md`. Claude writes `docs/plan.md`. Those files
+  do not exist yet and are not authorities for this PRD.
 
 ## Problem
 

@@ -164,12 +164,20 @@ if command -v jq >/dev/null 2>&1; then
   fi
 fi
 
-echo "=== shellcheck covers the dead-grep files and cannot skip on CI ==="
+echo "=== shellcheck globs hook dirs and cannot skip on CI ==="
+if grep -q '.cursor/hooks/\*\.sh' scripts/dev/shellcheck-guards.sh \
+  && grep -q '.claude/hooks/\*\.sh' scripts/dev/shellcheck-guards.sh \
+  && grep -q '.githooks/\*' scripts/dev/shellcheck-guards.sh \
+  && grep -q 'scripts/lib/\*\.sh' scripts/dev/shellcheck-guards.sh; then
+  ok "shellcheck-guards globs hook and guard directories"
+else
+  bad "shellcheck-guards does not glob hook and guard directories"
+fi
 for f in .claude/hooks/guard-secrets.sh .githooks/pre-commit; do
-  if grep -qF "$f" scripts/dev/shellcheck-guards.sh; then
-    ok "shellcheck-guards lists $f"
+  if [[ -f "$f" ]]; then
+    ok "$f exists under a globbed hook dir"
   else
-    bad "shellcheck-guards does not list $f"
+    bad "$f is missing from a globbed hook dir"
   fi
 done
 if grep -q 'not installed on CI' scripts/dev/shellcheck-guards.sh; then
@@ -301,17 +309,28 @@ if command -v jq >/dev/null 2>&1; then
   fi
 fi
 
-echo "=== U2 honesty / shellcheck / re-arm ==="
+echo "=== U2 honesty / shellcheck / knip sentinel ==="
 if grep -q 'speed bump' scripts/lib/guard-deploy-match.sh \
   && grep -q 'prose-only' AGENTS.md; then
   ok "matcher header and AGENTS.md say speed bump / prose-only"
 else
   bad "honesty lines missing from matcher header or AGENTS.md"
 fi
-if grep -q 'followup_message.*re-arming' .cursor/hooks/wait-for-mail.sh; then
-  bad "wait-for-mail.sh still sends a paid re-arm followup_message"
+echo "=== knip:clone refuses on the PRD sentinel ==="
+if grep -q 'TEMPLATE_PLACEHOLDER' docs/PRD.md; then
+  knip_out=$(mktemp)
+  if npm run --silent knip:clone >"$knip_out" 2>&1; then
+    bad "knip:clone exited 0 while docs/PRD.md still has the template sentinel"
+  else
+    if grep -q 'TEMPLATE_PLACEHOLDER' "$knip_out"; then
+      ok "knip:clone fails on the PRD sentinel"
+    else
+      bad "knip:clone failed but did not mention TEMPLATE_PLACEHOLDER"
+    fi
+  fi
+  rm -f "$knip_out"
 else
-  ok "wait-for-mail.sh does not send a paid re-arm followup"
+  ok "PRD sentinel absent — knip:clone PRD-sentinel proof skipped"
 fi
 if grep -q 'shellcheck-guards' package.json; then
   ok "package.json runs shellcheck-guards in check"

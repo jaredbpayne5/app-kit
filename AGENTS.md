@@ -4,8 +4,9 @@ Shared rules for every agent in this repo. Cursor reads this file natively;
 `CLAUDE.md` imports it.
 
 A **role** is the hat for the whole chat. `/` means run that **skill** (a
-playbook). Seats are fixed: Claude is thinker, Cursor is builder. Both may
-`/review` and `/test` the other's work. The agent picks the next allowed skill.
+playbook). Seats are fixed: Claude is thinker, Cursor is builder. Each app
+has its own `/` menu. Do not tell Claude to open a Cursor skill file. The
+agent picks the next allowed skill.
 
 ## What this is
 
@@ -25,13 +26,22 @@ it rather than adding a backend.
 
 | Role | Seat | Allowed skills | Forbidden |
 | --- | --- | --- | --- |
-| **thinker** | Claude Code | `/product` `/design` `/design-review` `/plan` `/harden` `/as-built` | App code. `/task-to-pr`. `/improve`. Submit, pay, publish. |
-| **builder** | Cursor | `/task-to-pr` `/improve` | Rewrite the product file or `docs/<slug>/design.md` (except Open questions). `/ship`. Invent a screen with no named export. |
-| **shipper** | Matt opens this on purpose | `/ship` only | Feature work. Redesigning the product. Auto-start from the pager. |
+| **thinker** | Claude Code | `/product` `/design` `/plan` `/review` | App code. `/code`. `/improve`. `/critic`. `/test`. `/harden`. Submit, pay, publish. |
+| **builder** | Cursor | `/critic` `/code` `/improve` `/test` `/harden` | Invent the product. Rewrite `docs/PRD.md` or `docs/design.md`. `/review`. `/ship` unless Matt opened shipper. Invent a screen with no named export. |
+| **shipper** | Matt opens this on purpose | `/ship` only | Feature work. Redesigning the product. |
 
-**Shared** (either seat): `/review` `/test`. Use them on the *other* agent's
-work. A chat must not review or rubber-stamp what it just wrote. The pager
-never starts shipper.
+`/critic` is Cursor only. Design critic is Grok only. `/review` is Claude
+only. A chat must not review or rubber-stamp what it just wrote.
+
+**Claude `/` menu** (`.claude/skills/`): `/product` `/design` `/plan`
+`/review`. `/architecture` stays on disk for a shipped app that needs
+`ARCHITECTURE.md`. It is not a first-app stage.
+
+**Cursor `/` menu** (`.cursor/skills/`): `/critic` `/code` `/improve`
+`/test` `/harden` `/ship`, plus `pull-design` and `maestro-e2e`
+
+No `.agents/skills`. No role-folder tree under `.cursor/skills`. No
+repo-wide role toggle.
 
 ## Authority
 
@@ -42,13 +52,13 @@ When sources disagree, this is the order:
    accounts or server-side sync means *stop and discuss*, not implement.
 2. `docs/PRD.md` — what the product must do, and why. Filled by `/product`.
 3. A named export in `docs/design-exports/` — the approved UX/UI.
-4. `docs/<slug>/design.md` — how we build it (storage, purchases, failures).
-   Written by `/design`.
+4. `docs/design.md` — how we build it (storage, purchases, failures).
+   Written by `/design`. Frozen once Matt agrees.
 5. Existing source code — what is actually there today.
 
-The **letter** (the work) lives in git: branch + commit. That is the product
-file, `design.md`, the task, and the code. `.ai/current-task.md` is not a
-source of requirements.
+The **letter** (the work) lives in git: branch + commit. That is the
+product file, `docs/design.md`, `docs/critic.md`, `docs/plan.md`, and
+the code.
 
 Never silently override a higher authority. If the conflict is material, stop
 and report it. If it is a minor implementation detail, make the smallest
@@ -62,22 +72,32 @@ invent an MVP, design system, screen list, or build plan.
 
 ## First-app path
 
-1. Thinker `/product` until the product file is filled. Pager idle.
+v1 is one complete app: one PRD, one design, one critic, one plan, then
+jobs. Do not restart product → design → critic per screen.
+
+1. Claude `/product` until `docs/PRD.md` is filled.
 2. Matt takes that file to a UI/UX tool. Drops exports in
    `docs/design-exports/`.
-3. New thinker chat → `/design` (how we build it). Cites export frames.
-   No app code.
-4. New thinker chat → `/design-review` then `/plan`. If solid, commit task 1.
-5. Builder `/task-to-pr` + `/test`. One task. Named frame. Commit.
-6. The other seat `/review` (and `/test` if needed) on
-   `git diff main...branch`. Approve → next task. Revise → builder. Deny →
-   stop.
-7. After the last feature: thinker `/harden`. Then Matt opens shipper →
-   `/ship`.
+3. New Claude chat → `/design`. Writes `docs/design.md`. Cites export
+   frames. No app code.
+4. New Cursor chat → `/critic`. Writes `docs/critic.md`. Claude does
+   not run `/critic`.
+5. On FAIL: new Claude chat fixes `docs/design.md` from the critic
+   findings. Cursor `/critic` again (appends a round). Max 2 rounds.
+6. After PASS and Matt agrees: new Claude chat → `/plan`. Writes
+   `docs/plan.md`.
+7. New Cursor chat → `/code` on the next unchecked job
+   (`code → test → improve → test`). Commit. Ask before `git push`.
+8. New Claude chat → `/review` on that job. Starts from `docs/PRD.md`,
+   the job's `AC-n`/`INV-n`, and the diff. On PASS, Claude checks the
+   box. On FAIL, the job returns to Cursor.
+9. Repeat 7–8 until `docs/plan.md` is complete.
+10. Release gate: Cursor `/harden`, Claude whole-app `/review`,
+    then `npm run verify` and `npm run preflight`. Matt opens `/ship`.
 
 There is **no** `docs/design-brief.md`. Kickoff prompts for the design tool
-stay outside the repo (chat paste only). Moonchild is optional. Exports in
-`docs/design-exports/` are first-class.
+stay outside the repo (chat paste only). Exports in `docs/design-exports/`
+are first-class.
 
 ## Design system & screens
 
@@ -210,8 +230,8 @@ npm run session:status            # what's still running
 
 ## How to work
 
-One skill outcome at a time. Do not also start the next task. A small change
-requested in chat is not a planned task.
+One skill outcome at a time. Do not also start the next job. A small
+change requested in chat is not a planned job.
 
 No unrelated refactors mid-task, and no reformatting untouched files. Reuse
 existing `ui/` primitives, `lib/` seams, components, and dependencies before
@@ -229,18 +249,16 @@ considering work done. `npm run test:e2e` drives Maestro against a simulator.
 
 ## On-demand procedures
 
-Skills load when relevant. Recipes in `docs/recipes/` are the human source —
-do not paste them into always-on files.
-
-Thinker and builder playbooks are the role allow-list above. Until those
-shared files exist, do not invent a missing skill and do not fall back to
-mailbox pickup.
+Skills load when the user names them in that app's `/` menu. Recipes in
+`docs/recipes/` are the human source — do not paste them into always-on
+files.
 
 Still on disk and still valid:
 
 - Pull a screen artifact (builder) — `pull-design`
-- Store gate (`npm run preflight`) — `store-preflight` (until `/ship` exists)
 - Maestro e2e — `maestro-e2e`
+- Document today's code (Claude, on demand) — `/architecture`. Not a
+  first-app stage.
 
 ## Delegate to a cheaper model
 
