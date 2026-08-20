@@ -274,7 +274,21 @@ starts with "figure out why", don't.
 
 Some work looks routine but stays on the stronger model anyway: implementing a
 freshly pulled screen, purchase and entitlement logic, and any design
-trade-off. Escalate back to the stronger model mid-task when:
+trade-off.
+
+The cheaper tier must never edit these, however mechanical the change looks.
+This is a hard line, not a judgment call — and mostly prose, so the stronger
+model owns it:
+
+- Expo build config — `app.json`, `metro.config.js`, `babel.config.js`
+- EAS config — `eas.json`
+- The `apps/mobile/lib/` seam files themselves. Lint stops code going *around*
+  a seam; nothing stops a rewrite of the seam
+- Purchases and entitlement logic
+- Navigation structure — the `app/` route tree and any `_layout.tsx`
+- Native modules, config plugins, and new dependencies
+
+Escalate back to the stronger model mid-task when:
 
 - requirements conflict, or a higher authority contradicts a lower one
 - an architecture decision has to be made rather than followed

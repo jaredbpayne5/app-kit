@@ -1,14 +1,21 @@
 ---
 name: critic
-description: "Writes docs/critic.md for Claude's product or design work before implementation. Cursor only. Use for docs/PRD.md and docs/design.md. Finds material ambiguity and flaws. Round 2 appends; never overwrites. Does not review code."
+description: "Writes docs/critic.md, adversarially reviewing Claude's docs/design.md before implementation. Cursor only. Judges the design against docs/PRD.md and the named exports in docs/design-exports/. Finds material ambiguity and flaws. Round 2 appends; never overwrites. Does not review the PRD itself, and does not review code."
 disable-model-invocation: true
 ---
 
 # Critic
 
-Cursor only. Review Claude's product or design work. Review the proposed
-choices, not the document type or size. Stay read-only of `docs/design.md`.
-Write `docs/critic.md`.
+Cursor only. The target is `docs/design.md`. Review the proposed choices, not
+the document type or size. Stay read-only of `docs/design.md`. Write
+`docs/critic.md`.
+
+`docs/PRD.md` and the named exports in `docs/design-exports/` are the
+yardstick, not the target. You need both to be adversarial: the PRD says what
+the product must do, the frames say what the screens are. A design that is
+internally consistent but does not deliver the PRD outcome, or that describes a
+screen the frames do not show, is a blocker. Do not write findings against the
+PRD itself — a PRD problem is a `BLOCKED` verdict and a `/product` return.
 
 This is not a code review. Use `/review` (Claude only) for implementation.
 
