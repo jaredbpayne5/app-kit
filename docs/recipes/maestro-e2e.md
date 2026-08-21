@@ -64,8 +64,15 @@ npm run test:e2e -- --port 8082   # match Metro port
    - Metro running (`npx expo start --port 8081`)
    - Project open: `npm run open:android`
 
-If Maestro, Xcode/`simctl`, or a booted simulator is missing, `test:e2e`
-(iOS default) prints help and **exits 0** (same soft skip as a missing Maestro install).
+## Missing tooling fails
+
+If Maestro, Xcode/`simctl`, or a booted simulator is missing, `test:e2e` prints
+what to install and **exits 1**. Missing tooling is a failure, not a pass.
+
+`--allow-skip` exits 0 instead. It is for humans who know they are skipping, and
+the skip must be recorded explicitly — it is not green. An unattended run must
+never pass `--allow-skip`, because a skipped e2e gate reports success while
+nothing was exercised.
 
 ## Port conflicts
 

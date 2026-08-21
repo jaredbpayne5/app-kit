@@ -80,3 +80,7 @@ apps/web/template/og-image.png
 
 # Local audit backlog — not part of the template product
 REPO-EVALUATION.md
+
+# Per-run agent artifacts: verify receipts, pending guard edits. Ephemeral by
+# design — authority lives in committed files, never here.
+.run/
