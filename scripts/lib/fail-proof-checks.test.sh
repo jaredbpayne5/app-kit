@@ -384,6 +384,11 @@ if grep -q 'shellcheck-guards' package.json; then
 else
   bad "shellcheck-guards is not in package.json"
 fi
+if grep '"check":' package.json | grep -q 'plan-lint'; then
+  ok "package.json runs plan-lint in check"
+else
+  bad "plan-lint is not in the check chain"
+fi
 
 echo "=== plan-lint can fail ==="
 if bash scripts/dev/plan-lint.sh \
@@ -398,6 +403,39 @@ if bash scripts/dev/plan-lint.sh \
 else
   ok "plan-lint rejects the bad fixture under --strict"
 fi
+
+echo "=== receipt gate can fail ==="
+if bash scripts/dev/receipt.sh record --command=verify >/dev/null 2>&1; then
+  bad "receipt record succeeded without APP_KIT_RECEIPT_FROM_VERIFY — the forge path is back"
+else
+  ok "receipt record refuses without the verify marker"
+fi
+if grep -q 'receipt.sh record' package.json \
+  && grep -q 'APP_KIT_RECEIPT_FROM_VERIFY' package.json; then
+  ok "verify chain records a receipt"
+else
+  bad "package.json verify chain does not record a receipt"
+fi
+if grep -q '"receipt:record"' package.json; then
+  bad "receipt:record is a public npm script — the forge path is documented"
+else
+  ok "receipt:record is not a public npm script"
+fi
+if guard_is_protected 'scripts/dev/receipt.sh' \
+  && guard_is_protected '.run/receipts/x.json'; then
+  ok "receipt.sh and .run/receipts/ are protected"
+else
+  bad "receipt machinery is not in guard_is_protected"
+fi
+
+echo "=== design-lint a11y warn section is present ==="
+if grep -q 'Warning only — design-lint does not fail on this yet' scripts/dev/design-lint.sh \
+  && grep -qE 'Pressable|TouchableOpacity' scripts/dev/design-lint.sh; then
+  ok "design-lint section 8 (a11y warn) is present"
+else
+  bad "design-lint section 8 (a11y warn) was removed"
+fi
+
 
 echo
 if [[ "$FAIL" -gt 0 ]]; then
