@@ -195,7 +195,7 @@ npx expo install expo-camera
 Then add its config plugin to `app.json` and update
 `apps/mobile/store/data-practices.json` if the data leaves the device.
 
-See `docs/CAPABILITIES.md` for what each module costs in permissions, and its
+See `docs/recipes/native-kit.md` for what each module costs in permissions, and its
 "Starter kit vs shipped code" section for which unused modules are deliberate
 inventory (do not delete them as dead code) versus prune-on-clone.
 

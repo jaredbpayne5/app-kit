@@ -1,4 +1,4 @@
-# Capability reference
+# Native kit
 
 What each first-party Expo module costs you in permissions, store-review
 questions, and privacy declarations. Use this before adding one.

@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
-  // Template inventory — see docs/CAPABILITIES.md "Starter kit vs shipped code".
+  // Template inventory — see docs/recipes/native-kit.md "Starter kit vs shipped code".
   // Keep these ignores on knip:clone so a product clone does not delete the factory.
   "workspaces": {
     ".": {

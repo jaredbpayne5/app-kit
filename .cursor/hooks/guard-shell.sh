@@ -32,7 +32,7 @@ fi
 
 if guard_should_ask "$command"; then
   cat <<'JSON'
-{"permission":"ask","user_message":"Confirm before continuing: push to main, EAS build/submit/update / expo prebuild, Cloudflare Pages deploy (web:deploy / wrangler pages deploy), custom-domain attach (attach-domain / wrangler pages domain / Cloudflare DNS or Pages domains API), store:push / fastlane, or adding a dependency (npm/yarn/pnpm/bun install or add with a package, npx expo install). EAS builds, lander deploys, public DNS changes, and store submissions cost money or are irreversible; a new dependency can add permission prompts and App Review questions (docs/CAPABILITIES.md).","agent_message":"A hook flagged this shell command as a deploy, store, or dependency-add action that needs confirmation."}
+{"permission":"ask","user_message":"Confirm before continuing: push to main, EAS build/submit/update / expo prebuild, Cloudflare Pages deploy (web:deploy / wrangler pages deploy), custom-domain attach (attach-domain / wrangler pages domain / Cloudflare DNS or Pages domains API), store:push / fastlane, or adding a dependency (npm/yarn/pnpm/bun install or add with a package, npx expo install). EAS builds, lander deploys, public DNS changes, and store submissions cost money or are irreversible; a new dependency can add permission prompts and App Review questions (docs/recipes/native-kit.md).","agent_message":"A hook flagged this shell command as a deploy, store, or dependency-add action that needs confirmation."}
 JSON
   exit 0
 fi

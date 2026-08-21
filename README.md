@@ -157,7 +157,7 @@ npx expo install expo-camera
 ```
 
 Then register its config plugin in `app.json` and rebuild the development
-build. `docs/CAPABILITIES.md` lists what each module costs in permissions.
+build. `docs/recipes/native-kit.md` lists what each module costs in permissions.
 
 ## Shipping
 

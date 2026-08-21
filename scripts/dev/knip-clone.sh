@@ -9,7 +9,7 @@ cd "$ROOT" || exit 1
 
 if grep -q 'TEMPLATE_PLACEHOLDER' "$ROOT/docs/PRD.md"; then
   printf '%s\n' "knip:clone: docs/PRD.md still has <!-- TEMPLATE_PLACEHOLDER -->."
-  printf '%s\n' "Fill the PRD first. Template inventory is ignored on purpose — see docs/CAPABILITIES.md."
+  printf '%s\n' "Fill the PRD first. Template inventory is ignored on purpose — see docs/recipes/native-kit.md."
   exit 1
 fi
 
