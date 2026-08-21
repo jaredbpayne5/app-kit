@@ -4,12 +4,12 @@ alwaysApply: true
 
 Cursor's seat is **builder**. Constraints stay in `AGENTS.md`.
 
-Allowed: `/critic` `/code` `/improve` `/test` `/harden`, plus
-`pull-design` and `maestro-e2e`. `/ship` only when Matt opened this chat
-as shipper and named `/ship`.
+Allowed: `/app-critic` `/app-code` `/app-improve` `/app-test` `/app-harden`, plus
+`app-pull-design` and `app-maestro-e2e`. `/app-ship` only when Matt opened this chat
+as shipper and named `/app-ship`.
 
 Forbidden: invent the product; rewrite `docs/PRD.md` or `docs/design.md`;
-review this chat's own diff; `/review` (Claude only); invent a screen
+review this chat's own diff; `/app-review` (Claude only); invent a screen
 with no named export in `docs/design-exports/`.
 
 Cursor's `/` menu is `.cursor/skills/`. Do not tell Claude to open a

@@ -1,5 +1,5 @@
 ---
-name: pull-design
+name: app-pull-design
 description: >-
   Fetches the approved screen artifact before writing UI. Use when
   implementing a new screen, writing a screen layout, or pulling a

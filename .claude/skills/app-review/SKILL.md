@@ -1,5 +1,5 @@
 ---
-name: review
+name: app-review
 description: "Reviews an implementation change without editing it, or the whole app at the release gate. Starts from docs/PRD.md, the job's AC/INV, and the diff — not design.md compliance. Claude only. Use for code, PR, diff, branch, job, or whole-app reviews."
 user-invocable: true
 argument-hint: "[job N, diff, branch, commit, PR, or whole-app]"
@@ -11,7 +11,7 @@ Claude only. Review builder code. Stay read-only except one write: on
 `PASS` for a job, check that job's box in `docs/plan.md`.
 
 This chat must not have written the code. If it did, stop and say independent
-review is blocked. A new thinker chat should run `/review`.
+review is blocked. A new thinker chat should run `/app-review`.
 
 Do not tell anyone to open a Cursor skill file. This playbook is complete.
 
@@ -25,7 +25,7 @@ If the user does not name a target, review `git diff main...HEAD` plus staged,
 unstaged, and untracked files on the current branch. If there are no local
 changes, say so instead of substituting a whole-repository audit.
 
-Use Cursor `/critic` for `docs/PRD.md` or `docs/design.md` that has not been
+Use Cursor `/app-critic` for `docs/PRD.md` or `docs/design.md` that has not been
 implemented. This skill reviews code.
 
 ## Standard
@@ -64,7 +64,7 @@ The verdict is independent agent evidence. It is not GitHub approval.
    comments, style, and docs. Keep findings within the change's scope.
 5. **Check this repo's gates.** Seams in `AGENTS.md` were used. No hardcoded
    hex or `text-[15px]`. No new screen without a named export and
-   `pull-design`. No secrets. No backend, accounts, or server-side sync.
+   `app-pull-design`. No secrets. No backend, accounts, or server-side sync.
 6. **Review the proof.** Check that tests:
    - Cover the changed behavior and affected failure paths.
    - Match the tier the job's `Tests:` field declared. A job that says `flow`
@@ -102,8 +102,8 @@ When the user asks for a whole-app review, also check:
   logged tokens, keys, or receipts. On-device data stays on-device unless
   the product added a network feature.
 
-Store-readiness is `npm run preflight` and `/ship`, not this skill.
-Runtime abuse is Cursor `/harden`. You may list simplify work;
+Store-readiness is `npm run preflight` and `/app-ship`, not this skill.
+Runtime abuse is Cursor `/app-harden`. You may list simplify work;
 Grok performs the edits. Do not gain app-write authority here.
 
 ## Code review findings
@@ -148,7 +148,7 @@ Use exactly `PASS`, `FAIL`, or `BLOCKED`.
 - `PASS`: no Must fix or Should fix findings remain. For a job, check
   its box in `docs/plan.md`. A checked box means built and reviewed.
 - `FAIL`: a Must fix or Should fix finding remains. Name the fixes.
-  Next skill is builder `/code` on those fixes. Do not check the box.
+  Next skill is builder `/app-code` on those fixes. Do not check the box.
 - `BLOCKED`: missing required context, specialist coverage, or this chat
   wrote the code.
 

@@ -1,5 +1,5 @@
 ---
-name: code
+name: app-code
 description: "Builder coding skill. Completes one job: code → test → improve → test. Ask before git push. Use to implement one unchecked job from docs/plan.md. Do not review this chat's own diff."
 disable-model-invocation: true
 ---
@@ -7,7 +7,7 @@ disable-model-invocation: true
 # Code
 
 Builder only. Complete **one** job. Do not start the next job. Do not
-review this chat's own diff. `/review` is Claude-only.
+review this chat's own diff. `/app-review` is Claude-only.
 
 One job is `code → test → improve → test`, then `npm run check`.
 
@@ -20,7 +20,7 @@ One job is `code → test → improve → test`, then `npm run check`.
    `PASS`, stop unless Matt explicitly overrides in this chat. Note the
    job's `Deps:` — if a job it depends on is still unchecked, stop and say
    so.
-2. If the job needs a new screen layout, run `pull-design` first. If the
+2. If the job needs a new screen layout, run `app-pull-design` first. If the
    pull fails, stop. Do not invent a layout.
 3. Create or reuse a branch from the latest default branch.
 4. Write the code. Use `lib/` seams, `ui/` primitives, and NativeWind
@@ -28,16 +28,16 @@ One job is `code → test → improve → test`, then `npm run check`.
    `Files:` field is its expected blast radius: if you need to touch
    something outside it, say so in the report rather than expanding scope
    quietly.
-5. Use `/test` to prove the job works, affected failures are handled, and
+5. Use `/app-test` to prove the job works, affected failures are handled, and
    refactors preserve behavior. Run `npm run check`. Run `npm test` for
    logic changes. Simulator and Maestro only when the job changes a
    user-visible flow.
-6. Use `/improve` on the code this job just wrote. Same behavior, clearer
-   code. Then `/test` again.
+6. Use `/app-improve` on the code this job just wrote. Same behavior, clearer
+   code. Then `/app-test` again.
 7. Commit. Ask before `git push`. If the user said to push, push and create
    or update one pull request with a short summary and the current proof.
 8. Stop. Do not check the box in `docs/plan.md`. Next allowed skill is
-   Claude `/review` on this job. Do not run `/review` here. Do not merge
+   Claude `/app-review` on this job. Do not run `/app-review` here. Do not merge
    unless the user asks.
 
 ## If something is wrong
@@ -45,7 +45,7 @@ One job is `code → test → improve → test`, then `npm run check`.
 - Job is unsound, or a higher authority contradicts it: stop and report.
   Do not silently implement a different design.
 - A product or technical decision is missing: stop and report. Do not
-  decide it in `/code`.
+  decide it in `/app-code`.
 - You need a new dependency, config plugin, backend, `eas`, `prebuild`,
   or `session:down`: ask first.
 
@@ -54,5 +54,5 @@ One job is `code → test → improve → test`, then `npm run check`.
 - One job, one focused change.
 - No unrelated refactors. No reformatting untouched files.
 - Do not invent a screen with no named export.
-- Do not start `/ship`.
+- Do not start `/app-ship`.
 - Automatic skill selection is not merge authority and not push authority.

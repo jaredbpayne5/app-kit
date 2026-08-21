@@ -1,5 +1,5 @@
 ---
-name: improve
+name: app-improve
 description: "Makes existing code easier to understand without changing behavior. Use inside a job after the first test pass. Do not add product behavior."
 disable-model-invocation: true
 ---
@@ -38,4 +38,4 @@ test`). It is not an app-wide phase after the plan is done.
 - Preserve behavior even when a redesign would be easier.
 - Tests must prove behavior was preserved.
 - Do not rewrite `docs/PRD.md` or `docs/design.md`.
-- Do not invent a screen. Do not start `/ship`.
+- Do not invent a screen. Do not start `/app-ship`.

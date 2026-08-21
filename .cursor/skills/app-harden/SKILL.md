@@ -1,16 +1,16 @@
 ---
-name: harden
-description: "Adversarial runtime lens at the release gate. Try to break the running app. Reports findings; fixes land as jobs. Cursor only. Does not write app code or start /ship."
+name: app-harden
+description: "Adversarial runtime lens at the release gate. Try to break the running app. Reports findings; fixes land as jobs. Cursor only. Does not write app code or start /app-ship."
 disable-model-invocation: true
 ---
 
 # Harden
 
 Builder only. Whole-app adversarial pass before Matt ships. Do not write
-app code. Do not start `/ship`. Do not submit, pay, or publish.
+app code. Do not start `/app-ship`. Do not submit, pay, or publish.
 
-Product-fit and architecture coherence are Claude whole-app `/review`.
-Store-readiness is `npm run preflight` and `/ship`. This skill is the
+Product-fit and architecture coherence are Claude whole-app `/app-review`.
+Store-readiness is `npm run preflight` and `/app-ship`. This skill is the
 runtime lens only.
 
 ## Outcome
@@ -64,7 +64,7 @@ Use exactly `PASS`, `FAIL`, or `BLOCKED`.
 
 - `PASS`: no blocker or important findings remain.
 - `FAIL`: a fixable blocker or important finding remains. Fixes land as
-  jobs for `/code`.
+  jobs for `/app-code`.
 - `BLOCKED`: missing required context, or the PRD sentinel is still
   present.
 

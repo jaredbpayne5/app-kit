@@ -1,13 +1,13 @@
 ---
-name: plan
-description: "Writes docs/plan.md as ordered jobs after the design is frozen. Use after Cursor /critic returns PASS and Matt agrees. Jobs only. Do not use for one already-decided coding task."
+name: app-plan
+description: "Writes docs/plan.md as ordered jobs after the design is frozen. Use after Cursor /app-critic returns PASS and Matt agrees. Jobs only. Do not use for one already-decided coding task."
 user-invocable: true
 argument-hint: "[optional focus]"
 ---
 
 # Plan
 
-Thinker only. Split decided work into jobs the builder can run with `/code`.
+Thinker only. Split decided work into jobs the builder can run with `/app-code`.
 Write `docs/plan.md`. Stop after planning. Do not implement.
 
 Do not start if `docs/PRD.md` still contains `<!-- TEMPLATE_PLACEHOLDER -->`.
@@ -18,7 +18,7 @@ Do not start if the last `**Verdict:**` line in `docs/critic.md` is not
 
 1. Read `docs/PRD.md`, `docs/design.md`, `docs/critic.md`, named exports,
    `AGENTS.md`, and relevant code.
-2. Stop and return to `/design` if an unresolved choice would change
+2. Stop and return to `/app-design` if an unresolved choice would change
    behavior, interfaces, data, security, compatibility, operations, or proof.
 3. Split the work into jobs that each deliver working behavior and fit one
    Cursor chat and one review.
@@ -30,7 +30,7 @@ Do not start if the last `**Verdict:**` line in `docs/critic.md` is not
    screens, data rules, payment behavior, or architecture. If planning
    reveals a design hole, stop and reopen design — do not patch it here.
 8. Stop. Do not check any box. Only Claude checks a box, and only after
-   `/review` returns PASS. Next allowed skill is builder `/code` on the
+   `/app-review` returns PASS. Next allowed skill is builder `/app-code` on the
    first unchecked job.
 
 ## Write for two readers

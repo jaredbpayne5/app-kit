@@ -1,5 +1,5 @@
 ---
-name: architecture
+name: app-architecture
 description: "Creates or updates root ARCHITECTURE.md from verified implementation. Use when the repository needs a current picture of what the code is today, or a structural change made the document stale. Use design for proposed systems or changes."
 user-invocable: true
 argument-hint: "[repository or existing ARCHITECTURE.md]"
@@ -86,7 +86,7 @@ important claims. State genuine evidence gaps instead of guessing.
 
 ## Writing rules
 
-- Describe implemented reality only. Use `/design` to decide future behavior.
+- Describe implemented reality only. Use `/app-design` to decide future behavior.
 - Write for a new teammate who needs to change the system safely.
 - Lead with the source of truth, dependency direction, and load-bearing rules.
 - For each architectural invariant, name the code, config, lint rule, or

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # scripts/dev/plan-lint.sh — validate the job cards in docs/plan.md against the
-# shape .claude/skills/plan/SKILL.md promises. A vague job produces vague code
+# shape .claude/skills/app-plan/SKILL.md promises. A vague job produces vague code
 # and a weak review, so the fields a builder needs (target files, proof tier,
 # dependencies) must be named fields rather than buried in Notes prose.
 #

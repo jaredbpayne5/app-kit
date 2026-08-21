@@ -37,14 +37,14 @@ jobs. Matt is the doorbell. Paste one line into the right app.
 
 3. `npm run doctor` to check your toolchain.
 4. Build the product (one PRD, one design, one critic, one plan, then jobs):
-   1. Claude: `/product` — fills `docs/PRD.md`
+   1. Claude: `/app-product` — fills `docs/PRD.md`
    2. Matt: drop screen pictures in `docs/design-exports/`
-   3. Claude, new chat: `/design` — writes `docs/design.md`
-   4. Cursor, new chat: `/critic` — writes `docs/critic.md`
+   3. Claude, new chat: `/app-design` — writes `docs/design.md`
+   4. Cursor, new chat: `/app-critic` — writes `docs/critic.md`
    5. On FAIL: new Claude chat fixes the design; Cursor critic again
-   6. After PASS and Matt agrees: Claude, new chat: `/plan` — writes `docs/plan.md`
-   7. Cursor: `/code next job` (`code → test → improve → test`)
-   8. Claude, new chat: `/review job N` — checks the box on PASS
+   6. After PASS and Matt agrees: Claude, new chat: `/app-plan` — writes `docs/plan.md`
+   7. Cursor: `/app-code next job` (`code → test → improve → test`)
+   8. Claude, new chat: `/app-review job N` — checks the box on PASS
    9. Repeat 7–8 until the plan is done, then `npm run verify` and `npm run preflight`
 5. `npm run dev` and press `i` for the iOS Simulator or `a` for Android.
    Prefer a development build (`npm run dev:build:ios` /

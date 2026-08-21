@@ -165,12 +165,12 @@ printf '\n%sproduct docs%s\n' "$BOLD" "$RESET"
 if [[ ! -f docs/PRD.md ]]; then
   bad 2 "product doc missing: docs/PRD.md"
 elif grep -q 'TEMPLATE_PLACEHOLDER' docs/PRD.md 2>/dev/null; then
-  warn "docs/PRD.md still has TEMPLATE_PLACEHOLDER — Claude /product before building UI"
+  warn "docs/PRD.md still has TEMPLATE_PLACEHOLDER — Claude /app-product before building UI"
   ok "docs/PRD.md present (sentinel still template default — expected on a fresh clone)"
 else
   ok "docs/PRD.md present and sentinel cleared"
 fi
-printf '  %sNext: Claude /product → pictures in docs/design-exports/ → Claude /design → Cursor /critic → Claude /plan → jobs.%s\n' "$DIM" "$RESET"
+printf '  %sNext: Claude /app-product → pictures in docs/design-exports/ → Claude /app-design → Cursor /app-critic → Claude /app-plan → jobs.%s\n' "$DIM" "$RESET"
 
 # Factory wiring — catches drift between what a config points at and what
 # exists. A hook registered to a deleted script, a skill citing an npm script

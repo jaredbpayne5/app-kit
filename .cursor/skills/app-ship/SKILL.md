@@ -1,12 +1,12 @@
 ---
-name: ship
-description: "Shipper playbook. Runs the store-readiness gate and store recipes before submit. Use when Matt opened this chat as shipper, or named /ship. Covers preflight, store metadata, compliance, and Ask-before spend commands."
+name: app-ship
+description: "Shipper playbook. Runs the store-readiness gate and store recipes before submit. Use when Matt opened this chat as shipper, or named /app-ship. Covers preflight, store metadata, compliance, and Ask-before spend commands."
 disable-model-invocation: true
 ---
 
 # Ship
 
-Matt opened this chat as shipper, or named `/ship`. Do not do feature work.
+Matt opened this chat as shipper, or named `/app-ship`. Do not do feature work.
 Do not redesign the product. Helpers do not start this skill.
 
 ## Store gate

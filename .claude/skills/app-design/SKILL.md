@@ -1,5 +1,5 @@
 ---
-name: design
+name: app-design
 description: "Writes docs/design.md for a proposed feature or the app. Use when product or technical choices must be settled before coding. Covers behavior, storage, purchases, failures, INV/AC, and tests. Use architecture for what the code is today."
 user-invocable: true
 argument-hint: "<feature, problem, or brief>"
@@ -8,7 +8,7 @@ argument-hint: "<feature, problem, or brief>"
 # Design
 
 Thinker only. No app code. Stop with a proposed design ready for Cursor
-`/critic`. This chat must not critic its own design.
+`/app-critic`. This chat must not critic its own design.
 
 ## Workflow
 
@@ -28,7 +28,7 @@ Thinker only. No app code. Stop with a proposed design ready for Cursor
    not apply.
 7. Run the review pass. Fix what you can. List the rest under Open questions.
 8. Stop. Do not plan or implement. Next allowed skill is a **new Cursor
-   chat** → `/critic`.
+   chat** → `/app-critic`.
 
 ## Document shape
 

@@ -24,7 +24,7 @@ Or group by flow: `docs/design-exports/onboarding/…`.
 
 ## After exporting
 
-Claude `/design` reads these files and writes `docs/design.md`. Cursor
-`/critic` then writes `docs/critic.md`. Do not invent layouts from the
+Claude `/app-design` reads these files and writes `docs/design.md`. Cursor
+`/app-critic` then writes `docs/critic.md`. Do not invent layouts from the
 PRD alone. Agents implement from these artifacts (or an MCP pull of the
 same screens).

@@ -1,5 +1,5 @@
 ---
-name: critic
+name: app-critic
 description: "Writes docs/critic.md, adversarially reviewing Claude's docs/design.md before implementation. Cursor only. Judges the design against docs/PRD.md and the named exports in docs/design-exports/. Finds material ambiguity and flaws. Round 2 appends; never overwrites. Does not review the PRD itself, and does not review code."
 disable-model-invocation: true
 ---
@@ -15,12 +15,12 @@ yardstick, not the target. You need both to be adversarial: the PRD says what
 the product must do, the frames say what the screens are. A design that is
 internally consistent but does not deliver the PRD outcome, or that describes a
 screen the frames do not show, is a blocker. Do not write findings against the
-PRD itself — a PRD problem is a `BLOCKED` verdict and a `/product` return.
+PRD itself — a PRD problem is a `BLOCKED` verdict and a `/app-product` return.
 
-This is not a code review. Use `/review` (Claude only) for implementation.
+This is not a code review. Use `/app-review` (Claude only) for implementation.
 
 This chat must not have written the proposal. If it did, stop and say
-independent review is blocked. A new Cursor chat should run `/critic`.
+independent review is blocked. A new Cursor chat should run `/app-critic`.
 
 Do not implement in this chat.
 
@@ -33,7 +33,7 @@ Do not implement in this chat.
    Do not take Claude's explanation of why the design is good — the
    committed file is the input.
 2. If `docs/PRD.md` still contains `<!-- TEMPLATE_PLACEHOLDER -->`,
-   verdict is `BLOCKED`. Next step is `/product`, not a design fix.
+   verdict is `BLOCKED`. Next step is `/app-product`, not a design fix.
 3. State the problem, affected user, intended outcome, success measure,
    scope, constraints, and main tradeoff. Report any that the proposal
    leaves unclear.
@@ -124,8 +124,8 @@ preferences.
 ## Verdict
 
 - `PASS`: no blocker or important findings or open questions remain.
-  Next allowed skill is Claude `/plan` after Matt agrees. Do not start
-  `/plan` from this chat.
+  Next allowed skill is Claude `/app-plan` after Matt agrees. Do not start
+  `/app-plan` from this chat.
 - `FAIL`: the proposal has a fixable blocker or important finding or
   open question. Next skill is a new Claude chat to fix `docs/design.md`.
 - `BLOCKED`: the review lacks required context, repository evidence, an

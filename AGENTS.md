@@ -26,19 +26,19 @@ it rather than adding a backend.
 
 | Role | Seat | Allowed skills | Forbidden |
 | --- | --- | --- | --- |
-| **thinker** | Claude Code | `/product` `/design` `/plan` `/review` | App code. `/code`. `/improve`. `/critic`. `/test`. `/harden`. Submit, pay, publish. |
-| **builder** | Cursor | `/critic` `/code` `/improve` `/test` `/harden` | Invent the product. Rewrite `docs/PRD.md` or `docs/design.md`. `/review`. `/ship` unless Matt opened shipper. Invent a screen with no named export. |
-| **shipper** | Matt opens this on purpose | `/ship` only | Feature work. Redesigning the product. |
+| **thinker** | Claude Code | `/app-product` `/app-design` `/app-plan` `/app-review` | App code. `/app-code`. `/app-improve`. `/app-critic`. `/app-test`. `/app-harden`. Submit, pay, publish. |
+| **builder** | Cursor | `/app-critic` `/app-code` `/app-improve` `/app-test` `/app-harden` | Invent the product. Rewrite `docs/PRD.md` or `docs/design.md`. `/app-review`. `/app-ship` unless Matt opened shipper. Invent a screen with no named export. |
+| **shipper** | Matt opens this on purpose | `/app-ship` only | Feature work. Redesigning the product. |
 
-`/critic` is Cursor only. Design critic is Grok only. `/review` is Claude
+`/app-critic` is Cursor only. Design critic is Grok only. `/app-review` is Claude
 only. A chat must not review or rubber-stamp what it just wrote.
 
-**Claude `/` menu** (`.claude/skills/`): `/product` `/design` `/plan`
-`/review`. `/architecture` stays on disk for a shipped app that needs
+**Claude `/` menu** (`.claude/skills/`): `/app-product` `/app-design` `/app-plan`
+`/app-review`. `/app-architecture` stays on disk for a shipped app that needs
 `ARCHITECTURE.md`. It is not a first-app stage.
 
-**Cursor `/` menu** (`.cursor/skills/`): `/critic` `/code` `/improve`
-`/test` `/harden` `/ship`, plus `pull-design` and `maestro-e2e`
+**Cursor `/` menu** (`.cursor/skills/`): `/app-critic` `/app-code` `/app-improve`
+`/app-test` `/app-harden` `/app-ship`, plus `app-pull-design` and `app-maestro-e2e`
 
 No `.agents/skills`. No role-folder tree under `.cursor/skills`. No
 repo-wide role toggle.
@@ -50,10 +50,10 @@ When sources disagree, this is the order:
 1. **This file** — no backend, the `lib/` seams, the "Ask before" list,
    security, roles. These outrank the product. A product file that needs
    accounts or server-side sync means *stop and discuss*, not implement.
-2. `docs/PRD.md` — what the product must do, and why. Filled by `/product`.
+2. `docs/PRD.md` — what the product must do, and why. Filled by `/app-product`.
 3. A named export in `docs/design-exports/` — the approved UX/UI.
 4. `docs/design.md` — how we build it (storage, purchases, failures).
-   Written by `/design`. Frozen once Matt agrees.
+   Written by `/app-design`. Frozen once Matt agrees.
 5. Existing source code — what is actually there today.
 
 The **letter** (the work) lives in git: branch + commit. That is the
@@ -75,25 +75,25 @@ invent an MVP, design system, screen list, or build plan.
 v1 is one complete app: one PRD, one design, one critic, one plan, then
 jobs. Do not restart product → design → critic per screen.
 
-1. Claude `/product` until `docs/PRD.md` is filled.
+1. Claude `/app-product` until `docs/PRD.md` is filled.
 2. Matt takes that file to a UI/UX tool. Drops exports in
    `docs/design-exports/`.
-3. New Claude chat → `/design`. Writes `docs/design.md`. Cites export
+3. New Claude chat → `/app-design`. Writes `docs/design.md`. Cites export
    frames. No app code.
-4. New Cursor chat → `/critic`. Writes `docs/critic.md`. Claude does
-   not run `/critic`.
+4. New Cursor chat → `/app-critic`. Writes `docs/critic.md`. Claude does
+   not run `/app-critic`.
 5. On FAIL: new Claude chat fixes `docs/design.md` from the critic
-   findings. Cursor `/critic` again (appends a round). Max 2 rounds.
-6. After PASS and Matt agrees: new Claude chat → `/plan`. Writes
+   findings. Cursor `/app-critic` again (appends a round). Max 2 rounds.
+6. After PASS and Matt agrees: new Claude chat → `/app-plan`. Writes
    `docs/plan.md`.
-7. New Cursor chat → `/code` on the next unchecked job
+7. New Cursor chat → `/app-code` on the next unchecked job
    (`code → test → improve → test`). Commit. Ask before `git push`.
-8. New Claude chat → `/review` on that job. Starts from `docs/PRD.md`,
+8. New Claude chat → `/app-review` on that job. Starts from `docs/PRD.md`,
    the job's `AC-n`/`INV-n`, and the diff. On PASS, Claude checks the
    box. On FAIL, the job returns to Cursor.
 9. Repeat 7–8 until `docs/plan.md` is complete.
-10. Release gate: Cursor `/harden`, Claude whole-app `/review`,
-    then `npm run verify` and `npm run preflight`. Matt opens `/ship`.
+10. Release gate: Cursor `/app-harden`, Claude whole-app `/app-review`,
+    then `npm run verify` and `npm run preflight`. Matt opens `/app-ship`.
 
 There is **no** `docs/design-brief.md`. Kickoff prompts for the design tool
 stay outside the repo (chat paste only). Exports in `docs/design-exports/`
@@ -108,7 +108,7 @@ downstream sync for NativeWind — see Stack below.
 
 A frame beats prose. `design.md` is not a substitute for the export.
 
-No new screen layout without the `pull-design` skill and a named export in
+No new screen layout without the `app-pull-design` skill and a named export in
 `docs/design-exports/`. If the pull fails, stop — do not invent a layout.
 Non-UI work (storage, purchases, copy) and edits to already-built screens
 that only use already-synced tokens are allowed without a new pull — still
@@ -255,9 +255,9 @@ files.
 
 Still on disk and still valid:
 
-- Pull a screen artifact (builder) — `pull-design`
-- Maestro e2e — `maestro-e2e`
-- Document today's code (Claude, on demand) — `/architecture`. Not a
+- Pull a screen artifact (builder) — `app-pull-design`
+- Maestro e2e — `app-maestro-e2e`
+- Document today's code (Claude, on demand) — `/app-architecture`. Not a
   first-app stage.
 
 ## Delegate to a cheaper model

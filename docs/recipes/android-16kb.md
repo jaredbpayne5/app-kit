@@ -73,6 +73,6 @@ than a subtle bug.
 
 ## 5. Where this belongs in the release flow
 
-This is a `/ship` concern, checked once per release against a real build — not a
+This is a `/app-ship` concern, checked once per release against a real build — not a
 per-job check, and deliberately not part of `npm run check`, which never builds
 native code.

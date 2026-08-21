@@ -1,5 +1,5 @@
 ---
-name: maestro-e2e
+name: app-maestro-e2e
 description: >-
   Runs Maestro e2e via project scripts with debug output contained.
   Use when running npm run test:e2e, maestro test, screenshots, or

@@ -1,5 +1,5 @@
 ---
-name: test
+name: app-test
 description: "Proves that a code change meets its acceptance criteria. Uses npm run check, npm test, npm run verify, and Maestro for mobile UI. Cursor only. Use to test or verify a job, diff, branch, PR, or user flow."
 disable-model-invocation: true
 ---
@@ -7,7 +7,7 @@ disable-model-invocation: true
 # Test
 
 Cursor only. Prove a change meets its acceptance criteria. Use this on
-the current job when you are the builder running `/code`.
+the current job when you are the builder running `/app-code`.
 
 ## Workflow
 
@@ -42,7 +42,7 @@ the current job when you are the builder running `/code`.
    - `npm test` for logic changes
    - `npm run verify` before considering work done
 8. When a new or changed user-visible flow is in scope, prove it on a
-   simulator with Maestro (`npm run test:e2e` or the `maestro-e2e`
+   simulator with Maestro (`npm run test:e2e` or the `app-maestro-e2e`
    playbook). Reading source is not device proof. Maestro is required on
    the first implementation of a new screen or flow, not every job. When
    the web lander changes, check the required flows in a real browser.
@@ -58,8 +58,8 @@ the current job when you are the builder running `/code`.
 - A green `npm run verify` records a receipt under `.run/receipts/` that the
   reviewer reads. Never write or edit one by hand. Reporting a check as passing
   when it did not run is the one failure this whole process cannot absorb.
-- Do not review the change in this skill. `/review` is Claude-only and
-  a different playbook. `/critic` is for product and design, not code.
+- Do not review the change in this skill. `/app-review` is Claude-only and
+  a different playbook. `/app-critic` is for product and design, not code.
 - If required device or Maestro tooling is unavailable, report the check
   as blocked unless the user explicitly accepts a manual exception.
 - Ask before `session:down`. Sims may be in use by another agent.
