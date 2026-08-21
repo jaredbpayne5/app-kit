@@ -2,23 +2,14 @@
   "permissions": {
     "deny": [
       "Edit(./.claude/hooks/**)",
-      "Write(./.claude/hooks/**)",
       "Edit(./.claude/settings.json)",
-      "Write(./.claude/settings.json)",
       "Edit(./.cursor/hooks/**)",
-      "Write(./.cursor/hooks/**)",
       "Edit(./.cursor/hooks.json)",
-      "Write(./.cursor/hooks.json)",
       "Edit(./.githooks/**)",
-      "Write(./.githooks/**)",
       "Edit(./eslint.config.js)",
-      "Write(./eslint.config.js)",
       "Edit(./.github/workflows/ci.yml)",
-      "Write(./.github/workflows/ci.yml)",
       "Edit(./scripts/lib/guard-*.sh)",
-      "Write(./scripts/lib/guard-*.sh)",
-      "Edit(./scripts/lib/fail-proof-checks.test.sh)",
-      "Write(./scripts/lib/fail-proof-checks.test.sh)"
+      "Edit(./scripts/lib/fail-proof-checks.test.sh)"
     ]
   },
   "hooks": {

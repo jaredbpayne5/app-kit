@@ -106,16 +106,20 @@ fi
 
 echo "=== guard-file deny is configured ==="
 if grep -q 'Edit(./.claude/hooks/\*\*)' .claude/settings.json \
-  && grep -q 'Write(./.claude/hooks/\*\*)' .claude/settings.json \
   && grep -q 'Edit(./.cursor/hooks/\*\*)' .claude/settings.json \
   && grep -q 'Edit(./scripts/lib/guard-\*\.sh)' .claude/settings.json \
   && grep -q 'Edit(./scripts/lib/fail-proof-checks.test.sh)' .claude/settings.json \
   && grep -q 'Edit(./.githooks/\*\*)' .claude/settings.json \
   && grep -q 'Edit(./eslint.config.js)' .claude/settings.json \
   && grep -q 'Edit(./.github/workflows/ci.yml)' .claude/settings.json; then
-  ok "Claude permissions.deny lists the guard paths (Edit and Write)"
+  ok "Claude permissions.deny lists the guard paths (Edit)"
 else
   bad "Claude permissions.deny is missing a guard path"
+fi
+if grep -q 'Write(' .claude/settings.json; then
+  bad "Claude permissions.deny still has Write() rules — current Claude Code ignores them, Edit() covers all file edits"
+else
+  ok "Claude permissions.deny has no dead Write() rules"
 fi
 
 if grep -q 'guard-protected-files.sh' .cursor/hooks.json; then
