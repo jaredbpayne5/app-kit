@@ -26,18 +26,30 @@ the current job when you are the builder running `/code`.
 5. Assert behavior a user or caller can observe unless the test targets a
    documented internal contract. Keep setup and assertions no more complex
    than the scenario.
-6. Run the narrowest checks that exercise the changed behavior:
+6. Produce the proof tier the job's `Tests:` field names. The field is the
+   floor, not a ceiling — add more if the change needs it, never less:
+   - `logic` — a Jest test under `apps/mobile/__tests__/`
+   - `screen` — a React Native Testing Library render plus accessibility
+     labels
+   - `flow` — a Maestro flow run on a simulator
+   - `none` — no behavior changed; say so in the report
+
+   If the job has no `Tests:` field, treat that as a planning defect: report
+   it and infer the tier from what changed rather than skipping proof.
+7. Run the narrowest checks that exercise the changed behavior:
    - `npm run check` after edits (format, lint, typecheck, contrast,
      design lint)
    - `npm test` for logic changes
    - `npm run verify` before considering work done
-7. When a new or changed user-visible flow is in scope, prove it on a
+8. When a new or changed user-visible flow is in scope, prove it on a
    simulator with Maestro (`npm run test:e2e` or the `maestro-e2e`
    playbook). Reading source is not device proof. Maestro is required on
    the first implementation of a new screen or flow, not every job. When
    the web lander changes, check the required flows in a real browser.
-8. Report each `AC-n`, `INV-n`, or job criterion as pass, fail, or
-   unverified. Include the command, flow, or other evidence.
+   A `--allow-skip` run is not proof of a `flow` tier.
+9. Report each `AC-n`, `INV-n`, or job criterion as pass, fail, or
+   unverified. Include the command, flow, or other evidence. Name the tier
+   you produced and the tier the job asked for.
 
 ## Boundaries
 

@@ -55,15 +55,40 @@ Design: docs/design.md (frozen YYYY-MM-DD)
 
 - [ ] 1. <Plain action and result>
       Done when: observable result; cite AC-n / INV-n where they apply.
+      Files: apps/mobile/lib/reminders.ts, apps/mobile/app/(tabs)/index.tsx
+      Tests: logic, screen
+      Deps: none
       Check: npm run check, npm test
-      Notes: seam to use, named export if UI, dependencies, what to stay out of.
+      Notes: seam to use, named export if UI, what to stay out of.
 ```
 
 Each job carries:
 
 - **Done when** — observable, cites `AC-n`/`INV-n` where they apply
+- **Files** — repo-relative paths this job is expected to touch, including
+  files it will create. This is the job's blast radius, not a guess.
+- **Tests** — the required proof tier, from the table below. Comma-separate
+  when a job needs more than one.
+- **Deps** — `none`, or the job numbers that must land first
 - **Check** — exact commands
-- **Notes** — dependencies, seam to use, named export if UI, what to stay out of
+- **Notes** — seam to use, named export if UI, what to stay out of
+
+`scripts/dev/plan-lint.sh` validates these fields, so keep the field names and
+spelling exact.
+
+### Test tiers
+
+| Tier | Means | Proof |
+| --- | --- | --- |
+| `logic` | Behavior with no UI: seams, data rules, pure functions | Jest test under `apps/mobile/__tests__/` |
+| `screen` | A screen or component renders and is reachable | React Native Testing Library render plus accessibility labels |
+| `flow` | A user journey across screens | Maestro flow in `apps/mobile/maestro/` |
+| `none` | No behavior change: copy, docs, config | State why in Notes |
+
+Pick the tier by what the job actually changes. A job that adds a seam function
+and shows it on a screen is `logic, screen`. Do not claim `flow` unless a
+Maestro flow really covers it — `npm run test:e2e` is the only thing that
+proves that tier, and `--allow-skip` does not.
 
 ## Writing rules
 
@@ -87,6 +112,8 @@ Each job carries:
 - A new screen needs a named export. If it is missing, stop.
 - In Check, include `npm run check`, `npm test` when logic changes,
   and the exact Maestro or manual proof when automation cannot cover it.
+- Every job needs `Files`, `Tests`, and `Deps`. Do not bury a target file or a
+  dependency in Notes prose, and do not write `Files: TBD`.
 - Do not decide anything this file is not allowed to decide.
 
 Before returning the plan, read each job twice:
