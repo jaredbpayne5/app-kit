@@ -22,7 +22,7 @@ Design: docs/design.md (frozen 2026-01-01)
       Done when: create, see, and delete a reminder in one Maestro run; AC-4.
       Files: apps/mobile/maestro/smoke.yaml
       Tests: flow
-      Deps: 2
+      Deps: 1, 2
       Check: npm run check, npm run test:e2e
       Notes: no --allow-skip.
 

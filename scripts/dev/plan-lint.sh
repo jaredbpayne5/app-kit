@@ -22,11 +22,12 @@ cd "$ROOT" || exit 1
 
 PLAN="docs/plan.md"
 STRICT=0
+EXPLICIT_FILE=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --file=*) PLAN="${1#--file=}"; shift ;;
-    --file) PLAN="${2:-}"; shift 2 ;;
+    --file=*) PLAN="${1#--file=}"; EXPLICIT_FILE=1; shift ;;
+    --file) PLAN="${2:-}"; EXPLICIT_FILE=1; shift 2 ;;
     --strict) STRICT=1; shift ;;
     -h|--help) sed -n '2,18p' "$0"; exit 0 ;;
     *) printf 'Unknown arg: %s\n' "$1" >&2; exit 2 ;;
@@ -34,6 +35,13 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ ! -f "$PLAN" ]]; then
+  # Quiet only for the default path, where a missing plan is the normal state of
+  # a fresh clone. A named --file that is not there is a typo, and reporting
+  # success would turn an operator mistake into a pass.
+  if [[ "$EXPLICIT_FILE" -eq 1 ]]; then
+    echo "plan-lint: $PLAN does not exist" >&2
+    exit 2
+  fi
   echo "plan-lint: no $PLAN yet — nothing to lint"
   exit 0
 fi
@@ -92,8 +100,12 @@ validate() {
   local tests_val tier
   tests_val="$(field_value Tests)"
   if [[ -n "$tests_val" ]]; then
-    local IFS=','
-    for tier in $tests_val; do
+    # `IFS=',' read` scopes the separator to this one command. A bare
+    # `local IFS=','` would leak to the Deps loop below, where the values
+    # arrive newline-separated.
+    local tiers=()
+    IFS=',' read -ra tiers <<< "$tests_val"
+    for tier in "${tiers[@]}"; do
       tier="$(trim "$tier")"
       [[ -z "$tier" ]] && continue
       case "$tier" in
@@ -112,8 +124,9 @@ validate() {
         warn "$label: Files must name real paths, not a placeholder"
         ;;
     esac
-    local IFS=','
-    for entry in $files_val; do
+    local entries=()
+    IFS=',' read -ra entries <<< "$files_val"
+    for entry in "${entries[@]}"; do
       entry="$(trim "$entry")"
       [[ -z "$entry" ]] && continue
       if [[ "$entry" != */* && "$entry" != *.* ]]; then

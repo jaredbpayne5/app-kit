@@ -34,7 +34,8 @@ touches rung 6 — that one has no CLI in this repo on purpose.
 ## 3. What enforces this
 
 Rungs 3 to 5 are matched by `scripts/lib/guard-deploy-match.sh` and surfaced
-through the shell hooks, which is why `npm run guard-check` covers 65 cases. That
+through the shell hooks, which is why `npm run guard-check` carries a named case
+for every rung it matches. That
 matcher is a **speed bump for spend, not a security boundary**: it catches the
 common command shapes, not every possible wrapper.
 

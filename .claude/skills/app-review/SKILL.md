@@ -73,8 +73,11 @@ The verdict is independent agent evidence. It is not GitHub approval.
    - Assert behavior a user or caller can observe, or a documented contract.
    - Would fail under a broken implementation.
 7. **Check the receipt.** Run `npm run receipt:check -- --command=verify`. A
-   receipt is written only by a green `npm run verify`, and is tied to the
-   commit it ran against. Report what it says:
+   receipt is written as the last step of the `verify` chain, so it is reached
+   only if every earlier check exited 0, and it carries the commit it ran
+   against. It is a claim with a commit attached, not proof against a
+   deliberate forge — anything that can run shell can write a file. Report what
+   it says:
    - No receipt for `HEAD`, or a receipt from an older commit: the "checks
      pass" claim is unproven. Say so in the findings rather than assuming
      either outcome.

@@ -4,16 +4,26 @@
 # at a specific commit.
 #
 # Without this, a reviewer takes the builder's word for "checks pass". A receipt
-# is written only by a command that succeeded, and is tied to the commit it ran
-# against, so a stale or absent receipt is detectable.
+# is tied to the commit it was written at, so a stale or absent one is
+# detectable — which is the property a reviewer actually needs.
+#
+# What a receipt proves and does not prove: `record` runs as the last link of the
+# `verify` chain, so it is reached only if every earlier link exited 0. It cannot
+# prove that nobody wrote one deliberately. Anything that can run shell can forge
+# a file, so this is a speed bump against a careless or over-eager agent, not a
+# security boundary. `record` is deliberately not a public npm script and refuses
+# to run unless the verify chain invoked it. Treat a receipt as a claim with a
+# commit attached, not as a cryptographic proof — a reviewer may always re-run
+# the checks instead.
 #
 # Receipts live under .run/receipts/ and are gitignored. They are evidence about
 # one machine at one moment, never a source of authority.
 #
 # Usage:
-#   npm run receipt:record -- --command=verify     # after a green run
 #   npm run receipt:check -- --command=verify      # does HEAD have one?
 #   npm run receipt:check -- --command=verify --strict
+#
+# Recording happens inside `npm run verify`. There is no by-hand equivalent.
 #
 set -uo pipefail
 
@@ -63,6 +73,14 @@ tree_state() {
 
 case "$ACTION" in
   record)
+    # Only the verify chain sets this. Without it, `record` was a one-command
+    # path to a green receipt for a run that never happened — the exact
+    # claim-without-evidence problem receipts exist to remove.
+    if [[ "${APP_KIT_RECEIPT_FROM_VERIFY:-}" != "1" ]]; then
+      echo "receipt: refusing to record — a receipt is written by the verify chain, not by hand" >&2
+      echo "receipt: run 'npm run verify'" >&2
+      exit 2
+    fi
     mkdir -p "$DIR"
     printf '{\n  "command": "%s",\n  "commit": "%s",\n  "branch": "%s",\n  "timestamp": "%s",\n  "exit_code": 0,\n  "tree": "%s"\n}\n' \
       "$COMMAND" "$COMMIT" "$BRANCH" \
