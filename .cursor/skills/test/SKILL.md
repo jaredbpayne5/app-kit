@@ -55,6 +55,9 @@ the current job when you are the builder running `/code`.
 
 - Do not weaken assertions to make a change pass.
 - Do not fix unrelated failures.
+- A green `npm run verify` records a receipt under `.run/receipts/` that the
+  reviewer reads. Never write or edit one by hand. Reporting a check as passing
+  when it did not run is the one failure this whole process cannot absorb.
 - Do not review the change in this skill. `/review` is Claude-only and
   a different playbook. `/critic` is for product and design, not code.
 - If required device or Maestro tooling is unavailable, report the check

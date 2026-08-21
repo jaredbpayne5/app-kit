@@ -172,6 +172,98 @@ else
 fi
 printf '  %sNext: Claude /product → pictures in docs/design-exports/ → Claude /design → Cursor /critic → Claude /plan → jobs.%s\n' "$DIM" "$RESET"
 
+# Factory wiring — catches drift between what a config points at and what
+# exists. A hook registered to a deleted script, a skill citing an npm script
+# that was renamed, or a skill whose name no longer matches its folder all fail
+# silently at the moment they are needed.
+printf '\n%sfactory wiring%s\n' "$BOLD" "$RESET"
+
+if have jq; then
+  missing_hooks=""
+  if [[ -f .cursor/hooks.json ]]; then
+    while read -r hook_cmd; do
+      [[ -z "$hook_cmd" ]] && continue
+      hook_path="${hook_cmd##* }"
+      [[ -f "$hook_path" ]] || missing_hooks="${missing_hooks} ${hook_path}"
+    done < <(jq -r '.hooks | to_entries[] | .value[] | .command' .cursor/hooks.json 2>/dev/null)
+  fi
+  if [[ -f .claude/settings.json ]]; then
+    while read -r hook_cmd; do
+      [[ -z "$hook_cmd" ]] && continue
+      hook_path="${hook_cmd/\$\{CLAUDE_PROJECT_DIR\}\//}"
+      [[ -f "$hook_path" ]] || missing_hooks="${missing_hooks} ${hook_path}"
+    done < <(jq -r '.hooks | to_entries[] | .value[] | .hooks[]? | .command' .claude/settings.json 2>/dev/null)
+  fi
+  if [[ -z "$missing_hooks" ]]; then
+    ok "every registered hook script exists"
+  else
+    bad 2 "registered hook script(s) missing:${missing_hooks}"
+  fi
+else
+  warn "jq missing — skipped hook wiring check"
+fi
+
+# npm scripts cited by a skill or recipe must exist, or the instruction is a
+# dead end the moment an agent follows it.
+if have jq && [[ -f package.json ]]; then
+  missing_scripts=""
+  cited="$(grep -rhoE 'npm run [a-z][a-z0-9:_-]*' \
+    .cursor/skills .claude/skills AGENTS.md docs/recipes 2>/dev/null \
+    | sed 's/^npm run //' | sort -u)"
+  for s in $cited; do
+    jq -e --arg s "$s" '.scripts[$s]' package.json >/dev/null 2>&1 \
+      || missing_scripts="${missing_scripts} ${s}"
+  done
+  if [[ -z "$missing_scripts" ]]; then
+    ok "every 'npm run' cited in a skill or recipe exists in package.json"
+  else
+    bad 2 "skill/recipe cites missing npm script(s):${missing_scripts}"
+  fi
+fi
+
+# Skill frontmatter drives the / menu. A missing name or description makes a
+# skill unlistable; a name that no longer matches its folder is silent drift.
+skill_problems=""
+skill_count=0
+while IFS= read -r skill; do
+  [[ -z "$skill" ]] && continue
+  skill_count=$((skill_count + 1))
+  dir_name="$(basename "$(dirname "$skill")")"
+  head -1 "$skill" | grep -q '^---$' \
+    || skill_problems="${skill_problems} ${skill}:no-frontmatter"
+  grep -qE '^name:[[:space:]]*\S' "$skill" \
+    || skill_problems="${skill_problems} ${skill}:no-name"
+  # A description must carry real words. An empty quoted value ("" or '') is as
+  # unlistable as a missing key. A folded scalar (>- or |) continues on the
+  # next line, so follow it before judging.
+  awk '
+    /^description:/ {
+      value = $0
+      sub(/^description:[[:space:]]*/, "", value)
+      if (value ~ /^[>|][-+]?$/) { getline value }
+      if (value ~ /[A-Za-z]/) { found = 1 }
+      exit
+    }
+    END { exit(found ? 0 : 1) }
+  ' "$skill" || skill_problems="${skill_problems} ${skill}:no-description"
+  declared="$(sed -nE 's/^name:[[:space:]]*"?([^"]*)"?[[:space:]]*$/\1/p' "$skill" | head -1)"
+  if [[ -n "$declared" && "$declared" != "$dir_name" ]]; then
+    skill_problems="${skill_problems} ${skill}:name-is-${declared}-but-folder-is-${dir_name}"
+  fi
+  if grep -qE '^disable-model-invocation:' "$skill" \
+    && ! grep -qE '^disable-model-invocation:[[:space:]]*true$' "$skill"; then
+    skill_problems="${skill_problems} ${skill}:disable-model-invocation-not-true"
+  fi
+done < <(find .cursor/skills .claude/skills -name 'SKILL.md' 2>/dev/null | sort)
+
+if [[ "$skill_count" -eq 0 ]]; then
+  bad 2 "no SKILL.md files found under .cursor/skills or .claude/skills"
+elif [[ -z "$skill_problems" ]]; then
+  ok "$skill_count skill(s) have valid frontmatter and match their folder"
+else
+  bad 2 "skill frontmatter problem(s):${skill_problems}"
+fi
+
 printf '\n%slocal runtime%s\n' "$BOLD" "$RESET"
 ok "backend: none (local-first — no Docker / hosted BaaS checks)"
 

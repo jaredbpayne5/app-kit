@@ -67,12 +67,25 @@ The verdict is independent agent evidence. It is not GitHub approval.
    `pull-design`. No secrets. No backend, accounts, or server-side sync.
 6. **Review the proof.** Check that tests:
    - Cover the changed behavior and affected failure paths.
+   - Match the tier the job's `Tests:` field declared. A job that says `flow`
+     needs a Maestro run, and a `--allow-skip` run does not count.
    - Prove every cited `AC-n`, `INV-n`, or job criterion.
    - Assert behavior a user or caller can observe, or a documented contract.
    - Would fail under a broken implementation.
-7. Run focused checks that can confirm or disprove a claim that could change
+7. **Check the receipt.** Run `npm run receipt:check -- --command=verify`. A
+   receipt is written only by a green `npm run verify`, and is tied to the
+   commit it ran against. Report what it says:
+   - No receipt for `HEAD`, or a receipt from an older commit: the "checks
+     pass" claim is unproven. Say so in the findings rather than assuming
+     either outcome.
+   - A dirty tree, then or now: the commit does not describe what was
+     verified.
+
+   A missing receipt is not automatically `FAIL` — you may run the checks
+   yourself instead. What is not allowed is taking the claim on trust.
+8. Run focused checks that can confirm or disprove a claim that could change
    a finding or verdict (`npm run check`, `npm test`). Do not pipe to `tail`.
-8. **Report findings.** Return actionable findings in priority order.
+9. **Report findings.** Return actionable findings in priority order.
 
 ## Whole-app target (release gate)
 
