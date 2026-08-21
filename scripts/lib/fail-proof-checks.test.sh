@@ -283,11 +283,11 @@ if command -v jq >/dev/null 2>&1; then
   else
     bad "secret hook got $p8_perm on .p8 (expected deny)"
   fi
-if [[ "$app_perm" == deny ]]; then
-  ok "identity hook denies a tool write to app.json"
-else
-  bad "identity hook got $app_perm on an app.json tool write (expected deny — preToolUse ignores ask)"
-fi
+  if [[ "$app_perm" == deny ]]; then
+    ok "identity hook denies a tool write to app.json"
+  else
+    bad "identity hook got $app_perm on an app.json tool write (expected deny — preToolUse ignores ask)"
+  fi
   if [[ "$init_perm" == allow ]]; then
     ok "identity hook allows init-app"
   else
@@ -298,36 +298,54 @@ fi
   else
     bad "secret hook got $ordinary_perm on an ordinary path (expected allow)"
   fi
-app_cmd_perm=$(jq -nc '{command:"printf x >> apps/mobile/app.json"}' \
-  | bash "$ident_hook" | jq -r '.permission')
-if [[ "$app_cmd_perm" == ask ]]; then
-  ok "identity hook asks on an app.json shell write"
-else
-  bad "identity hook got $app_cmd_perm on an app.json shell command (expected ask)"
-fi
-
-# An `ask` on a file-path payload is unenforced by preToolUse, so it is a
-# fake gate. Never emit one.
-fake_gate=0
-for p in apps/mobile/app.json apps/mobile/eas.json \
-  apps/mobile/store/data-practices.json .env; do
-  v=$(jq -nc --arg p "$p" '{tool_input:{file_path:$p}}' \
+  app_cmd_perm=$(jq -nc '{command:"printf x >> apps/mobile/app.json"}' \
     | bash "$ident_hook" | jq -r '.permission')
-  [[ "$v" == ask ]] && fake_gate=1
-done
-if [[ "$fake_gate" -eq 0 ]]; then
-  ok "identity hook never returns an unenforced ask on a tool write"
-else
-  bad "identity hook returned ask for a tool write — preToolUse ignores it, so the gate is fake"
-fi
+  if [[ "$app_cmd_perm" == ask ]]; then
+    ok "identity hook asks on an app.json shell write"
+  else
+    bad "identity hook got $app_cmd_perm on an app.json shell command (expected ask)"
+  fi
 
-if [[ "$(jq '[.hooks.preToolUse[], .hooks.beforeReadFile[]]
-  | map(select(.command | test("guard-secret-files")))
-  | all(.failClosed == true)' .cursor/hooks.json)" == true ]]; then
-  ok "secret-file hook registrations are failClosed"
-else
-  bad "guard-secret-files.sh registrations must set failClosed: true"
-fi
+  # Every identity path must come back `deny` on a tool write. Asserting only
+  # "not ask" was a hole: `allow` satisfied it, so the classifier entries for
+  # eas.json, data-practices.json, and .env could be deleted outright while this
+  # stayed green. Asserting the positive verdict covers both properties at once.
+  not_denied=""
+  for p in apps/mobile/app.json apps/mobile/eas.json \
+    apps/mobile/store/data-practices.json .env; do
+    v=$(jq -nc --arg p "$p" '{tool_input:{file_path:$p}}' \
+      | bash "$ident_hook" | jq -r '.permission')
+    [[ "$v" == deny ]] || not_denied="$not_denied $p($v)"
+  done
+  if [[ -z "$not_denied" ]]; then
+    ok "identity hook denies a tool write to every identity path"
+  else
+    bad "identity hook did not deny tool writes to:$not_denied"
+  fi
+
+  # Count first. `all()` over an empty array is vacuously true, so a length check
+  # is what makes deleting the registration detectable rather than invisible.
+  secret_regs=$(jq '[.hooks.preToolUse[], .hooks.beforeReadFile[]]
+    | map(select(.command | test("guard-secret-files")))' .cursor/hooks.json)
+  if [[ "$(echo "$secret_regs" | jq 'length')" -eq 2 ]] \
+    && [[ "$(echo "$secret_regs" | jq 'all(.failClosed == true)')" == true ]]; then
+    ok "both secret-file hook registrations are present and failClosed"
+  else
+    bad "guard-secret-files.sh must be registered on preToolUse and beforeReadFile, both failClosed: true"
+  fi
+
+  # The suite proved the identity hook's verdict but never its wiring.
+  # A correct guard that is not registered is the same fake gate one layer up.
+  ident_events=$(jq -r '[
+      (.hooks.beforeShellExecution[]? | select(.command | test("guard-identity-writes")) | "shell"),
+      (.hooks.preToolUse[]? | select(.command | test("guard-identity-writes")) | "tool")
+    ] | sort | join(",")' .cursor/hooks.json)
+  if [[ "$ident_events" == "shell,tool" ]]; then
+    ok "identity hook is registered on both preToolUse and beforeShellExecution"
+  else
+    bad "identity hook registration incomplete (got '$ident_events', want 'shell,tool')"
+  fi
+
   claude_ident="$ROOT/scripts/lib/guard-sensitive-writes-claude.sh"
   claude_app=$(jq -nc '{tool_input:{file_path:"apps/mobile/app.json"}}' | bash "$claude_ident")
   claude_perm=$(echo "$claude_app" | jq -r '.hookSpecificOutput.permissionDecision // empty')
@@ -365,6 +383,20 @@ if grep -q 'shellcheck-guards' package.json; then
   ok "package.json runs shellcheck-guards in check"
 else
   bad "shellcheck-guards is not in package.json"
+fi
+
+echo "=== plan-lint can fail ==="
+if bash scripts/dev/plan-lint.sh \
+  --file=scripts/dev/fixtures/plan-lint/good.md --strict >/dev/null 2>&1; then
+  ok "plan-lint accepts the good fixture under --strict"
+else
+  bad "plan-lint rejected the good fixture under --strict"
+fi
+if bash scripts/dev/plan-lint.sh \
+  --file=scripts/dev/fixtures/plan-lint/bad.md --strict >/dev/null 2>&1; then
+  bad "plan-lint passed the bad fixture under --strict — it has no failure path"
+else
+  ok "plan-lint rejects the bad fixture under --strict"
 fi
 
 echo

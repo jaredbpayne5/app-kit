@@ -69,6 +69,8 @@ guard_is_protected() {
     .github/workflows/ci.yml | */.github/workflows/ci.yml) return 0 ;;
     scripts/lib/guard-*.sh | */scripts/lib/guard-*.sh) return 0 ;;
     scripts/lib/fail-proof-checks.test.sh | */scripts/lib/fail-proof-checks.test.sh) return 0 ;;
+    scripts/dev/receipt.sh | */scripts/dev/receipt.sh) return 0 ;;
+    .run/receipts/* | */.run/receipts/*) return 0 ;;
   esac
   return 1
 }
@@ -78,7 +80,7 @@ guard_is_protected() {
 # chmod, or every bash -c wrapper.
 guard_command_writes_protected() {
   local command="$1"
-  local pat='(\.claude/hooks/|\.claude/settings\.json|\.cursor/hooks|\.githooks/|eslint\.config\.js|\.github/workflows/ci\.yml|scripts/lib/guard-|scripts/lib/fail-proof-checks\.test\.sh)'
+  local pat='(\.claude/hooks/|\.claude/settings\.json|\.cursor/hooks|\.githooks/|eslint\.config\.js|\.github/workflows/ci\.yml|scripts/lib/guard-|scripts/lib/fail-proof-checks\.test\.sh|scripts/dev/receipt\.sh|\.run/receipts/)'
   if echo "$command" | grep -Eqe "\\brm\\b[^;&|]*${pat}"; then
     return 0
   fi
