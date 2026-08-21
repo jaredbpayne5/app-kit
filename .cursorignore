@@ -4,6 +4,11 @@
 # This is about attention, not secrecy — `.gitignore` still governs what gets
 # committed. Anything genuinely secret is listed here as well as there.
 
+# Claude Code only. Cursor auto-loads CLAUDE.md. That leaks the thinker
+# menu into the builder. Claude Code does not use this ignore list.
+CLAUDE.md
+
+
 # Dependencies — 936MB, never useful to read
 node_modules/
 package-lock.json
