@@ -243,6 +243,41 @@ else
   echo "design-lint: no unmarked inline style={{ }} in apps/mobile TS/TSX"
 fi
 
+# --- 8. Accessibility affordances on interactive files (warn-only) -----------
+# A screen full of unlabelled Pressables is invisible to VoiceOver and to the
+# accessibility-label assertions the tests rely on. This is a floor, not an
+# audit: it fires when a file renders something tappable and offers no
+# accessibility affordance anywhere. Per-element checking is deliberately not
+# attempted — a Pressable wrapping visible <Text> needs no separate label, and
+# flagging those would train everyone to ignore the output.
+#
+# ui/ primitives are exempt: they forward props, so the caller supplies labels.
+# Warn-only by design. It never sets FAIL.
+A11Y_MISS=""
+while IFS= read -r f; do
+  [[ -f "$f" ]] || continue
+  case "$f" in
+    apps/mobile/ui/*) continue ;;
+  esac
+  if ! grep -qE 'accessibilityLabel|accessibilityRole|accessible=|aria-label' "$f"; then
+    A11Y_MISS+="  $f"$'\n'
+  fi
+done < <(
+  grep -rl --include='*.tsx' \
+    -E '<(Pressable|TouchableOpacity|TouchableHighlight|Button|Switch)\b' \
+    --exclude-dir=node_modules --exclude-dir=android --exclude-dir=ios \
+    --exclude-dir=.expo --exclude-dir=__tests__ \
+    apps/mobile 2>/dev/null | grep -v '\.test\.tsx$' | sort
+)
+if [[ -n "$A11Y_MISS" ]]; then
+  echo "design-lint: ! file(s) render something tappable with no accessibility affordance:"
+  printf '%s' "$A11Y_MISS"
+  echo "  Add accessibilityLabel (or accessibilityRole) so VoiceOver and the a11y tests can reach it."
+  echo "  Warning only — design-lint does not fail on this yet."
+else
+  echo "design-lint: every file with interactive elements has an accessibility affordance"
+fi
+
 if [[ "$FAIL" -eq 1 ]]; then
   exit 1
 fi

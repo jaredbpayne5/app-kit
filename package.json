@@ -31,6 +31,7 @@
     "knip:clone": "bash scripts/dev/knip-clone.sh",
     "check": "npm run format:check && npm run lint && npm run typecheck && npm run gen-theme -- --check && npm run sync:legal -- --check && npm run contrast-check && npm run design-lint && npm run plan-lint && npm run guard-check && npm run fail-proof-check && npm run shellcheck-guards",
     "test": "npm run test -w mobile",
+    "test:coverage": "npm run test:coverage -w mobile",
     "test:e2e": "bash scripts/dev/test-e2e.sh",
     "smoke:export": "bash scripts/dev/smoke-export.sh",
     "smoke:init": "bash scripts/factory/init-app.smoke.sh",

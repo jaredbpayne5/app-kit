@@ -15,6 +15,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "jest --watchAll=false",
+    "test:coverage": "jest --watchAll=false --coverage",
     "smoke:export": "bash ../../scripts/dev/smoke-export.sh"
   },
   "dependencies": {

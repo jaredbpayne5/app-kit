@@ -18,6 +18,15 @@ module.exports = {
     '^lucide-react-native$':
       '<rootDir>/../../node_modules/lucide-react-native/dist/cjs/lucide-react-native.js',
   },
+  // Coverage is scoped to the lib/ seams — the code where an untested branch
+  // means silent data loss, a wrong entitlement, or a swallowed error. Screens
+  // are proved by render and Maestro, where a line-coverage number says little.
+  //
+  // Deliberately no coverageThreshold: a number to hit invites padding tests,
+  // which is the opposite of proof. Read the report, then write the test the
+  // gap actually calls for. Run: npm run test:coverage
+  collectCoverageFrom: ['lib/**/*.{ts,tsx}'],
+  coverageReporters: ['text-summary', 'text'],
   // Avoid requiring a writable Watchman state dir (Cursor sandbox / CI agents).
   watchman: false,
   transformIgnorePatterns: [
