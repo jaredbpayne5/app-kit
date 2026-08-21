@@ -1,6 +1,6 @@
 ---
 name: app-code
-description: "Builder coding skill. Completes one job: code → test → improve → test. Ask before git push. Use to implement one unchecked job from docs/plan.md. Do not review this chat's own diff."
+description: "Builder coding skill. Completes one job: code → test → improve → test. Ask before git push. Use to implement one unchecked job from docs/BACKLOG.md. Do not review this chat's own diff."
 disable-model-invocation: true
 ---
 
@@ -13,10 +13,10 @@ One job is `code → test → improve → test`, then `npm run check`.
 
 ## Workflow
 
-1. Read the next unchecked job in `docs/plan.md`, `AGENTS.md`,
-   `docs/PRD.md`, `docs/design.md`, and the named export if the job is a
+1. Read the next unchecked job in `docs/BACKLOG.md`, `AGENTS.md`,
+   `docs/PRD.md`, `docs/CONTRACT.md`, and the named export if the job is a
    screen. If `docs/PRD.md` still contains `<!-- TEMPLATE_PLACEHOLDER -->`,
-   stop. If the last `**Verdict:**` line in `docs/critic.md` is not
+   stop. If the last `**Verdict:**` line in `docs/CRITIC.md` is not
    `PASS`, stop unless Matt explicitly overrides in this chat. Note the
    job's `Deps:` — if a job it depends on is still unchecked, stop and say
    so.
@@ -24,7 +24,7 @@ One job is `code → test → improve → test`, then `npm run check`.
    pull fails, stop. Do not invent a layout.
 3. Create or reuse a branch from the latest default branch.
 4. Write the code. Use `lib/` seams, `ui/` primitives, and NativeWind
-   tokens. Do not rewrite `docs/PRD.md` or `docs/design.md`. The job's
+   tokens. Do not rewrite `docs/PRD.md` or `docs/CONTRACT.md`. The job's
    `Files:` field is its expected blast radius: if you need to touch
    something outside it, say so in the report rather than expanding scope
    quietly.
@@ -36,14 +36,14 @@ One job is `code → test → improve → test`, then `npm run check`.
    code. Then `/app-test` again.
 7. Commit. Ask before `git push`. If the user said to push, push and create
    or update one pull request with a short summary and the current proof.
-8. Stop. Do not check the box in `docs/plan.md`. Next allowed skill is
+8. Stop. Do not check the box in `docs/BACKLOG.md`. Next allowed skill is
    Claude `/app-review` on this job. Do not run `/app-review` here. Do not merge
    unless the user asks.
 
 ## If something is wrong
 
 - Job is unsound, or a higher authority contradicts it: stop and report.
-  Do not silently implement a different design.
+  Do not silently implement a different contract.
 - A product or technical decision is missing: stop and report. Do not
   decide it in `/app-code`.
 - You need a new dependency, config plugin, backend, `eas`, `prebuild`,

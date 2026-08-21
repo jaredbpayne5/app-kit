@@ -1,6 +1,6 @@
 ---
 name: app-review
-description: "Reviews an implementation change without editing it, or the whole app at the release gate. Starts from docs/PRD.md, the job's AC/INV, and the diff — not design.md compliance. Claude only. Use for code, PR, diff, branch, job, or whole-app reviews."
+description: "Reviews an implementation change without editing it, or the whole app at the release gate. Starts from docs/PRD.md, the job's AC/INV, and the diff — not CONTRACT.md compliance. Claude only. Use for code, PR, diff, branch, job, or whole-app reviews."
 user-invocable: true
 argument-hint: "[job N, diff, branch, commit, PR, or whole-app]"
 ---
@@ -8,7 +8,7 @@ argument-hint: "[job N, diff, branch, commit, PR, or whole-app]"
 # Review
 
 Claude only. Review builder code. Stay read-only except one write: on
-`PASS` for a job, check that job's box in `docs/plan.md`.
+`PASS` for a job, check that job's box in `docs/BACKLOG.md`.
 
 This chat must not have written the code. If it did, stop and say independent
 review is blocked. A new thinker chat should run `/app-review`.
@@ -18,23 +18,23 @@ Do not tell anyone to open a Cursor skill file. This playbook is complete.
 ## Scope
 
 Review the implementation target named by the user. It may be a job in
-`docs/plan.md`, a file, diff, branch, commit, pull request, or the whole
+`docs/BACKLOG.md`, a file, diff, branch, commit, pull request, or the whole
 app at the release gate.
 
 If the user does not name a target, review `git diff main...HEAD` plus staged,
 unstaged, and untracked files on the current branch. If there are no local
 changes, say so instead of substituting a whole-repository audit.
 
-Use Cursor `/app-critic` for `docs/PRD.md` or `docs/design.md` that has not been
+Use Cursor `/app-critic` for `docs/PRD.md` or `docs/CONTRACT.md` that has not been
 implemented. This skill reviews code.
 
 ## Standard
 
 Start from `docs/PRD.md`, the job's `AC-n`/`INV-n`, and the diff. The
 question is *would the user succeed?* — not *does this match my
-`docs/design.md`*. Design-compliance is a secondary check, not the
-standard. If the implementation satisfies the design but the user would
-still fail, that is `FAIL` and a design reopen.
+`docs/CONTRACT.md`*. Contract-compliance is a secondary check, not the
+standard. If the implementation satisfies the contract but the user would
+still fail, that is `FAIL` and a contract reopen.
 
 Approve only when:
 
@@ -149,7 +149,7 @@ Confidence means:
 Use exactly `PASS`, `FAIL`, or `BLOCKED`.
 
 - `PASS`: no Must fix or Should fix findings remain. For a job, check
-  its box in `docs/plan.md`. A checked box means built and reviewed.
+  its box in `docs/BACKLOG.md`. A checked box means built and reviewed.
 - `FAIL`: a Must fix or Should fix finding remains. Name the fixes.
   Next skill is builder `/app-code` on those fixes. Do not check the box.
 - `BLOCKED`: missing required context, specialist coverage, or this chat

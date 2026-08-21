@@ -1,26 +1,26 @@
 #!/usr/bin/env bash
 #
-# scripts/dev/plan-lint.sh — validate the job cards in docs/plan.md against the
-# shape .claude/skills/app-plan/SKILL.md promises. A vague job produces vague code
+# scripts/dev/backlog-lint.sh — validate the job cards in docs/BACKLOG.md against the
+# shape .claude/skills/app-backlog/SKILL.md promises. A vague job produces vague code
 # and a weak review, so the fields a builder needs (target files, proof tier,
 # dependencies) must be named fields rather than buried in Notes prose.
 #
 # Only unchecked jobs are linted. A checked job is already built and reviewed.
 #
-# Warn-only by default so a hand-edited plan cannot block `npm run check`.
+# Warn-only by default so a hand-edited backlog cannot block `npm run check`.
 # Pass --strict once the format has settled to make issues fail.
 #
 # Usage:
-#   npm run plan-lint
-#   npm run plan-lint -- --strict
-#   bash scripts/dev/plan-lint.sh --file=scripts/dev/fixtures/plan-lint/bad.md
+#   npm run backlog-lint
+#   npm run backlog-lint -- --strict
+#   bash scripts/dev/backlog-lint.sh --file=scripts/dev/fixtures/backlog-lint/bad.md
 #
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT" || exit 1
 
-PLAN="docs/plan.md"
+PLAN="docs/BACKLOG.md"
 STRICT=0
 EXPLICIT_FILE=0
 
@@ -35,22 +35,22 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ ! -f "$PLAN" ]]; then
-  # Quiet only for the default path, where a missing plan is the normal state of
-  # a fresh clone. A named --file that is not there is a typo, and reporting
-  # success would turn an operator mistake into a pass.
+  # Quiet only for the default path, where a missing backlog is the normal
+  # state of a fresh clone. A named --file that is not there is a typo, and
+  # reporting success would turn an operator mistake into a pass.
   if [[ "$EXPLICIT_FILE" -eq 1 ]]; then
-    echo "plan-lint: $PLAN does not exist" >&2
+    echo "backlog-lint: $PLAN does not exist" >&2
     exit 2
   fi
-  echo "plan-lint: no $PLAN yet — nothing to lint"
+  echo "backlog-lint: no $PLAN yet — nothing to lint"
   exit 0
 fi
 
 # Before a product exists there is nothing to plan. Mirrors the design-lint
 # sentinel gate so a template clone stays quiet.
-if [[ "$PLAN" == "docs/plan.md" ]] \
+if [[ "$PLAN" == "docs/BACKLOG.md" ]] \
   && grep -q 'TEMPLATE_PLACEHOLDER' docs/PRD.md 2>/dev/null; then
-  echo "plan-lint: docs/PRD.md still has its TEMPLATE_PLACEHOLDER sentinel — skipping"
+  echo "backlog-lint: docs/PRD.md still has its TEMPLATE_PLACEHOLDER sentinel — skipping"
   exit 0
 fi
 
@@ -176,13 +176,13 @@ done < "$PLAN"
 validate
 
 if [[ "$WARN" -eq 0 ]]; then
-  echo "plan-lint: $JOBS unchecked job(s) OK in $PLAN"
+  echo "backlog-lint: $JOBS unchecked job(s) OK in $PLAN"
   exit 0
 fi
 
-echo "plan-lint: $WARN issue(s) across $JOBS unchecked job(s) in $PLAN"
+echo "backlog-lint: $WARN issue(s) across $JOBS unchecked job(s) in $PLAN"
 if [[ "$STRICT" -eq 1 ]]; then
   exit 1
 fi
-echo "plan-lint: warn-only — pass --strict to make this fail"
+echo "backlog-lint: warn-only — pass --strict to make this fail"
 exit 0

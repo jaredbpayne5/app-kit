@@ -1,6 +1,6 @@
-# Plan
+# Backlog
 
-Design: docs/design.md (frozen 2026-01-01)
+Contract: docs/CONTRACT.md (frozen 2026-01-01)
 
 - [x] 1. Add the reminder storage seam
       Done when: a reminder survives an app restart; INV-2.

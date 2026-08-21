@@ -388,24 +388,24 @@ if grep -q 'shellcheck-guards' package.json; then
 else
   bad "shellcheck-guards is not in package.json"
 fi
-if grep '"check":' package.json | grep -q 'plan-lint'; then
-  ok "package.json runs plan-lint in check"
+if grep '"check":' package.json | grep -q 'backlog-lint'; then
+  ok "package.json runs backlog-lint in check"
 else
-  bad "plan-lint is not in the check chain"
+  bad "backlog-lint is not in the check chain"
 fi
 
-echo "=== plan-lint can fail ==="
-if bash scripts/dev/plan-lint.sh \
-  --file=scripts/dev/fixtures/plan-lint/good.md --strict >/dev/null 2>&1; then
-  ok "plan-lint accepts the good fixture under --strict"
+echo "=== backlog-lint can fail ==="
+if bash scripts/dev/backlog-lint.sh \
+  --file=scripts/dev/fixtures/backlog-lint/good.md --strict >/dev/null 2>&1; then
+  ok "backlog-lint accepts the good fixture under --strict"
 else
-  bad "plan-lint rejected the good fixture under --strict"
+  bad "backlog-lint rejected the good fixture under --strict"
 fi
-if bash scripts/dev/plan-lint.sh \
-  --file=scripts/dev/fixtures/plan-lint/bad.md --strict >/dev/null 2>&1; then
-  bad "plan-lint passed the bad fixture under --strict — it has no failure path"
+if bash scripts/dev/backlog-lint.sh \
+  --file=scripts/dev/fixtures/backlog-lint/bad.md --strict >/dev/null 2>&1; then
+  bad "backlog-lint passed the bad fixture under --strict — it has no failure path"
 else
-  ok "plan-lint rejects the bad fixture under --strict"
+  ok "backlog-lint rejects the bad fixture under --strict"
 fi
 
 echo "=== receipt gate can fail ==="

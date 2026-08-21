@@ -357,8 +357,8 @@ Updated app identity:
 
 Next: npm run doctor
 Then: Claude /app-product (docs/PRD.md) → pictures in docs/design-exports/ →
-Claude /app-design (docs/design.md) → Cursor /app-critic (docs/critic.md) →
-Claude /app-plan (docs/plan.md) → jobs.
+Claude /app-contract (docs/CONTRACT.md) → Cursor /app-critic (docs/CRITIC.md) →
+Claude /app-backlog (docs/BACKLOG.md) → jobs.
 EOF
 if [[ -z "$COPYRIGHT_HOLDER" ]]; then
   printf 'LICENSE still has REPLACE_WITH_COPYRIGHT_HOLDER — re-run with --copyright-holder (or edit LICENSE by hand).\n'

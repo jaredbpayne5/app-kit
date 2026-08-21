@@ -11,9 +11,9 @@ the current job when you are the builder running `/app-code`.
 
 ## Workflow
 
-1. Read the job in `docs/plan.md`, `docs/design.md` when present, changed
+1. Read the job in `docs/BACKLOG.md`, `docs/CONTRACT.md` when present, changed
    code, existing tests, and `AGENTS.md`. Acceptance criteria come from
-   the job or `docs/design.md`. Preserve their wording and `AC-n` or
+   the job or `docs/CONTRACT.md`. Preserve their wording and `AC-n` or
    `INV-n` IDs. Never rewrite criteria to match the code.
 2. Map every acceptance criterion, cited invariant, and affected failure
    path to proof by ID. Test changed behavior and behavior a refactor
@@ -59,7 +59,7 @@ the current job when you are the builder running `/app-code`.
   reviewer reads. Never write or edit one by hand. Reporting a check as passing
   when it did not run is the one failure this whole process cannot absorb.
 - Do not review the change in this skill. `/app-review` is Claude-only and
-  a different playbook. `/app-critic` is for product and design, not code.
+  a different playbook. `/app-critic` is for product and contract, not code.
 - If required device or Maestro tooling is unavailable, report the check
   as blocked unless the user explicitly accepts a manual exception.
 - Ask before `session:down`. Sims may be in use by another agent.

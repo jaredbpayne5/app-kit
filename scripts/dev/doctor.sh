@@ -170,7 +170,7 @@ elif grep -q 'TEMPLATE_PLACEHOLDER' docs/PRD.md 2>/dev/null; then
 else
   ok "docs/PRD.md present and sentinel cleared"
 fi
-printf '  %sNext: Claude /app-product → pictures in docs/design-exports/ → Claude /app-design → Cursor /app-critic → Claude /app-plan → jobs.%s\n' "$DIM" "$RESET"
+printf '  %sNext: Claude /app-product → pictures in docs/design-exports/ → Claude /app-contract → Cursor /app-critic → Claude /app-backlog → jobs.%s\n' "$DIM" "$RESET"
 
 # Factory wiring — catches drift between what a config points at and what
 # exists. A hook registered to a deleted script, a skill citing an npm script

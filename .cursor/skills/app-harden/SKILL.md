@@ -20,7 +20,7 @@ not. Name every blocker. Do not implement the fixes. Fixes become jobs.
 
 ## Workflow
 
-1. Read `AGENTS.md`, `docs/PRD.md`, `AC-n` / `INV-n` in `docs/design.md`,
+1. Read `AGENTS.md`, `docs/PRD.md`, `AC-n` / `INV-n` in `docs/CONTRACT.md`,
    named exports, and the running source.
 2. If `docs/PRD.md` still contains `<!-- TEMPLATE_PLACEHOLDER -->`,
    verdict is `BLOCKED`. Stop.

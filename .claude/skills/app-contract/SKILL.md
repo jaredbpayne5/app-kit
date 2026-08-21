@@ -1,34 +1,34 @@
 ---
-name: app-design
-description: "Writes docs/design.md for a proposed feature or the app. Use when product or technical choices must be settled before coding. Covers behavior, storage, purchases, failures, INV/AC, and tests. Use architecture for what the code is today."
+name: app-contract
+description: "Writes docs/CONTRACT.md for a proposed feature or the app. Use when product or technical choices must be settled before coding. Covers behavior, storage, purchases, failures, INV/AC, and tests. Use architecture for what the code is today."
 user-invocable: true
 argument-hint: "<feature, problem, or brief>"
 ---
 
-# Design
+# Contract
 
-Thinker only. No app code. Stop with a proposed design ready for Cursor
-`/app-critic`. This chat must not critic its own design.
+Thinker only. No app code. Stop with a proposed contract ready for Cursor
+`/app-critic`. This chat must not critic its own contract.
 
 ## Workflow
 
 1. Read `AGENTS.md`, `docs/PRD.md`, named exports in `docs/design-exports/`,
-   relevant code, and any existing `docs/design.md`. If a later chunk lives
-   under `docs/<feature>/`, read that too — v1 itself is `docs/design.md`.
+   relevant code, and any existing `docs/CONTRACT.md`. If a later chunk lives
+   under `docs/<feature>/`, read that too — v1 itself is `docs/CONTRACT.md`.
 2. If `docs/PRD.md` still contains `<!-- TEMPLATE_PLACEHOLDER -->`, stop.
 3. If a screen is in scope and has no named export, stop. Do not invent a
    layout. The export is first-class.
 4. Identify choices that would change behavior, interfaces, data, errors,
    security, operations, or tests.
 5. Ask blocking questions before drafting. Ask only when the answer would
-   change the design, and recommend an answer. Record non-blocking questions
+   change the contract, and recommend an answer. Record non-blocking questions
    and a recommended default under Open questions.
-6. Write `docs/design.md` using the numbered shape below. Cite export
+6. Write `docs/CONTRACT.md` using the numbered shape below. Cite export
    frames by name. Keep it short and in order. Omit only sections that do
    not apply.
 7. Run the review pass. Fix what you can. List the rest under Open questions.
-8. Stop. Do not plan or implement. Next allowed skill is a **new Cursor
-   chat** → `/app-critic`.
+8. Stop. Do not write the backlog or implement. Next allowed skill is a
+   **new Cursor chat** → `/app-critic`.
 
 ## Document shape
 
@@ -41,12 +41,12 @@ Thinker only. No app code. Stop with a proposed design ready for Cursor
 Say what is wrong today, who feels the problem, what will change, how we plan to fix it, and the main downside. Use simple words. Do not list sections or implementation details.
 
 ## 2. Context and scope
-Describe the current behavior, why it is insufficient, what changes once this ships, and the boundary of this design.
+Describe the current behavior, why it is insufficient, what changes once this ships, and the boundary of this contract.
 
 ## 3. System context
 Show where the change fits. Name the parts it touches and the boundaries it must preserve (no backend, `lib/` seams, named exports). Include a small diagram when it makes those relationships clearer.
 
-## 4. Proposed design
+## 4. Proposed contract
 
 ### How it works
 Walk one real case from start to finish. Name the thing that arrives, what handles it, what gets written down, and what the user sees.
@@ -90,7 +90,7 @@ How each `INV-n` and `AC-n` will be proved. Cite the IDs.
 - Question, and whether it blocks starting work.
 
 ## 13. Out of scope
-- Related work this design does not include.
+- Related work this contract does not include.
 ```
 
 ## Writing rules
@@ -109,7 +109,7 @@ How each `INV-n` and `AC-n` will be proved. Cite the IDs.
 - Do not use em dashes.
 - Do not prescribe freehand layouts. A named export beats prose.
 - Do not put a job list in this file. Tracking work belongs in
-  `docs/plan.md`.
+  `docs/BACKLOG.md`.
 
 ## Review pass
 
@@ -118,7 +118,7 @@ from the available evidence.
 
 1. **Executive summary.** Can a new teammate understand the problem, outcome,
    approach, and main downside without reading the rest?
-2. **Fit.** Does the design preserve no-backend, the `lib/` seams, and named
+2. **Fit.** Does the contract preserve no-backend, the `lib/` seams, and named
    export frames?
 3. **Names and identity.** Where does every stored identifier come from?
 4. **Failure and recovery.** What creates a bad state? What does the user see?

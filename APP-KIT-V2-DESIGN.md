@@ -5,7 +5,7 @@ was in this file's previous life as a V2 migration spec is done and has been
 removed; read `git log` for that history.
 
 Authority still lives where it always did: `AGENTS.md`, then `docs/PRD.md`,
-then a named export in `docs/design-exports/`, then `docs/design.md`, then the
+then a named export in `docs/design-exports/`, then `docs/CONTRACT.md`, then the
 source. This file is a backlog. It is not an authority, and nothing here
 overrides those.
 
@@ -22,10 +22,10 @@ deep enough to catch what an unattended loop would miss.
 | 1 | **Retry with a fresh context.** On a red gate, compact the failure trace, discard the polluted session, retry. Cap at 2–3 attempts, then escalate. | Pure waste without deep gates — retrying against weak checks just relaunders the same failure |
 | 2 | **Keep-working enforcement.** Refuse to end a turn with no proof. | Mechanism differs per tool; see section 5 |
 | 3 | **Read-only reviewer subagent.** `readonly: true` in `.cursor/agents/*.md`, plus a post-flight dirty-tree check. | Makes "must not review its own diff" mechanical instead of prose |
-| 4 | **Stage printer.** Read-only, derived from files: PRD sentinel, presence of `design.md` / `critic.md` / `plan.md`, the last `**Verdict:**` line, the `- [ ]` count. | Useful standalone for resuming after a break. The cheapest item here |
+| 4 | **Stage printer.** Read-only, derived from files: PRD sentinel, presence of `CONTRACT.md` / `CRITIC.md` / `BACKLOG.md`, the last `**Verdict:**` line, the `- [ ]` count. | Useful standalone for resuming after a break. The cheapest item here |
 | 5 | **Driver.** Reads stage, spawns one fresh `claude -p` / `agent -p` per unit with the right skill, parses the verdict, writes receipts, commits with an `Agent:` trailer, enforces caps. | The real commitment. Most moving parts, most maintenance as CLI flags churn |
 | 6 | **Run report and desktop notification** on block or completion (`osascript`). | Only matters for unattended overnight runs |
-| 7 | **Optional:** one council pass (draft/vote/refine) on `design.md` and `plan.md` only, never per job. Worktree isolation for risky jobs. | Council costs 3–5×. Worktrees carry the auto-deletion footgun in section 5 |
+| 7 | **Optional:** one council pass (draft/vote/refine) on `CONTRACT.md` and `BACKLOG.md` only, never per job. Worktree isolation for risky jobs. | Council costs 3–5×. Worktrees carry the auto-deletion footgun in section 5 |
 
 Stage must stay **derived, never stored**. A committed turn file desyncs from
 reality; the four signals above cannot lie.
@@ -37,7 +37,7 @@ reality; the four signals above cannot lie.
 Not deferred by choice — these cannot be built or tested until an actual
 product exists in the repo. Today `docs/PRD.md` still holds its
 `TEMPLATE_PLACEHOLDER` sentinel, `docs/design-exports/` holds only its README,
-and there is no `docs/plan.md`.
+and there is no `docs/BACKLOG.md`.
 
 Writing a gate with nothing to run it against produces a check that has never
 fired, which is the fake-gate failure mode this repo exists to avoid.
@@ -45,7 +45,7 @@ fired, which is the fake-gate failure mode this repo exists to avoid.
 | Item | Needs first |
 | --- | --- |
 | **Readiness gate** — a pass over PRD + exports returning `READY` or `BLOCKED` with batched written questions, never a conversation | A filled `docs/PRD.md` |
-| **Maestro on the critical path** for `flow`-tier jobs. `--allow-skip` must be forbidden unattended | A `docs/plan.md` with flow-tier jobs |
+| **Maestro on the critical path** for `flow`-tier jobs. `--allow-skip` must be forbidden unattended | A `docs/BACKLOG.md` with flow-tier jobs |
 | **Visual conformance** — `npm run screenshots`, then compare against the named export frame | Real export frames |
 | **Token sync** — design tool export → `global.css` → `gen-theme` | A token export (JSON or CSS) committed to `docs/design-exports/` |
 
@@ -61,7 +61,7 @@ path when a tool happens to offer one, never the contract.
 | --- | --- |
 | **Preflight gate-6 additions.** Wire `expo-sdk-check.sh` and `audit-report.sh` into `scripts/store/review-preflight.sh` at gate 6. Both scripts exist and are CI-only today; the gate 4/6 split is already there | Carried over from the old spec. Never done |
 | **A11y depth.** `design-lint.sh` has a warn-only check that a file rendering something tappable offers some accessibility affordance. Per-element labels, roles, and touch-target sizes are not checked | The warn is a floor, not an audit. See `docs/recipes/accessibility-audit.md` for the manual pass |
-| **`plan-lint` strictness.** Warn-only today; `--strict` fails | Cannot be tightened honestly until a real `docs/plan.md` proves the schema is right rather than friction |
+| **`backlog-lint` strictness.** Warn-only today; `--strict` fails | Cannot be tightened honestly until a real `docs/BACKLOG.md` proves the schema is right rather than friction |
 | **Coverage.** `npm run test:coverage` reports on `lib/` only, with no threshold, deliberately — a number to hit invites padding tests | Revisit only if a real untested branch ships a bug. A mutation spot-check would prove more than a percentage |
 | **Recipe gaps.** No offline-first recipe. ASO/listing and EAS diagnosis are partly covered by `app-store.md`, `play-store.md`, and `eas-build.md` | Long tail, weakest payoff per item |
 | **Stale guard wording.** `guard-protected-files.sh` and `guard-shell.sh` still say "mailbox check" in their denial messages, naming a system that no longer exists | Cosmetic. Both are protected files, so Matt edits them by hand |
@@ -91,7 +91,7 @@ not a new conversation.
   same job.
 - **tmux panes for watching.** `--output-format stream-json` to a log file is
   strictly better.
-- **A second job store.** `docs/plan.md` is the only job list. No ticket
+- **A second job store.** `docs/BACKLOG.md` is the only job list. No ticket
   database, no `tasks/` directory.
 - **YOLO / unrestricted permissions** on a signing-adjacent Mac. Use
   `dontAsk` plus allowlists plus `permissions.deny`.

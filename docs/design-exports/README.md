@@ -24,7 +24,10 @@ Or group by flow: `docs/design-exports/onboarding/…`.
 
 ## After exporting
 
-Claude `/app-design` reads these files and writes `docs/design.md`. Cursor
-`/app-critic` then writes `docs/critic.md`. Do not invent layouts from the
+Claude `/app-contract` reads these files and writes `docs/CONTRACT.md`. Cursor
+`/app-critic` then writes `docs/CRITIC.md`. Do not invent layouts from the
 PRD alone. Agents implement from these artifacts (or an MCP pull of the
 same screens).
+
+A `design.md` or `navigate.md` in this folder is a design-tool artifact, not
+the build contract. The build contract is `docs/CONTRACT.md`.

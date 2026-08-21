@@ -1,24 +1,24 @@
 ---
-name: app-plan
-description: "Writes docs/plan.md as ordered jobs after the design is frozen. Use after Cursor /app-critic returns PASS and Matt agrees. Jobs only. Do not use for one already-decided coding task."
+name: app-backlog
+description: "Writes docs/BACKLOG.md as ordered jobs after the contract is frozen. Use after Cursor /app-critic returns PASS and Matt agrees. Jobs only. Do not use for one already-decided coding task."
 user-invocable: true
 argument-hint: "[optional focus]"
 ---
 
-# Plan
+# Backlog
 
 Thinker only. Split decided work into jobs the builder can run with `/app-code`.
-Write `docs/plan.md`. Stop after planning. Do not implement.
+Write `docs/BACKLOG.md`. Stop after writing the backlog. Do not implement.
 
 Do not start if `docs/PRD.md` still contains `<!-- TEMPLATE_PLACEHOLDER -->`.
-Do not start if the last `**Verdict:**` line in `docs/critic.md` is not
+Do not start if the last `**Verdict:**` line in `docs/CRITIC.md` is not
 `PASS`, unless Matt explicitly overrides in this chat.
 
 ## Workflow
 
-1. Read `docs/PRD.md`, `docs/design.md`, `docs/critic.md`, named exports,
+1. Read `docs/PRD.md`, `docs/CONTRACT.md`, `docs/CRITIC.md`, named exports,
    `AGENTS.md`, and relevant code.
-2. Stop and return to `/app-design` if an unresolved choice would change
+2. Stop and return to `/app-contract` if an unresolved choice would change
    behavior, interfaces, data, security, compatibility, operations, or proof.
 3. Split the work into jobs that each deliver working behavior and fit one
    Cursor chat and one review.
@@ -26,9 +26,10 @@ Do not start if the last `**Verdict:**` line in `docs/critic.md` is not
    question independently.
 5. Separate refactoring when it would hide a behavior change.
 6. Order jobs by dependency.
-7. Write `docs/plan.md` using the job shape below. Jobs only. No new
-   screens, data rules, payment behavior, or architecture. If planning
-   reveals a design hole, stop and reopen design — do not patch it here.
+7. Write `docs/BACKLOG.md` using the job shape below. Jobs only. No new
+   screens, data rules, payment behavior, or architecture. If the backlog
+   reveals a contract hole, stop and reopen the contract — do not patch it
+   here.
 8. Stop. Do not check any box. Only Claude checks a box, and only after
    `/app-review` returns PASS. Next allowed skill is builder `/app-code` on the
    first unchecked job.
@@ -43,15 +44,15 @@ Do not use requirement IDs, implementation details, undefined project terms,
 or unfamiliar acronyms there.
 
 Put job-specific decisions, interfaces, failure rules, and security
-constraints in Notes. Link `docs/design.md`. Pin the decided version when
+constraints in Notes. Link `docs/CONTRACT.md`. Pin the decided version when
 later edits could change the contract.
 
 ## Document shape
 
 ```markdown
-# Plan
+# Backlog
 
-Design: docs/design.md (frozen YYYY-MM-DD)
+Contract: docs/CONTRACT.md (frozen YYYY-MM-DD)
 
 - [ ] 1. <Plain action and result>
       Done when: observable result; cite AC-n / INV-n where they apply.
@@ -73,7 +74,7 @@ Each job carries:
 - **Check** — exact commands
 - **Notes** — seam to use, named export if UI, what to stay out of
 
-`scripts/dev/plan-lint.sh` validates these fields, so keep the field names and
+`scripts/dev/backlog-lint.sh` validates these fields, so keep the field names and
 spelling exact.
 
 ### Test tiers
@@ -115,8 +116,10 @@ proves that tier, and `--allow-skip` does not.
 - Every job needs `Files`, `Tests`, and `Deps`. Do not bury a target file or a
   dependency in Notes prose, and do not write `Files: TBD`.
 - Do not decide anything this file is not allowed to decide.
+- Do not append someday ideas. A hole in the contract goes back to
+  `/app-contract`, not into this file.
 
-Before returning the plan, read each job twice:
+Before returning the backlog, read each job twice:
 
 1. Human pass: can someone explain what will change and why after reading
    only the title and Done when?

@@ -1,6 +1,6 @@
-# Plan
+# Backlog
 
-Design: docs/design.md (frozen 2026-01-01)
+Contract: docs/CONTRACT.md (frozen 2026-01-01)
 
 - [ ] 1. Add reminders somehow
       Done when: reminders work.

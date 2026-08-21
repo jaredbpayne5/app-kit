@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Builder only. Make existing code easier to understand without changing
 behavior. This skill is **inside every job** (`code → test → improve →
-test`). It is not an app-wide phase after the plan is done.
+test`). It is not an app-wide phase after the backlog is done.
 
 ## Workflow
 
@@ -37,5 +37,5 @@ test`). It is not an app-wide phase after the plan is done.
 - Prefer a few clear edits over a broad rewrite.
 - Preserve behavior even when a redesign would be easier.
 - Tests must prove behavior was preserved.
-- Do not rewrite `docs/PRD.md` or `docs/design.md`.
+- Do not rewrite `docs/PRD.md` or `docs/CONTRACT.md`.
 - Do not invent a screen. Do not start `/app-ship`.

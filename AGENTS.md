@@ -26,16 +26,16 @@ it rather than adding a backend.
 
 | Role | Seat | Allowed skills | Forbidden |
 | --- | --- | --- | --- |
-| **thinker** | Claude Code | `/app-product` `/app-design` `/app-plan` `/app-review` | App code. `/app-code`. `/app-improve`. `/app-critic`. `/app-test`. `/app-harden`. Submit, pay, publish. |
-| **builder** | Cursor | `/app-critic` `/app-code` `/app-improve` `/app-test` `/app-harden` | Invent the product. Rewrite `docs/PRD.md` or `docs/design.md`. `/app-review`. `/app-ship` unless Matt opened shipper. Invent a screen with no named export. |
+| **thinker** | Claude Code | `/app-product` `/app-contract` `/app-backlog` `/app-review` | App code. `/app-code`. `/app-improve`. `/app-critic`. `/app-test`. `/app-harden`. Submit, pay, publish. |
+| **builder** | Cursor | `/app-critic` `/app-code` `/app-improve` `/app-test` `/app-harden` | Invent the product. Rewrite `docs/PRD.md` or `docs/CONTRACT.md`. `/app-review`. `/app-ship` unless Matt opened shipper. Invent a screen with no named export. |
 | **shipper** | Matt opens this on purpose | `/app-ship` only | Feature work. Redesigning the product. |
 
 `/app-critic` is Cursor only. Design critic is Grok only. `/app-review` is Claude
 only. A chat must not review or rubber-stamp what it just wrote.
 
-**Claude `/` menu** (`.claude/skills/`): `/app-product` `/app-design` `/app-plan`
-`/app-review`. `/app-architecture` stays on disk for a shipped app that needs
-`ARCHITECTURE.md`. It is not a first-app stage.
+**Claude `/` menu** (`.claude/skills/`): `/app-product` `/app-contract`
+`/app-backlog` `/app-review`. `/app-architecture` stays on disk for a shipped
+app that needs `ARCHITECTURE.md`. It is not a first-app stage.
 
 **Cursor `/` menu** (`.cursor/skills/`): `/app-critic` `/app-code` `/app-improve`
 `/app-test` `/app-harden` `/app-ship`, plus `app-pull-design` and `app-maestro-e2e`
@@ -52,13 +52,17 @@ When sources disagree, this is the order:
    accounts or server-side sync means *stop and discuss*, not implement.
 2. `docs/PRD.md` — what the product must do, and why. Filled by `/app-product`.
 3. A named export in `docs/design-exports/` — the approved UX/UI.
-4. `docs/design.md` — how we build it (storage, purchases, failures).
-   Written by `/app-design`. Frozen once Matt agrees.
+4. `docs/CONTRACT.md` — how we build it (storage, purchases, failures).
+   Written by `/app-contract`. Frozen once Matt agrees.
 5. Existing source code — what is actually there today.
 
 The **letter** (the work) lives in git: branch + commit. That is the
-product file, `docs/design.md`, `docs/critic.md`, `docs/plan.md`, and
+product file, `docs/CONTRACT.md`, `docs/CRITIC.md`, `docs/BACKLOG.md`, and
 the code.
+
+`docs/BACKLOG.md` is the ordered job list for this v1. Do not append someday
+ideas. A hole in the contract goes back to `/app-contract`, not into the
+backlog.
 
 Never silently override a higher authority. If the conflict is material, stop
 and report it. If it is a minor implementation detail, make the smallest
@@ -72,26 +76,26 @@ invent an MVP, design system, screen list, or build plan.
 
 ## First-app path
 
-v1 is one complete app: one PRD, one design, one critic, one plan, then
-jobs. Do not restart product → design → critic per screen.
+v1 is one complete app: one PRD, one contract, one critic, one backlog, then
+jobs. Do not restart product → contract → critic per screen.
 
 1. Claude `/app-product` until `docs/PRD.md` is filled.
 2. Matt takes that file to a UI/UX tool. Drops exports in
    `docs/design-exports/`.
-3. New Claude chat → `/app-design`. Writes `docs/design.md`. Cites export
+3. New Claude chat → `/app-contract`. Writes `docs/CONTRACT.md`. Cites export
    frames. No app code.
-4. New Cursor chat → `/app-critic`. Writes `docs/critic.md`. Claude does
+4. New Cursor chat → `/app-critic`. Writes `docs/CRITIC.md`. Claude does
    not run `/app-critic`.
-5. On FAIL: new Claude chat fixes `docs/design.md` from the critic
+5. On FAIL: new Claude chat fixes `docs/CONTRACT.md` from the critic
    findings. Cursor `/app-critic` again (appends a round). Max 2 rounds.
-6. After PASS and Matt agrees: new Claude chat → `/app-plan`. Writes
-   `docs/plan.md`.
+6. After PASS and Matt agrees: new Claude chat → `/app-backlog`. Writes
+   `docs/BACKLOG.md`.
 7. New Cursor chat → `/app-code` on the next unchecked job
    (`code → test → improve → test`). Commit. Ask before `git push`.
 8. New Claude chat → `/app-review` on that job. Starts from `docs/PRD.md`,
    the job's `AC-n`/`INV-n`, and the diff. On PASS, Claude checks the
    box. On FAIL, the job returns to Cursor.
-9. Repeat 7–8 until `docs/plan.md` is complete.
+9. Repeat 7–8 until `docs/BACKLOG.md` is complete.
 10. Release gate: Cursor `/app-harden`, Claude whole-app `/app-review`,
     then `npm run verify` and `npm run preflight`. Matt opens `/app-ship`.
 
@@ -106,7 +110,9 @@ scale, spacing) and screen/flow layouts. The PRD is the only repo file given
 to that tool. Repo token files (`apps/mobile/global.css`, `ui/`) are the
 downstream sync for NativeWind — see Stack below.
 
-A frame beats prose. `design.md` is not a substitute for the export.
+A frame beats prose. `CONTRACT.md` is not a substitute for the export. A
+`design.md` or `navigate.md` inside `docs/design-exports/` is a design-tool
+artifact, not the build contract.
 
 No new screen layout without the `app-pull-design` skill and a named export in
 `docs/design-exports/`. If the pull fails, stop — do not invent a layout.
@@ -294,4 +300,4 @@ Escalate back to the stronger model mid-task when:
 - an architecture decision has to be made rather than followed
 - debugging is genuinely difficult
 - implementation reveals a real problem in the product file, a named export,
-  or `design.md`
+  or `CONTRACT.md`

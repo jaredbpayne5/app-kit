@@ -19,7 +19,7 @@ Play, and a marketing lander. No backend, no accounts, no server bill.
 
 ## Starting a new app
 
-v1 is one complete app: one PRD, one design, one critic, one plan, then
+v1 is one complete app: one PRD, one contract, one critic, one backlog, then
 jobs. Matt is the doorbell. Paste one line into the right app.
 
 1. Copy this repo to a new folder and `npm install`.
@@ -36,16 +36,16 @@ jobs. Matt is the doorbell. Paste one line into the right app.
    Bundle identifiers are permanent once you upload to a store.
 
 3. `npm run doctor` to check your toolchain.
-4. Build the product (one PRD, one design, one critic, one plan, then jobs):
+4. Build the product (one PRD, one contract, one critic, one backlog, then jobs):
    1. Claude: `/app-product` — fills `docs/PRD.md`
    2. Matt: drop screen pictures in `docs/design-exports/`
-   3. Claude, new chat: `/app-design` — writes `docs/design.md`
-   4. Cursor, new chat: `/app-critic` — writes `docs/critic.md`
-   5. On FAIL: new Claude chat fixes the design; Cursor critic again
-   6. After PASS and Matt agrees: Claude, new chat: `/app-plan` — writes `docs/plan.md`
+   3. Claude, new chat: `/app-contract` — writes `docs/CONTRACT.md`
+   4. Cursor, new chat: `/app-critic` — writes `docs/CRITIC.md`
+   5. On FAIL: new Claude chat fixes the contract; Cursor critic again
+   6. After PASS and Matt agrees: Claude, new chat: `/app-backlog` — writes `docs/BACKLOG.md`
    7. Cursor: `/app-code next job` (`code → test → improve → test`)
    8. Claude, new chat: `/app-review job N` — checks the box on PASS
-   9. Repeat 7–8 until the plan is done, then `npm run verify` and `npm run preflight`
+   9. Repeat 7–8 until the backlog is done, then `npm run verify` and `npm run preflight`
 5. `npm run dev` and press `i` for the iOS Simulator or `a` for Android.
    Prefer a development build (`npm run dev:build:ios` /
    `dev:build:android`) once you add native modules.
