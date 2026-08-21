@@ -12,7 +12,8 @@
     "preToolUse": [
       {
         "command": "bash .cursor/hooks/guard-secret-files.sh",
-        "matcher": "Write|StrReplace|Delete"
+        "matcher": "Write|StrReplace|Delete",
+        "failClosed": true
       },
       {
         "command": "bash .cursor/hooks/guard-identity-writes.sh",
@@ -26,7 +27,8 @@
     "beforeReadFile": [
       {
         "command": "bash .cursor/hooks/guard-secret-files.sh",
-        "matcher": "Read|TabRead"
+        "matcher": "Read|TabRead",
+        "failClosed": true
       }
     ]
   }

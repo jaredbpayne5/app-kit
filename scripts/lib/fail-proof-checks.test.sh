@@ -283,11 +283,11 @@ if command -v jq >/dev/null 2>&1; then
   else
     bad "secret hook got $p8_perm on .p8 (expected deny)"
   fi
-  if [[ "$app_perm" == ask ]]; then
-    ok "identity hook asks on app.json"
-  else
-    bad "identity hook got $app_perm on app.json (expected ask)"
-  fi
+if [[ "$app_perm" == deny ]]; then
+  ok "identity hook denies a tool write to app.json"
+else
+  bad "identity hook got $app_perm on an app.json tool write (expected deny — preToolUse ignores ask)"
+fi
   if [[ "$init_perm" == allow ]]; then
     ok "identity hook allows init-app"
   else
@@ -298,7 +298,36 @@ if command -v jq >/dev/null 2>&1; then
   else
     bad "secret hook got $ordinary_perm on an ordinary path (expected allow)"
   fi
+app_cmd_perm=$(jq -nc '{command:"printf x >> apps/mobile/app.json"}' \
+  | bash "$ident_hook" | jq -r '.permission')
+if [[ "$app_cmd_perm" == ask ]]; then
+  ok "identity hook asks on an app.json shell write"
+else
+  bad "identity hook got $app_cmd_perm on an app.json shell command (expected ask)"
+fi
 
+# An `ask` on a file-path payload is unenforced by preToolUse, so it is a
+# fake gate. Never emit one.
+fake_gate=0
+for p in apps/mobile/app.json apps/mobile/eas.json \
+  apps/mobile/store/data-practices.json .env; do
+  v=$(jq -nc --arg p "$p" '{tool_input:{file_path:$p}}' \
+    | bash "$ident_hook" | jq -r '.permission')
+  [[ "$v" == ask ]] && fake_gate=1
+done
+if [[ "$fake_gate" -eq 0 ]]; then
+  ok "identity hook never returns an unenforced ask on a tool write"
+else
+  bad "identity hook returned ask for a tool write — preToolUse ignores it, so the gate is fake"
+fi
+
+if [[ "$(jq '[.hooks.preToolUse[], .hooks.beforeReadFile[]]
+  | map(select(.command | test("guard-secret-files")))
+  | all(.failClosed == true)' .cursor/hooks.json)" == true ]]; then
+  ok "secret-file hook registrations are failClosed"
+else
+  bad "guard-secret-files.sh registrations must set failClosed: true"
+fi
   claude_ident="$ROOT/scripts/lib/guard-sensitive-writes-claude.sh"
   claude_app=$(jq -nc '{tool_input:{file_path:"apps/mobile/app.json"}}' | bash "$claude_ident")
   claude_perm=$(echo "$claude_app" | jq -r '.hookSpecificOutput.permissionDecision // empty')
