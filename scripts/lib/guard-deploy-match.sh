@@ -53,6 +53,10 @@ guard_should_ask() {
   if echo "$command" | grep -Eq 'git[[:space:]]+config[[:space:]].*core\.hooksPath[[:space:]]*(=|[[:space:]])[[:space:]]*/dev/null'; then
     is_hooks_bypass=true
   fi
+  # One-shot override: git -c core.hooksPath=/dev/null commit …
+  if echo "$command" | grep -Eq 'git[[:space:]].*-c[[:space:]]+core\.hooksPath=/dev/null'; then
+    is_hooks_bypass=true
+  fi
   if echo "$command" | grep -Eq '\brm\b.*\.githooks/pre-commit'; then
     is_hooks_bypass=true
   fi

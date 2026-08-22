@@ -105,6 +105,8 @@ ask	npx eas-cli build --platform ios
 ask	npm run session:down
 ask	git config core.hooksPath /dev/null
 ask	git config core.hooksPath=/dev/null
+ask	git -c core.hooksPath=/dev/null commit -m wip
+ask	git -C . -c core.hooksPath=/dev/null commit -m wip
 ask	rm .githooks/pre-commit
 ask	git commit --no-verify -m wip
 ask	git commit -n -m wip
