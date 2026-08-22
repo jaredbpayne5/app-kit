@@ -169,10 +169,12 @@ if command -v jq >/dev/null 2>&1; then
 fi
 
 echo "=== shellcheck globs hook dirs and cannot skip on CI ==="
+# Floor, not a ceiling: more globs may be added when those trees are linted.
 if grep -q '.cursor/hooks/\*\.sh' scripts/dev/shellcheck-guards.sh \
   && grep -q '.claude/hooks/\*\.sh' scripts/dev/shellcheck-guards.sh \
   && grep -q '.githooks/\*' scripts/dev/shellcheck-guards.sh \
-  && grep -q 'scripts/lib/\*\.sh' scripts/dev/shellcheck-guards.sh; then
+  && grep -q 'scripts/lib/\*\.sh' scripts/dev/shellcheck-guards.sh \
+  && grep -q 'scripts/ci/\*\.sh' scripts/dev/shellcheck-guards.sh; then
   ok "shellcheck-guards globs hook and guard directories"
 else
   bad "shellcheck-guards does not glob hook and guard directories"

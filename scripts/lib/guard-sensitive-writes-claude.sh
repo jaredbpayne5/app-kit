@@ -17,13 +17,13 @@ source "$ROOT/scripts/lib/guard-sensitive-paths.sh"
 
 if [[ -n "$file_path" ]] && guard_is_protected "$(guard_rel_path "$file_path" "$ROOT")"; then
   cat <<'JSON'
-{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "This file is a factory guard. Editing it is denied so an agent cannot rewrite the safety net."}}
+{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "This file is a factory guard. Editing it via the agent is denied. Change it yourself in the editor if you really mean to."}}
 JSON
   exit 0
 fi
 if [[ -n "$command" ]] && guard_command_writes_protected "$command"; then
   cat <<'JSON'
-{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "This command would rewrite a factory guard. Denied so an agent cannot hollow out the safety net."}}
+{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "This command looks like rm, redirect, tee, cp, or mv onto a factory guard. Denied as a speed bump — not every write shape is caught."}}
 JSON
   exit 0
 fi

@@ -90,7 +90,7 @@ validate() {
   local label="job $NUM (line $AT)"
 
   local f
-  for f in "Done when" "Files" "Tests" "Deps" "Check"; do
+  for f in "Done when" "Files" "Tests" "Deps" "Check" "Notes"; do
     if ! printf '%s\n' "$BLOCK" | grep -qE "^[[:space:]]*$f:"; then
       warn "$label: missing '$f:'"
     fi

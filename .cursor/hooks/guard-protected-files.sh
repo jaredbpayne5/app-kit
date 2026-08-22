@@ -30,7 +30,7 @@ rel="$(guard_rel_path "$path" "$ROOT")"
 
 if guard_is_protected "$rel"; then
   cat <<'JSON'
-{"permission":"deny","user_message":"This file is a factory guard (hooks, matchers, mailbox check, eslint, githooks, or CI). Editing it is denied so an agent cannot rewrite the safety net. Change it yourself in the editor if you really mean to.","agent_message":"Write denied: guard files are protected. Ask the human to edit them."}
+{"permission":"deny","user_message":"This file is a factory guard (hooks, matchers, eslint, githooks, or CI). Editing it via the agent is denied. Change it yourself in the editor if you really mean to.","agent_message":"Write denied: guard files are protected. Ask the human to edit them."}
 JSON
   exit 0
 fi

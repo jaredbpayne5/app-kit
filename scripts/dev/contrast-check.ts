@@ -1,11 +1,11 @@
 /**
- * scripts/dev/contrast-check.ts — WCAG contrast guard for the brand color tokens.
+ * scripts/dev/contrast-check.ts — WCAG contrast guard for text token pairs.
  *
- * The brand palette lives in apps/mobile/assets/brand/brand.json and is invented
- * once per product with no automated check that the result is actually legible.
- * This reads the HSL tokens straight out of apps/mobile/global.css (both
- * `:root` and `.dark:root`) and fails the check when a foreground/background
- * pair used for real text falls below WCAG AA. Pure math, no dependency.
+ * Reads HSL tokens from apps/mobile/global.css (`:root` and `.dark:root`)
+ * and fails when a pair used for normal text is below WCAG AA (4.5:1).
+ * Pairs listed in LARGE_TEXT_LABELS may pass at 3.0:1 (AA large/bold only).
+ * Does not read brand.json — that file is hex brand swatches, not these HSL
+ * pairs. Pure math, no dependency.
  *
  * Usage:
  *   npm run contrast-check
@@ -35,6 +35,8 @@ const PAIRS: [fg: string, bg: string, label: string][] = [
 
 const AA_NORMAL = 4.5;
 const AA_LARGE = 3.0;
+/** Labels of pairs that are large/bold text only. Empty: every pair is body text. */
+const LARGE_TEXT_LABELS = new Set<string>();
 
 type Hsl = { h: number; s: number; l: number };
 type Theme = Record<string, Hsl>;
@@ -105,9 +107,10 @@ function checkTheme(name: string, theme: Theme): boolean {
     }
     const ratio = contrastRatio(fg, bg);
     const rounded = ratio.toFixed(2);
+    const largeOnly = LARGE_TEXT_LABELS.has(label);
     if (ratio >= AA_NORMAL) {
       console.log(`  ✓ ${label}: ${rounded}:1 (AA normal text)`);
-    } else if (ratio >= AA_LARGE) {
+    } else if (largeOnly && ratio >= AA_LARGE) {
       console.log(`  ⚠ ${label}: ${rounded}:1 (AA large/bold text only — avoid for body copy)`);
     } else {
       console.log(`  ✗ ${label}: ${rounded}:1 (below AA — FAIL)`);
@@ -129,7 +132,7 @@ function main(): void {
     );
     process.exit(1);
   }
-  console.log('\ncontrast-check: all pairs pass AA (or are large-text-only warnings)');
+  console.log('\ncontrast-check: all pairs pass AA for their declared text size');
 }
 
 main();

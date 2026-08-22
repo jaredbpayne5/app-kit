@@ -7,8 +7,9 @@ argument-hint: "[job N, diff, branch, commit, PR, or whole-app]"
 
 # Review
 
-Claude only. Review builder code. Stay read-only except one write: on
-`PASS` for a job, check that job's box in `docs/BACKLOG.md`.
+Claude only. Review builder code. Stay read-only except two writes: on
+`PASS` for a job, check that job's box in `docs/BACKLOG.md`. On a
+whole-app review, write `docs/AUDIT.md`.
 
 This chat must not have written the code. If it did, stop and say independent
 review is blocked. A new thinker chat should run `/app-review`.
@@ -106,8 +107,14 @@ When the user asks for a whole-app review, also check:
   the product added a network feature.
 
 Store-readiness is `npm run preflight` and `/app-ship`, not this skill.
-Runtime abuse is Cursor `/app-harden`. You may list simplify work;
-Grok performs the edits. Do not gain app-write authority here.
+Runtime abuse is Cursor `/app-harden`. You may list simplify work as
+`Could fix`. Those items are Matt's to route — do not gain app-write
+authority here.
+
+Write findings and the verdict to `docs/AUDIT.md`, ending with the
+`**Verdict:**` line. It is a findings document, not a job list —
+`/app-code` does not read it. Matt turns findings into jobs in
+`docs/BACKLOG.md`, himself or in a new Claude chat.
 
 ## Code review findings
 
@@ -151,7 +158,9 @@ Use exactly `PASS`, `FAIL`, or `BLOCKED`.
 - `PASS`: no Must fix or Should fix findings remain. For a job, check
   its box in `docs/BACKLOG.md`. A checked box means built and reviewed.
 - `FAIL`: a Must fix or Should fix finding remains. Name the fixes.
-  Next skill is builder `/app-code` on those fixes. Do not check the box.
+  For a job, do not check the box — the job returns to Cursor. For a
+  whole-app review, write `docs/AUDIT.md`. Matt turns findings into
+  backlog jobs. Do not implement the fix.
 - `BLOCKED`: missing required context, specialist coverage, or this chat
   wrote the code.
 

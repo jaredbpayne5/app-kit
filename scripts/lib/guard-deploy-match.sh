@@ -56,6 +56,10 @@ guard_should_ask() {
   if echo "$command" | grep -Eq '\brm\b.*\.githooks/pre-commit'; then
     is_hooks_bypass=true
   fi
+  # -n / -nm sit right after `commit `, so do not require a space before the dash.
+  if echo "$command" | grep -Eq 'git[[:space:]]+commit[[:space:]]+([^;&|]*[[:space:]])?(-[a-zA-Z]*n[a-zA-Z]*|--no-verify)'; then
+    is_hooks_bypass=true
+  fi
 
   # Cloudflare Pages lander deploy — ask (CLAUDE.md Hard Stop / web:deploy).
   # npm run web:deploy always matched; direct-bash path must be scripts/web/ (monorepo).

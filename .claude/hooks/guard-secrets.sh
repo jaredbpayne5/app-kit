@@ -12,7 +12,14 @@ fi
 
 input=$(cat)
 file_path=$(echo "$input" | jq -r '.tool_input.file_path // .tool_input.path // empty')
-content=$(echo "$input" | jq -r '.tool_input.command // .tool_input.content // .tool_input.new_string // empty')
+content=$(echo "$input" | jq -r '
+  [
+    .tool_input.command,
+    .tool_input.content,
+    .tool_input.new_string,
+    (.tool_input.edits // [] | .[].new_string)
+  ] | map(select(. != null and . != "")) | join("\n")
+')
 
 base="$(basename "$file_path" 2>/dev/null || true)"
 # Allow real local env files only (not .env.example).

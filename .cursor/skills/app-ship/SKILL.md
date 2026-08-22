@@ -20,21 +20,20 @@ npm run preflight -- --gate=4     # harden; some checks deferred
 
 ## Do this
 
-1. Read the recipes below. Do not invent data practices or legal copy.
-2. Fill `apps/mobile/store/metadata/` and `apps/brand/` first.
-3. After editing `apps/mobile/store/data-practices.json`, run
+1. Confirm the release gate ran. The last `**Verdict:**` line in both
+   `docs/HARDEN.md` and `docs/AUDIT.md` must be `PASS`. Skip this step while
+   `docs/PRD.md` still contains `<!-- TEMPLATE_PLACEHOLDER -->`. This is a
+   speed bump confirming step 10 happened, not proof it was done well.
+2. Read the recipes below. Do not invent data practices or legal copy.
+3. Fill `apps/mobile/store/metadata/` and `apps/brand/` first.
+4. After editing `apps/mobile/store/data-practices.json`, run
    `npm run gen-compliance`.
-4. Run `npm run preflight`. Fix every named failure. Do not skip the gate.
-5. Stop at every Ask-before command and wait for Matt.
+5. Run `npm run preflight`. Fix every named failure. Do not skip the gate.
+6. Stop at every Ask-before command and wait for Matt.
 
 ## Ask before
 
-These cost money or are hard to undo. Do not run them unless Matt said so
-in this chat:
-
-- `eas build`, `eas submit`, `eas update`, `npx expo prebuild`
-- `web:deploy`, `store:push`, `domain-attach`
-- `git push`
+Follow `AGENTS.md` → Ask before. Do not restate that list here.
 
 ## Recipes (authoritative)
 

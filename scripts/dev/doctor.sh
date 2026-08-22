@@ -203,22 +203,76 @@ else
   warn "jq missing — skipped hook wiring check"
 fi
 
-# npm scripts cited by a skill or recipe must exist, or the instruction is a
+# Every file an agent is instructed from. Prose is the one layer with no
+# compiler, so these three checks are it. CLAUDE.md, .cursor/rules, README.md,
+# and UPGRADE-LOG.md were unscanned once and drifted into naming skills that do
+# not exist — keep them in this list.
+AGENT_DOCS=(
+  .cursor/skills .claude/skills .cursor/rules docs/recipes
+  AGENTS.md CLAUDE.md README.md UPGRADE-LOG.md
+)
+
+# npm scripts cited by an agent-facing doc must exist, or the instruction is a
 # dead end the moment an agent follows it.
 if have jq && [[ -f package.json ]]; then
   missing_scripts=""
   cited="$(grep -rhoE 'npm run [a-z][a-z0-9:_-]*' \
-    .cursor/skills .claude/skills AGENTS.md docs/recipes 2>/dev/null \
+    "${AGENT_DOCS[@]}" 2>/dev/null \
     | sed 's/^npm run //' | sort -u)"
   for s in $cited; do
     jq -e --arg s "$s" '.scripts[$s]' package.json >/dev/null 2>&1 \
       || missing_scripts="${missing_scripts} ${s}"
   done
   if [[ -z "$missing_scripts" ]]; then
-    ok "every 'npm run' cited in a skill or recipe exists in package.json"
+    ok "every 'npm run' cited in an agent doc exists in package.json"
   else
-    bad 2 "skill/recipe cites missing npm script(s):${missing_scripts}"
+    bad 2 "agent doc cites missing npm script(s):${missing_scripts}"
   fi
+fi
+
+# A cited /app-skill must resolve to a folder in one of the two menus.
+# Naming a skill that does not exist makes an agent refuse real work.
+missing_skills=""
+# Backticks are required, and the name must end at the closing backtick, so
+# `lib/app-config.ts` and `apps/product.json` are not mistaken for skills.
+cited_skills="$(grep -rhoE '`/?app-[a-z0-9-]+`' "${AGENT_DOCS[@]}" 2>/dev/null \
+  | tr -d '`' | sed 's|^/||' | sort -u)"
+for s in $cited_skills; do
+  [[ -d ".cursor/skills/$s" || -d ".claude/skills/$s" ]] \
+    || missing_skills="${missing_skills} /${s}"
+done
+if [[ -z "$cited_skills" ]]; then
+  warn "no /app-skill references found in agent docs"
+elif [[ -z "$missing_skills" ]]; then
+  ok "every /app-skill cited in an agent doc exists on disk"
+else
+  bad 2 "agent doc cites missing skill(s):${missing_skills}"
+fi
+
+# Backticked repo-relative paths must exist. Only paths containing a slash are
+# checked — a bare `app.json` is usually shorthand, not a path. Files a stage
+# has not produced yet are expected to be absent.
+# A stage that has not run yet legitimately has no output file.
+NOT_YET_WRITTEN='^(docs/(CONTRACT|CRITIC|BACKLOG|AUDIT|HARDEN)\.md|ARCHITECTURE\.md)$'
+# Paths the docs name in order to say they do NOT exist. Removing one of these
+# from the docs is fine; leaving it here just means one less thing checked.
+DELIBERATELY_ABSENT='^(docs/(design-brief|design-spec|screens-status)\.md|lib/barcode\.ts)$'
+missing_paths=""
+cited_paths="$(grep -rhoE '`[A-Za-z0-9_.][A-Za-z0-9_./-]*/[A-Za-z0-9_./-]*\.(md|ts|tsx|js|jsonc?|sh|css|ya?ml)`' \
+  "${AGENT_DOCS[@]}" 2>/dev/null | tr -d '`' | sort -u)"
+for p in $cited_paths; do
+  case "$p" in
+    *'*'* | *'<'* | *'$'* | '~'* | /*) continue ;;
+  esac
+  printf '%s' "$p" | grep -Eq "$NOT_YET_WRITTEN" && continue
+  printf '%s' "$p" | grep -Eq "$DELIBERATELY_ABSENT" && continue
+  # Docs cite app paths shorthand (`lib/storage.ts`), rooted at apps/mobile.
+  [[ -e "$p" || -e "apps/mobile/$p" ]] || missing_paths="${missing_paths} ${p}"
+done
+if [[ -z "$missing_paths" ]]; then
+  ok "every backticked repo path in an agent doc exists"
+else
+  bad 2 "agent doc cites missing path(s):${missing_paths}"
 fi
 
 # Skill frontmatter drives the / menu. A missing name or description makes a

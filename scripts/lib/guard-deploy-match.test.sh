@@ -106,6 +106,9 @@ ask	npm run session:down
 ask	git config core.hooksPath /dev/null
 ask	git config core.hooksPath=/dev/null
 ask	rm .githooks/pre-commit
+ask	git commit --no-verify -m wip
+ask	git commit -n -m wip
+ask	git commit -nm wip
 ask	npm run web:deploy
 ask	npm run store:push
 ask	bundle exec fastlane deliver

@@ -30,8 +30,12 @@ it rather than adding a backend.
 | **builder** | Cursor | `/app-critic` `/app-code` `/app-improve` `/app-test` `/app-harden` | Invent the product. Rewrite `docs/PRD.md` or `docs/CONTRACT.md`. `/app-review`. `/app-ship` unless Matt opened shipper. Invent a screen with no named export. |
 | **shipper** | Matt opens this on purpose | `/app-ship` only | Feature work. Redesigning the product. |
 
-`/app-critic` is Cursor only. Design critic is Grok only. `/app-review` is Claude
-only. A chat must not review or rubber-stamp what it just wrote.
+`/app-critic` is Cursor only. `/app-review` is Claude only. A chat must not
+review or rubber-stamp what it just wrote.
+
+**Review** is one job's diff. **Audit** is the whole app at the release gate.
+Same skill (`/app-review`), different scope and different output — see
+Release-gate findings below.
 
 **Claude `/` menu** (`.claude/skills/`): `/app-product` `/app-contract`
 `/app-backlog` `/app-review`. `/app-architecture` stays on disk for a shipped
@@ -57,12 +61,27 @@ When sources disagree, this is the order:
 5. Existing source code — what is actually there today.
 
 The **letter** (the work) lives in git: branch + commit. That is the
-product file, `docs/CONTRACT.md`, `docs/CRITIC.md`, `docs/BACKLOG.md`, and
-the code.
+product file, `docs/CONTRACT.md`, `docs/CRITIC.md`, `docs/BACKLOG.md`,
+`docs/AUDIT.md`, `docs/HARDEN.md`, and the code.
 
 `docs/BACKLOG.md` is the ordered job list for this v1. Do not append someday
 ideas. A hole in the contract goes back to `/app-contract`, not into the
-backlog.
+backlog. Release-gate findings are not someday ideas — see below.
+
+## Release-gate findings
+
+At the release gate, `/app-harden` writes `docs/HARDEN.md` and a whole-app
+`/app-review` writes `docs/AUDIT.md`. Both behave like `docs/CRITIC.md`:
+written when that skill actually runs, findings plus a final
+`**Verdict:** PASS|FAIL|BLOCKED` line.
+
+They are findings documents, not job lists. `/app-code` still takes only the
+next unchecked job in `docs/BACKLOG.md`. Turning a finding into a job is
+Matt's call — he adds it himself or opens a new Claude chat to do it.
+
+`/app-ship` greps the last verdict in both files. That is a speed bump
+confirming the release gate ran, not proof it ran well: anyone can type
+`**Verdict:** PASS`. It is the same class of check as the verify receipt.
 
 Never silently override a higher authority. If the conflict is material, stop
 and report it. If it is a minor implementation detail, make the smallest
@@ -96,8 +115,10 @@ jobs. Do not restart product → contract → critic per screen.
    the job's `AC-n`/`INV-n`, and the diff. On PASS, Claude checks the
    box. On FAIL, the job returns to Cursor.
 9. Repeat 7–8 until `docs/BACKLOG.md` is complete.
-10. Release gate: Cursor `/app-harden`, Claude whole-app `/app-review`,
-    then `npm run verify` and `npm run preflight`. Matt opens `/app-ship`.
+10. Release gate: Cursor `/app-harden` writes `docs/HARDEN.md`, Claude
+    whole-app `/app-review` writes `docs/AUDIT.md`. Matt turns any findings
+    into backlog jobs. Then `npm run verify` and `npm run preflight`. Matt
+    opens `/app-ship`.
 
 There is **no** `docs/design-brief.md`. Kickoff prompts for the design tool
 stay outside the repo (chat paste only). Exports in `docs/design-exports/`
@@ -249,9 +270,10 @@ decision or information needed to clear it.
 
 ## Verify
 
-Run `npm run check` after edits (format, lint, typecheck, contrast, design
-lint). Run `npm test` for logic changes. Run `npm run verify` before
-considering work done. `npm run test:e2e` drives Maestro against a simulator.
+Run `npm run check` after edits. `package.json` is the list of what it runs —
+do not restate the steps here, they drift. Run `npm test` for logic changes.
+Run `npm run verify` before considering work done. `npm run test:e2e` drives
+Maestro against a simulator.
 
 ## On-demand procedures
 

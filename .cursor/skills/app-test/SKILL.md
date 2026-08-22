@@ -37,8 +37,7 @@ the current job when you are the builder running `/app-code`.
    If the job has no `Tests:` field, treat that as a planning defect: report
    it and infer the tier from what changed rather than skipping proof.
 7. Run the narrowest checks that exercise the changed behavior:
-   - `npm run check` after edits (format, lint, typecheck, contrast,
-     design lint)
+   - `npm run check` after edits (`package.json` is the list of steps)
    - `npm test` for logic changes
    - `npm run verify` before considering work done
 8. When a new or changed user-visible flow is in scope, prove it on a

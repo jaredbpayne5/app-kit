@@ -1,6 +1,6 @@
 ---
 name: app-harden
-description: "Adversarial runtime lens at the release gate. Try to break the running app. Reports findings; fixes land as jobs. Cursor only. Does not write app code or start /app-ship."
+description: "Adversarial runtime lens at the release gate. Try to break the running app. Writes docs/HARDEN.md. Fixes become backlog jobs via Matt. Cursor only. Does not write app code or start /app-ship."
 disable-model-invocation: true
 ---
 
@@ -58,13 +58,20 @@ Report only flaws that can block ship or change user-visible safety:
 For each finding include location, concrete failure, impact, evidence, and
 the smallest correction. Omit style preferences.
 
+## Output
+
+Write findings and the verdict to `docs/HARDEN.md`, ending with the
+`**Verdict:**` line. It is a findings document, not a job list — `/app-code`
+does not read it. Matt turns findings into jobs in `docs/BACKLOG.md`,
+himself or in a new Claude chat.
+
 ## Verdict
 
 Use exactly `PASS`, `FAIL`, or `BLOCKED`.
 
 - `PASS`: no blocker or important findings remain.
-- `FAIL`: a fixable blocker or important finding remains. Fixes land as
-  jobs for `/app-code`.
+- `FAIL`: a fixable blocker or important finding remains. Matt turns those
+  findings into backlog jobs before the gate can pass.
 - `BLOCKED`: missing required context, or the PRD sentinel is still
   present.
 

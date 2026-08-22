@@ -24,7 +24,8 @@ jobs. Matt is the doorbell. Paste one line into the right app.
 
 1. Copy this repo to a new folder and `npm install`.
 2. Set identity with one command (keeps the four surfaces in sync). Copy
-   `.env.example` to `.env.local` first if you have not already:
+   `apps/mobile/.env.example` to `apps/mobile/.env.local` first if you have
+   not already:
 
    ```bash
    npm run init-app -- --name "My App" --slug my-app --package com.yourname.myapp
@@ -45,7 +46,12 @@ jobs. Matt is the doorbell. Paste one line into the right app.
    6. After PASS and Matt agrees: Claude, new chat: `/app-backlog` — writes `docs/BACKLOG.md`
    7. Cursor: `/app-code next job` (`code → test → improve → test`)
    8. Claude, new chat: `/app-review job N` — checks the box on PASS
-   9. Repeat 7–8 until the backlog is done, then `npm run verify` and `npm run preflight`
+   9. Repeat 7–8 until the backlog is done
+   10. Release gate: Cursor `/app-harden` writes `docs/HARDEN.md`; Claude,
+       new chat: whole-app `/app-review` writes `docs/AUDIT.md`. Turn any
+       findings into backlog jobs and clear them.
+   11. `npm run verify` and `npm run preflight`, then open a shipper chat:
+       `/app-ship`
 5. `npm run dev` and press `i` for the iOS Simulator or `a` for Android.
    Prefer a development build (`npm run dev:build:ios` /
    `dev:build:android`) once you add native modules.
@@ -55,7 +61,7 @@ jobs. Matt is the doorbell. Paste one line into the right app.
 ```bash
 npm run session:up     # boot iOS Simulator (optional start of day)
 npm run dev            # Metro (+ press i / a for a device)
-npm run check          # format, lint, typecheck, contrast, design lint
+npm run check          # the full static gate (see package.json for the steps)
 npm test               # unit tests
 npm run verify         # check + test + a real bundle export
 npm run session:down   # stop Metro, iOS sim, Android emu, Gradle, adb
